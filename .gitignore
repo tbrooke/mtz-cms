@@ -1,0 +1,26 @@
+# Clojure
+.cpcache/
+.nrepl-port
+.lsp/
+target/
+
+# Development
+.rebel_readline_history
+.calva/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
