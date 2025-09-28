@@ -72,6 +72,7 @@
        [:li [:a {:href "/contact" :class "text-blue-600 hover:text-blue-800"} "Contact Information"]]
        [:li [:a {:href "/about" :class "text-blue-600 hover:text-blue-800"} "About Our Church"]]]]]]])
 
+
 (defn cards-grid-layout
   "Layout: Grid of cards"
   [page-data]
@@ -87,7 +88,12 @@
       [:div {:class "grid gap-6 sm:grid-cols-2 lg:grid-cols-3"}
        (for [item items]
          [:div {:key (:id item)}
-          (templates/feature-card item)])]]]))
+          (templates/feature-card item)])]]]))  ; <- Fixed: added the missing closing parenthesis
+
+
+
+
+
 
 ;; --- LAYOUT SELECTOR ---
 

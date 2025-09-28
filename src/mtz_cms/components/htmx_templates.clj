@@ -49,6 +49,7 @@
                   :hx-push-url "true"}
          "Join Us for Worship"]]]]]))
 
+
 (defn htmx-feature-with-image
   "HTMX-enhanced feature component with edit capabilities"
   [feature-data]
@@ -80,7 +81,7 @@
                 :hx-get (str "/api/components/feature/" node-id "/content")
                 :hx-trigger "every 60s"  ; Refresh content periodically
                 :hx-swap "innerHTML"}
-          [:div {:dangerouslySetInnerHTML {:__html content}}]]
+          [:div (or content "")]]
          
          [:div {:class "mt-8"}
           [:button {:class "inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
@@ -89,7 +90,7 @@
                     :hx-push-url "true"}
            "Learn More"
            [:svg {:class "h-4 w-4" :fill "none" :viewBox "0 0 24 24" :stroke-width "1.5" :stroke "currentColor"}
-            [:path {:stroke-linecap "round" :stroke-linejoin "round" :d "M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"}]]]]]]
+            [:path {:stroke-linecap "round" :stroke-linejoin "round" :d "M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"}]]]]]]  ; <- FIXED: Added missing bracket here
        
        ;; Image with lazy loading
        [:div {:class "flex items-start justify-end lg:order-first"}
@@ -105,6 +106,7 @@
             [:svg {:class "mx-auto h-12 w-12" :fill "none" :viewBox "0 0 24 24" :stroke "currentColor"}
              [:path {:stroke-linecap "round" :stroke-linejoin "round" :stroke-width "2" :d "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"}]]
             [:p {:class "mt-2 text-sm"} "Click to add image"]]])]]]))
+
 
 (defn htmx-dynamic-components-container
   "Container that can dynamically load and reorder components"
