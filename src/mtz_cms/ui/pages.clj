@@ -1,7 +1,8 @@
 (ns mtz-cms.ui.pages
   "Page templates for Mount Zion CMS"
   (:require
-   [mtz-cms.ui.components :as ui]))
+   [mtz-cms.ui.components :as ui]
+   [mtz-cms.components.layouts :as layouts]))
 
 ;; --- PAGE LAYOUTS ---
 
@@ -162,8 +163,92 @@
         [:div {:class "font-semibold text-pink-900"} "Tailwind"]
         [:div {:class "text-xs text-pink-600"} "Beautiful UI"]]]]]))
 
+;; --- COMPONENT-BASED PAGES ---
+
+(defn component-home-page [component-data]
+  "Component-based home page using layouts and components"
+  (base-layout 
+    "Mount Zion UCC - Home"
+    (layouts/render-layout (:home/layout component-data) component-data)))
+
+;; --- DYNAMIC PAGES ---
+
+(defn dynamic-page [page-data]
+  "Template for dynamically discovered pages"
+  (base-layout 
+    (:page/title page-data)
+    [:div
+     [:h1 {:class "text-3xl font-bold text-gray-900 mb-6"} 
+      (:page/title page-data)]
+     
+     [:div {:class "bg-white rounded-lg shadow-sm p-6 mb-8"}
+      [:div {:class "prose max-w-none"}
+       (:page/content page-data)]]
+     
+     [:div {:class "bg-blue-50 rounded-lg p-4"}
+      [:p {:class "text-sm text-blue-600"}
+       "📁 This is a dynamically discovered page from Alfresco"]
+      [:p {:class "text-xs text-blue-500 mt-1"}
+       "Node ID: " (:page/node-id page-data)]]]))
+
+(defn pages-list-page [{:keys [pages navigation]}]
+  "Template for listing all discovered pages"
+  (base-layout 
+    "All Pages - Mount Zion UCC"
+    [:div
+     [:h1 {:class "text-3xl font-bold text-gray-900 mb-6"} "All Pages"]
+     
+     [:div {:class "bg-green-50 rounded-lg p-4 mb-6"}
+      [:h2 {:class "text-lg font-semibold text-green-800 mb-2"} 
+       "🚀 Dynamic Page Discovery"]
+      [:p {:class "text-green-600 text-sm"}
+       "These pages are automatically discovered from your Alfresco Web Site folder. "
+       "Add a new folder there and it will appear here!"]]
+     
+     [:div {:class "grid gap-4 md:grid-cols-2 lg:grid-cols-3"}
+      (for [page pages]
+        [:div {:key (:page/key page)
+               :class "bg-white rounded-lg shadow-sm p-6 border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all"}
+         [:h3 {:class "text-lg font-semibold text-gray-900 mb-2"}
+          (:page/name page)]
+         [:p {:class "text-sm text-gray-600 mb-3"}
+          "Slug: " (:page/slug page)]
+         [:div {:class "flex gap-2"}
+          [:a {:href (str "/page/" (:page/slug page))
+               :class "bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"}
+           "View Page"]
+          [:span {:class "bg-gray-100 text-gray-600 px-3 py-1 rounded text-xs"}
+           "Node: " (subs (:page/node-id page) 0 8) "..."]]])]
+     
+     [:div {:class "mt-8 bg-white rounded-lg shadow-sm p-6"}
+      [:h2 {:class "text-xl font-semibold text-gray-900 mb-4"} "Navigation Items"]
+      [:div {:class "space-y-2"}
+       (for [nav-item navigation]
+         [:div {:key (:nav/key nav-item)
+                :class "flex justify-between items-center py-2 px-3 bg-gray-50 rounded"}
+          [:span {:class "font-medium"} (:nav/label nav-item)]
+          [:a {:href (:nav/path nav-item)
+               :class "text-blue-600 hover:text-blue-800 text-sm"}
+           (:nav/path nav-item)]])]]]))
+
+(defn not-found-page [slug]
+  "Template for 404 pages"
+  (base-layout 
+    "Page Not Found - Mount Zion UCC"
+    [:div {:class "text-center py-12"}
+     [:h1 {:class "text-4xl font-bold text-gray-900 mb-4"} "Page Not Found"]
+     [:p {:class "text-xl text-gray-600 mb-6"}
+      "The page \"" slug "\" could not be found."]
+     [:div {:class "bg-yellow-50 rounded-lg p-6 mb-6"}
+      [:p {:class "text-yellow-800"}
+       "This page might not exist in the Alfresco Web Site folder, or there might be a connection issue."]]
+     [:a {:href "/pages"
+          :class "bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"}
+      "View All Available Pages"]]))
+
 (comment
   ;; Test pages
   (home-page {:page/title "Home" :page/content "Welcome!"})
   (demo-page {:greeting "Hello World!"
-              :alfresco {:success true :message "Connected"}}))
+              :alfresco {:success true :message "Connected"}})
+  (dynamic-page {:page/title "Test Page" :page/content "Test content" :page/node-id "123"}))

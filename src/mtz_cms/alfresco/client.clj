@@ -131,6 +131,64 @@
      :aspect-names (:aspectNames entry)
      :properties (:properties entry)}))
 
+;; --- SEARCH FUNCTIONS ---
+
+(defn search-nodes
+  "Search for nodes using AFTS query"
+  [ctx query-string & [options]]
+  (let [query-params (merge {:q query-string}
+                           options)
+        param-string (str/join "&" 
+                              (for [[k v] query-params]
+                                (str (name k) "=" (java.net.URLEncoder/encode (str v) "UTF-8"))))]
+    (make-request ctx :get (str "/search/nodes?" param-string))))
+
+(defn find-nodes-by-name
+  "Find nodes by name pattern"
+  [ctx name-pattern]
+  (search-nodes ctx (str "cm:name:\"" name-pattern "\"")))
+
+(defn find-nodes-by-path
+  "Find nodes by path"
+  [ctx path-pattern]
+  (search-nodes ctx (str "PATH:\"" path-pattern "\"")))
+
+;; --- SITE FUNCTIONS ---
+
+(defn get-sites
+  "Get all sites"
+  [ctx]
+  (make-request ctx :get "/sites"))
+
+(defn get-site
+  "Get a specific site"
+  [ctx site-id]
+  (make-request ctx :get (str "/sites/" site-id)))
+
+(defn get-site-containers
+  "Get containers (document library, etc.) for a site"
+  [ctx site-id]
+  (make-request ctx :get (str "/sites/" site-id "/containers")))
+
+;; --- DISCOVERY FUNCTIONS ---
+
+(defn discover-content-structure
+  "Discover the content structure starting from root"
+  [ctx & [max-depth]]
+  (letfn [(explore-node [node-id depth]
+            (when (< depth (or max-depth 3))
+              (let [node-result (get-node ctx node-id)
+                    children-result (get-node-children ctx node-id)]
+                (when (and (:success node-result) (:success children-result))
+                  (let [node-data (get-in node-result [:data :entry])
+                        children (get-in children-result [:data :list :entries])]
+                    {:node (extract-node-metadata {:entry node-data})
+                     :children (map #(explore-node (get-in % [:entry :id]) (inc depth))
+                                   (take 10 children))})))))]
+    (let [root-result (get-root-node ctx)]
+      (when (:success root-result)
+        (explore-node (get-in root-result [:data :entry :id]) 0)))))
+
 ;; --- HIGH-LEVEL FUNCTIONS ---
 
 (defn get-page-content
@@ -149,11 +207,30 @@
         (log/info "✅ Alfresco connection successful")
         {:success true 
          :message "Connected to Alfresco successfully!"
-         :company-home (get-in result [:data :entry :name])})
+         :company-home (get-in result [:data :entry :name])
+         :root-id (get-in result [:data :entry :id])})
       (do
         (log/error "❌ Alfresco connection failed:" (:error result))
         {:success false 
          :message (str "Connection failed: " (:error result))}))))
+
+(defn explore-structure
+  "Explore and display Alfresco structure for setup"
+  [ctx]
+  (log/info "🔍 Exploring Alfresco structure...")
+  (let [root-result (get-root-node ctx)]
+    (if (:success root-result)
+      (let [root-id (get-in root-result [:data :entry :id])
+            sites-result (get-sites ctx)
+            children-result (get-node-children ctx root-id)]
+        {:success true
+         :root-node (get-in root-result [:data :entry])
+         :sites (when (:success sites-result) 
+                  (get-in sites-result [:data :list :entries]))
+         :root-children (when (:success children-result)
+                         (get-in children-result [:data :list :entries]))})
+      {:success false 
+       :error (:error root-result)})))
 
 (comment
   ;; Test connection

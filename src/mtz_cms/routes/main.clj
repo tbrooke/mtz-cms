@@ -50,6 +50,26 @@
         result (pathom/query ctx query)]
     (json-response result)))
 
+(defn dynamic-page-handler [request]
+  "Handle any page by discovering it from Alfresco"
+  (let [ctx {}
+        slug (get-in request [:path-params :slug])
+        result (pathom/query ctx [{[:page/slug slug] [:page/title :page/content :page/exists]}])
+        page-data (get result [:page/slug slug])]
+    (if (:page/exists page-data)
+      (html-response (pages/dynamic-page page-data))
+      {:status 404
+       :headers {"Content-Type" "text/html"}
+       :body (hiccup/html (pages/not-found-page slug))})))
+
+(defn pages-list-handler [request]
+  "List all discovered pages"
+  (let [ctx {}
+        result (pathom/query ctx [:site/pages :site/navigation])
+        pages (:site/pages result)
+        navigation (:site/navigation result)]
+    (html-response (pages/pages-list-page {:pages pages :navigation navigation}))))
+
 ;; --- ROUTES ---
 
 (def all-routes
@@ -59,7 +79,12 @@
    
    ["/demo" {:get demo-handler}]
    
+   ["/pages" {:get pages-list-handler}]
+   
    ["/api/pathom" {:post api-pathom-handler}]
+   
+   ;; Dynamic page handler - catches any page slug
+   ["/page/:slug" {:get dynamic-page-handler}]
    
    ;; Static assets (basic)
    ["/assets/*" {:get (fn [request]

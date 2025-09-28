@@ -34,6 +34,53 @@
 (defn test-pathom []
   (pathom/query {} [{[:test/name "Development"] [:test/greeting]}]))
 
+(defn test-pathom-real []
+  "Test real Pathom with Alfresco connection"
+  (pathom/query {} [:alfresco/root]))
+
+(defn explore-alfresco []
+  "Explore Alfresco structure to help set up page mappings"
+  (alfresco/explore-structure {}))
+
+(defn discover-nodes []
+  "Discover available nodes for page mapping"
+  (pathom/discover-page-nodes {}))
+
+(defn test-page-content [page-key]
+  "Test getting content for a specific page"
+  (pathom/query {} [{[:page/key page-key] [:page/title :page/content :page/node-id]}]))
+
+(defn discover-all-pages []
+  "Discover all pages dynamically from Alfresco"
+  (pathom/query {} [:site/pages]))
+
+(defn test-dynamic-page [slug]
+  "Test getting content for a dynamic page by slug"
+  (pathom/query {} [{[:page/slug slug] [:page/title :page/content :page/exists]}]))
+
+(defn get-navigation []
+  "Get dynamic navigation"
+  (pathom/query {} [:site/navigation]))
+
+(defn test-hero-component []
+  "Test hero component with real data"
+  (pathom/query {} [{:hero/node-id "39985c5c-201a-42f6-985c-5c201a62f6d8"} 
+                    [:hero/title :hero/image :hero/content]]))
+
+(defn test-feature-component [feature-num]
+  "Test feature component with real data"
+  (let [node-id (case feature-num
+                  1 "264ab06c-984e-4f64-8ab0-6c984eaf6440"  ; Feature 1
+                  2 "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89"  ; Feature 2
+                  3 "6737d1b1-5465-4625-b7d1-b15465b62530"  ; Feature 3
+                  "264ab06c-984e-4f64-8ab0-6c984eaf6440")]
+    (pathom/query {} [{:feature/node-id node-id} 
+                      [:feature/title :feature/content :feature/image :feature/type]])))
+
+(defn test-home-components []
+  "Test complete home page component composition"
+  (pathom/query {} [:home/hero :home/features :home/layout]))
+
 (defn routes []
   (require 'mtz-cms.routes.main :reload)
   @(resolve 'mtz-cms.routes.main/all-routes))
@@ -52,7 +99,28 @@
   
   ;; Test connections
   (test-alfresco)
-  (test-pathom)
+  (test-pathom)         ; Test mock resolver
+  (test-pathom-real)    ; Test real Pathom with Alfresco
+  
+  ;; Explore Alfresco structure
+  (explore-alfresco)    ; See what's available in Alfresco
+  (discover-nodes)      ; Find nodes for page mapping
+  
+  ;; Test page content
+  (test-page-content :home)
+  (test-page-content :about)
+  
+  ;; Test dynamic discovery
+  (discover-all-pages)          ; See all discovered pages
+  (get-navigation)             ; See dynamic navigation
+  (test-dynamic-page "home-page")  ; Test dynamic page access
+  (test-dynamic-page "about")      ; Test another page
+  
+  ;; Test component system
+  (test-hero-component)         ; Test hero with real Alfresco data
+  (test-feature-component 1)    ; Test feature 1
+  (test-feature-component 2)    ; Test feature 2
+  (test-home-components)        ; Test complete home page composition
   
   ;; View routes
   (routes))
