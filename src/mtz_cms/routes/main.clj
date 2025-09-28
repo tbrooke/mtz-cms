@@ -4,7 +4,10 @@
    [hiccup.core :as hiccup]
    [mtz-cms.pathom.resolvers :as pathom]
    [mtz-cms.alfresco.client :as alfresco]
-   [mtz-cms.ui.pages :as pages]))
+   [mtz-cms.ui.pages :as pages]
+   [mtz-cms.components.templates :as components]
+   [mtz-cms.components.htmx :as htmx]
+   [mtz-cms.routes.api :as api]))
 
 ;; --- HANDLER HELPERS ---
 
@@ -21,10 +24,13 @@
 ;; --- ROUTE HANDLERS ---
 
 (defn home-handler [request]
+  "Home page with HTMX dynamic components"
   (let [ctx {}
-        result (pathom/query ctx [{[:page/key :home] [:page/title :page/content]}])
-        page-data (get result [:page/key :home])]
-    (html-response (pages/home-page page-data))))
+        page-config (htmx/get-page-component-config :home)]
+    (html-response 
+     (pages/base-layout 
+      "Mount Zion UCC - Home"
+      (htmx/htmx-hero-features-layout page-config)))))
 
 (defn about-handler [request]
   (let [ctx {}
@@ -73,23 +79,28 @@
 ;; --- ROUTES ---
 
 (def all-routes
-  [["/" {:get home-handler}]
+  "All application routes including API routes"
+  (concat
+   [["/" {:get home-handler}]
+    
+    ["/about" {:get about-handler}]
+    
+    ["/demo" {:get demo-handler}]
+    
+    ["/pages" {:get pages-list-handler}]
+    
+    ["/api/pathom" {:post api-pathom-handler}]
+    
+    ;; Dynamic page handler - catches any page slug
+    ["/page/:slug" {:get dynamic-page-handler}]
+    
+    ;; Static assets (basic)
+    ["/assets/*" {:get (fn [request]
+                          {:status 404
+                           :body "Static assets not implemented"})}]]
    
-   ["/about" {:get about-handler}]
-   
-   ["/demo" {:get demo-handler}]
-   
-   ["/pages" {:get pages-list-handler}]
-   
-   ["/api/pathom" {:post api-pathom-handler}]
-   
-   ;; Dynamic page handler - catches any page slug
-   ["/page/:slug" {:get dynamic-page-handler}]
-   
-   ;; Static assets (basic)
-   ["/assets/*" {:get (fn [request]
-                        {:status 404
-                         :body "Static assets not implemented"})}]])
+   ;; API routes for HTMX dynamic loading
+   api/api-routes))
 
 (comment
   ;; Test routes

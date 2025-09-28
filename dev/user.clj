@@ -81,6 +81,25 @@
   "Test complete home page component composition"
   (pathom/query {} [:home/hero :home/features :home/layout]))
 
+(defn test-htmx-hero []
+  "Test HTMX hero component with node ID"
+  (let [node-id "39985c5c-201a-42f6-985c-5c201a62f6d8"]
+    (pathom/query {} [{:hero/node-id node-id} [:hero/title :hero/image :hero/content]])))
+
+(defn test-htmx-feature [feature-num]
+  "Test HTMX feature component with node ID"
+  (let [node-id (case feature-num
+                  1 "264ab06c-984e-4f64-8ab0-6c984eaf6440"  ; Feature 1
+                  2 "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89"  ; Feature 2
+                  3 "6737d1b1-5465-4625-b7d1-b15465b62530"  ; Feature 3
+                  "264ab06c-984e-4f64-8ab0-6c984eaf6440")]
+    (pathom/query {} [{:feature/node-id node-id} [:feature/title :feature/content :feature/image :feature/type]])))
+
+(defn test-htmx-home []
+  "Test HTMX home page configuration"
+  (require '[mtz-cms.components.htmx :as htmx])
+  (htmx/get-page-component-config :home))
+
 (defn routes []
   (require 'mtz-cms.routes.main :reload)
   @(resolve 'mtz-cms.routes.main/all-routes))
