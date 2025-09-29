@@ -3,6 +3,7 @@
   (:require
    [com.wsscode.pathom3.connect.operation :as pco :refer [defresolver]]
    [mtz-cms.alfresco.client :as alfresco]
+   [mtz-cms.alfresco.content-processor :as processor]
    [mtz-cms.config.core :as config]
    [mtz-cms.validation.schemas :as schemas]
    [mtz-cms.validation.middleware :as validation]
@@ -87,11 +88,12 @@
                                     (str/includes?
                                      (get-in % [:entry :content :mimeType] "") "html")) children)
 
-            ;; Get content from first text/html file
+            ;; Get content from first text/html file and process images
             content (if (seq text-files)
                       (let [content-result (alfresco/get-node-content ctx (get-in (first text-files) [:entry :id]))]
                         (if (:success content-result)
-                          (:data content-result)
+                          ;; Process HTML content to convert image URLs
+                          (processor/process-html-content (:data content-result))
                           ""))
                       "")
 

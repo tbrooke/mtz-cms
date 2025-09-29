@@ -8,7 +8,8 @@
    [mtz-cms.components.templates :as components]
    [mtz-cms.components.htmx :as htmx]
    [mtz-cms.routes.api :as api]
-   [mtz-cms.validation.dashboard :as dashboard]))
+   [mtz-cms.validation.dashboard :as dashboard]
+   [clojure.tools.logging :as log]))
 
 ;; --- HANDLER HELPERS ---
 
@@ -71,6 +72,31 @@
         navigation (:site/navigation result)]
     (html-response (pages/pages-list-page {:pages pages :navigation navigation}))))
 
+(defn image-proxy-handler [request]
+  "Proxy images from Alfresco by node ID"
+  (let [ctx {}
+        node-id (get-in request [:path-params :node-id])]
+    (log/debug "Proxying image for node:" node-id)
+    (try
+      (let [result (alfresco/get-node-content ctx node-id)]
+        (if (:success result)
+          (let [node-info (alfresco/get-node ctx node-id)
+                mime-type (if (:success node-info)
+                            (get-in node-info [:data :entry :content :mimeType])
+                            "image/jpeg")]
+            {:status 200
+             :headers {"Content-Type" mime-type
+                       "Cache-Control" "public, max-age=3600"}
+             :body (:data result)})
+          (do
+            (log/error "Failed to fetch image from Alfresco:" (:error result))
+            {:status 404
+             :body "Image not found"})))
+      (catch Exception e
+        (log/error "Error proxying image:" (.getMessage e))
+        {:status 500
+         :body "Image proxy error"}))))
+
 ;; --- ROUTES ---
 
 (def all-routes
@@ -83,6 +109,9 @@
     ["/demo" {:get demo-handler}]
 
     ["/pages" {:get pages-list-handler}]
+
+    ;; Image proxy - must come before dynamic page handler
+    ["/proxy/image/:node-id" {:get image-proxy-handler}]
 
 ;; Dynamic page handler - catches any page slug
     ["/page/:slug" {:get dynamic-page-handler}]

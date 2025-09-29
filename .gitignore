@@ -3,6 +3,7 @@
 .nrepl-port
 .lsp/
 target/
+.clj-kondo
 
 # Development
 .rebel_readline_history
