@@ -156,7 +156,7 @@
   "Transform data using Malli transformers"
   [schema-key data transformer]
   (if-let [schema (get schema-registry schema-key)]
-    (m/transform schema data transformer)
+    (m/decode schema data transformer)
     data))
 
 ;; --- PIPELINE VALIDATION ---
