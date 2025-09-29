@@ -6,6 +6,7 @@
    [mtz-cms.components.htmx-templates :as htmx-templates]
    [mtz-cms.components.templates :as templates]
    [mtz-cms.validation.middleware :as validation]
+   [mtz-cms.alfresco.client :as alfresco]
    [clojure.tools.logging :as log]))
 
 ;; --- RESPONSE HELPERS ---
@@ -42,16 +43,23 @@
           _ (log/debug "Pathom query result:" result)
           
           hero-data (get result [:hero/node-id node-id])
-          title (or (:hero/title hero-data) "Welcome to Mount Zion UCC")
+          image-url (get-in hero-data [:hero/image :url])
           content (or (:hero/content hero-data) "A progressive Christian community welcoming all people.")
-          
+
+          ;; Create hero section with background image
           response (html-fragment-response
-                   [:div
-                    [:h1 {:class "text-3xl font-extrabold sm:text-5xl"}
-                     title
-                     [:strong {:class "block font-extrabold text-blue-200"} "United Church of Christ"]]
-                    [:p {:class "mt-4 max-w-lg sm:text-xl/relaxed"}
-                     content]])]
+                   [:div {:class "relative bg-gradient-to-r from-blue-600 to-blue-800 text-white py-32"
+                          :style (when image-url
+                                   (str "background-image: linear-gradient(rgba(37, 99, 235, 0.8), rgba(29, 78, 216, 0.8)), url('" image-url "'); background-size: cover; background-position: center;"))}
+                    [:div {:class "mx-auto max-w-screen-xl px-4 text-center relative z-10"}
+                     [:h1 {:class "text-4xl font-extrabold sm:text-6xl text-white drop-shadow-lg"}
+                      "Welcome to Mount Zion UCC"
+                      [:strong {:class "block font-extrabold text-blue-200 mt-2"} "United Church of Christ"]]
+                     [:p {:class "mt-6 max-w-lg mx-auto sm:text-xl/relaxed text-blue-100 drop-shadow"}
+                      content]
+                     [:div {:class "mt-8"}
+                      [:button {:class "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition-colors shadow-lg"}
+                       "Learn More"]]]])]
       
       ;; Validate HTMX response
       (validation/validate-htmx-response response "hero-component")
@@ -152,10 +160,33 @@
 (defn pathom-query-handler [request]
   "Handle dynamic Pathom queries from HTMX"
   (let [ctx {}
-        query (get-in request [:params :query])
-        result (pathom/query ctx query)]
-    (log/info "Pathom query:" query)
+        query-str (get-in request [:params :query])
+        query (try
+                (read-string query-str)
+                (catch Exception e
+                  (log/error "Failed to parse query:" query-str (.getMessage e))
+                  nil))
+        result (if query
+                 (pathom/query ctx query)
+                 {:error "Invalid query format"})]
+    (log/info "Pathom query:" query "result:" result)
     (json-response result)))
+
+;; --- IMAGE PROXY HANDLER ---
+
+(defn image-proxy-handler [request]
+  "Proxy images from Alfresco with authentication"
+  (let [node-id (get-in request [:path-params :node-id])
+        ctx {}
+        result (alfresco/get-node-content ctx node-id)]
+    (if (:success result)
+      {:status 200
+       :headers {"Content-Type" "image/png"
+                 "Cache-Control" "public, max-age=3600"}
+       :body (:data result)}
+      {:status 404
+       :headers {"Content-Type" "text/plain"}
+       :body "Image not found"})))
 
 ;; --- TIME API HANDLER ---
 
@@ -186,5 +217,7 @@
     
     ["/page"
      ["/publish" {:post page-publish-handler}]]
-    
-    ["/pathom" {:post pathom-query-handler}]]])
+
+    ["/pathom" {:post pathom-query-handler}]
+
+    ["/image/:node-id" {:get image-proxy-handler}]]])

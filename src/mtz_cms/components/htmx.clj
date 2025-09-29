@@ -11,7 +11,7 @@
   [node-id]
   [:section {:class "relative"
              :hx-get (str "/api/components/hero/" node-id)
-             :hx-trigger "click"
+             :hx-trigger "load"
              :hx-swap "innerHTML"
              :hx-indicator "#hero-loading"}
    ;; Loading state
@@ -28,7 +28,7 @@
   [node-id]
   [:div {:class "feature-component"
          :hx-get (str "/api/components/feature/" node-id)
-         :hx-trigger "click"
+         :hx-trigger "load"
          :hx-swap "innerHTML"
          :hx-indicator (str "#feature-loading-" node-id)}
    ;; Loading state

@@ -62,8 +62,7 @@
                          :hero/image (when image-file
                                        {:id (get-in image-file [:entry :id])
                                         :name (get-in image-file [:entry :name])
-                                        :url (str "/alfresco/api/-default-/public/alfresco/versions/1/nodes/"
-                                                  (get-in image-file [:entry :id]) "/content")})
+                                        :url (str "/api/image/" (get-in image-file [:entry :id]))})
                          :hero/content hero-content}]
 
               ;; Validate output
@@ -122,8 +121,11 @@
             feature-content (if (seq text-files)
                              (let [content-result (alfresco/get-node-content ctx (get-in (first text-files) [:entry :id]))]
                                (if (:success content-result)
-                                 ;; Process HTML content to convert image URLs
-                                 (processor/process-html-content (:data content-result))
+                                 ;; Convert binary data to string and process HTML content
+                                 (let [content-str (if (bytes? (:data content-result))
+                                                    (String. (:data content-result) "UTF-8")
+                                                    (str (:data content-result)))]
+                                   (processor/process-html-content content-str))
                                  ""))
                              "")
 
@@ -141,8 +143,7 @@
                           (let [image-file (first image-files)]
                             {:id (get-in image-file [:entry :id])
                              :name (get-in image-file [:entry :name])
-                             :url (str "/alfresco/api/-default-/public/alfresco/versions/1/nodes/"
-                                       (get-in image-file [:entry :id]) "/content")}))
+                             :url (str "/api/image/" (get-in image-file [:entry :id]))}))
          :feature/type component-type})
       (do
         (log/warn "Feature component fallback for node:" node-id)
