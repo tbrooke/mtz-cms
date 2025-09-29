@@ -71,10 +71,10 @@
   "Serve feature component data dynamically"
   (let [ctx {}
         node-id (get-in request [:path-params :node-id])
-        result (pathom/query ctx [{[:feature/node-id node-id] 
+        result (pathom/query ctx [{[:feature/node-id node-id]
                                   [:feature/title :feature/content :feature/image :feature/type]}])]
     (log/info "Loading feature component for node:" node-id "result:" result)
-    (let [feature-data (get result [:feature/node-id node-id])]
+    (let [feature-data (assoc (get result [:feature/node-id node-id]) :feature/node-id node-id)]
       (html-fragment-response
        (htmx-templates/htmx-feature-with-image feature-data)))))
 
@@ -82,12 +82,13 @@
   "Serve just the content portion of a feature component"
   (let [ctx {}
         node-id (get-in request [:path-params :node-id])
-        result (pathom/query ctx [{:feature/node-id node-id} 
-                                  [:feature/content]])]
+        result (pathom/query ctx [{[:feature/node-id node-id]
+                                  [:feature/content]}])]
     (log/info "Loading feature content for node:" node-id)
-    (html-fragment-response
-     [:div {:dangerouslySetInnerHTML 
-            {:__html (:feature/content (get result {:feature/node-id node-id}))}}])))
+    (let [content (:feature/content (get result [:feature/node-id node-id]))]
+      {:status 200
+       :headers {"Content-Type" "text/html"}
+       :body (str "<div>" (or content "") "</div>")})))
 
 (defn components-refresh-handler [request]
   "Refresh all components on a page"

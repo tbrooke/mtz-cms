@@ -4,6 +4,7 @@
    [ring.adapter.jetty :as jetty]
    [ring.middleware.params :as params]
    [ring.middleware.keyword-params :as keyword-params]
+   [ring.middleware.resource :as resource]
    [reitit.ring :as reitit-ring]
    [mtz-cms.routes.main :as routes]
    [clojure.tools.logging :as log])
@@ -17,7 +18,8 @@
 (defn create-app []
   (-> (create-handler)
       keyword-params/wrap-keyword-params
-      params/wrap-params))
+      params/wrap-params
+      (resource/wrap-resource "public")))
 
 (defn start-server [& [port]]
   (let [port (or port 3000)]

@@ -13,7 +13,7 @@
     [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
     [:title title]
     (ui/tailwind-cdn)
-    [:script {:src "https://unpkg.com/htmx.org@1.9.6"}]
+    [:script {:src "/js/htmx.min.js"}]
     (ui/custom-styles)]
    [:body {:class "h-full bg-gray-50"}
     (ui/site-header)

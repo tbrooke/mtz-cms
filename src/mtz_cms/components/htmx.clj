@@ -11,7 +11,7 @@
   [node-id]
   [:section {:class "relative"
              :hx-get (str "/api/components/hero/" node-id)
-             :hx-trigger "load"
+             :hx-trigger "click"
              :hx-swap "innerHTML"
              :hx-indicator "#hero-loading"}
    ;; Loading state
@@ -28,7 +28,7 @@
   [node-id]
   [:div {:class "feature-component"
          :hx-get (str "/api/components/feature/" node-id)
-         :hx-trigger "load"
+         :hx-trigger "click"
          :hx-swap "innerHTML"
          :hx-indicator (str "#feature-loading-" node-id)}
    ;; Loading state
@@ -85,9 +85,7 @@
      ;; Refresh button for content editors
      [:div {:class "fixed bottom-4 right-4 z-50"}
       [:button {:class "bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
-                :hx-get "/api/page/refresh"
-                :hx-target "body"
-                :hx-swap "innerHTML"
+                :onclick "window.location.reload()"
                 :title "Refresh content from Alfresco"}
        "🔄 Refresh"]]]))
 

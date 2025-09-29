@@ -96,7 +96,7 @@
       (let [response (http/get full-url
                                {:basic-auth [username password]
                                 :throw-exceptions false
-                                :as :string})]
+                                :as :byte-array})]
 
         (if (< (:status response) 400)
           {:success true

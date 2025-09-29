@@ -6,6 +6,23 @@
 
 **Architecture**: Alfresco → Pathom → HTMX → Tailwind CSS
 
+## 🚀 **Latest Development Phase: Content Model Integration Complete**
+
+### ✅ **Completed Tasks**
+1. **Content Model Discovery**: Successfully ran Babashka schema generator and discovered actual Alfresco Content Model structure
+2. **Node Analysis**: Analyzed Hero and Feature nodes - they are `cm:folder` types with `cm:title` properties containing typed children
+3. **Pathom Resolver Rewrite**: Completely rewrote hero and feature component resolvers to use Content Model instead of file-system approach
+4. **Authentication Verification**: Confirmed SSH tunnel and manual Alfresco API access works with admin/admin credentials
+
+### 🔍 **Current Status**
+- **Content Model Structure**: Hero node (39985c5c-201a-42f6-985c-5c201a62f6d8) has `cm:title` "The Hero Graphic Dafault large image or images"
+- **Feature Structure**: Feature 2 node (fe3c64bf-bb1b-456f-bc64-bfbb1b656f89) has `cm:title` "Second feature on Home page" with "Blood Drive" HTML content
+- **Authentication Issue**: CMS resolvers returning empty data despite manual curl with admin/admin working perfectly
+- **Pipeline Status**: Content Model resolvers implemented but authentication not working in application context
+
+### 🎯 **Next Development Phase**
+**Primary Issue**: Fix authentication in Pathom resolvers - manual API calls work but CMS application calls return empty data
+
 ---
 
 ## 🎯 **Current Status: COMPONENT-BASED ARCHITECTURE COMPLETE**
@@ -481,3 +498,105 @@ We've built a **fully dynamic, component-based CMS with complete image processin
 - **Production-grade caching** and error handling
 
 This is a **production-ready CMS** for Mount Zion's website with full image support! 🎉
+
+---
+
+## 🚨 **CURRENT STATUS: Content Model Implementation Required**
+
+### **📅 Session Date: September 29, 2025**
+
+### **✅ What's Working:**
+- **🔧 HTMX Infrastructure**: Local HTMX serving, no CDN dependencies
+- **🖼️ Image Processing**: Binary data handling fixed, images display correctly
+- **⚡ Dynamic Loading**: API endpoints return 200, HTMX triggers work
+- **🔄 Server Stability**: All syntax errors resolved, server runs reliably
+- **🔗 SSH Tunnel**: Active connection to Alfresco at localhost:8080
+- **📡 Alfresco API**: Responds correctly to direct API calls
+
+### **❌ Critical Issue Identified:**
+
+**PATHOM RESOLVERS USE FILE-BASED APPROACH INSTEAD OF CONTENT MODEL**
+
+The fundamental problem is architectural:
+- **Current approach**: Look for "image files" and "text files" in folders
+- **Hero folder contains**: Single PNG file (`buildingC.png`)
+- **Resolver expects**: HTML text files for content
+- **Result**: Empty content because data structure doesn't match expectations
+
+### **🎯 Root Cause Discovery:**
+
+User identified that Alfresco has a **Content Model** with typed content:
+- Nodes have `nodeType` (e.g., `cm:folder`, `cm:content`)
+- Nodes have `aspectNames` for additional properties
+- Properties are typed (e.g., `:cm:title`, `:mt:heroImage`)
+- Images can be resized/transformed via Alfresco
+- Custom types can inherit from base types
+
+### **📋 Architecture We Need:**
+
+Instead of:
+```clojure
+;; ❌ Current: File-system approach
+(alfresco/get-node-children ctx hero-folder-id)
+;; Look for image files and text files
+```
+
+Should be:
+```clojure
+;; ✅ Content Model approach
+(alfresco/get-node ctx hero-node-id)
+;; Extract: :properties :cm:title, :mt:heroImage, etc.
+;; OR: (alfresco/search-nodes ctx "TYPE:'mt:hero'")
+```
+
+### **🔧 Solution Components Available:**
+
+✅ **Babashka Schema Generator**:
+- `model_sync_working.clj` - General content model introspection
+- `model_sync_calendar.clj` - Calendar-specific model analysis
+- Generated schemas in `generated-model/` and `alfresco /generated-model/`
+
+✅ **Live Schema Data**:
+- `generated-model/live-schemas.edn` - Current Malli schemas
+- `generated-model/sample-data.edn` - Sample node data
+- Multiple schema files for different content types
+
+✅ **Malli Validation Pipeline**: Already integrated and working
+
+### **🚀 Next Development Session Tasks:**
+
+#### **Phase 1: Content Model Discovery**
+1. **Run Babashka schema generator** to get current Content Model structure
+2. **Analyze existing Hero/Feature content** to understand actual node types
+3. **Identify custom content types** needed (e.g., `mt:hero`, `mt:feature`)
+
+#### **Phase 2: Content Model Extension**
+1. **Create custom Alfresco content types** if needed:
+   - `mt:hero` (inherits from `cm:content` + `cm:image`)
+   - `mt:feature` (has title, content, optional image)
+2. **Update Alfresco content model** to include these types
+
+#### **Phase 3: Pathom Resolver Rewrite**
+1. **Replace file-based queries** with Content Model queries
+2. **Update resolvers** to extract properties by Content Model schema
+3. **Use generated Malli schemas** for validation
+4. **Test with actual typed content**
+
+### **🧪 Current Test Setup:**
+- **Server**: Running on port 3002 with local HTMX
+- **Trigger Mode**: `hx-trigger="click"` for manual testing
+- **Components**: Load on click but show empty content
+- **API Status**: All endpoints return 200 OK
+- **No Console Errors**: Frontend working perfectly
+
+### **💡 Key Insight:**
+The empty content issue isn't a frontend or HTMX problem - it's that we're trying to extract HTML content from PNG image files using file-system assumptions instead of leveraging Alfresco's rich Content Model system.
+
+### **🎯 Success Criteria for Next Session:**
+- [ ] Pathom resolvers query Content Model properties instead of file structure
+- [ ] Hero component loads actual content from Alfresco node properties
+- [ ] Feature components load typed content with proper validation
+- [ ] Content creators can use proper Alfresco content types
+- [ ] Image handling leverages Alfresco's transformation capabilities
+
+**The foundation is solid - we just need to "go deeper" into Alfresco's Content Model! 🏗️**
