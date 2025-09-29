@@ -1,10 +1,11 @@
 (ns mtz-cms.routes.api
-  "API routes for HTMX dynamic component loading"
+  "API routes for HTMX dynamic component loading with validation"
   (:require
    [hiccup.core :as hiccup]
    [mtz-cms.pathom.resolvers :as pathom]
    [mtz-cms.components.htmx-templates :as htmx-templates]
    [mtz-cms.components.templates :as templates]
+   [mtz-cms.validation.middleware :as validation]
    [clojure.tools.logging :as log]))
 
 ;; --- RESPONSE HELPERS ---
@@ -29,30 +30,53 @@
 ;; --- COMPONENT API HANDLERS ---
 
 (defn hero-component-handler [request]
-  "Serve hero component data dynamically"
-  (let [ctx {}
-        node-id (get-in request [:path-params :node-id])
-        result (pathom/query ctx [{:hero/node-id node-id} 
-                                  [:hero/title :hero/image :hero/content]])]
-    (log/info "Loading hero component for node:" node-id)
-    (html-fragment-response
-     [:div
-      [:h1 {:class "text-3xl font-extrabold sm:text-5xl"}
-       (:hero/title (get result {:hero/node-id node-id}))
-       [:strong {:class "block font-extrabold text-blue-200"} "United Church of Christ"]]
-      [:p {:class "mt-4 max-w-lg sm:text-xl/relaxed"}
-       (or (:hero/content (get result {:hero/node-id node-id}))
-           "A progressive Christian community welcoming all people.")]])))
+  "Serve hero component data dynamically with validation"
+  (try
+    (let [ctx {}
+          node-id (get-in request [:path-params :node-id])
+          _ (log/info "🔍 Loading hero component for node:" node-id)
+          
+          ;; Query Pathom with validation
+          result (pathom/query ctx [{[:hero/node-id node-id] 
+                                    [:hero/title :hero/image :hero/content]}])
+          _ (log/debug "Pathom query result:" result)
+          
+          hero-data (get result [:hero/node-id node-id])
+          title (or (:hero/title hero-data) "Welcome to Mount Zion UCC")
+          content (or (:hero/content hero-data) "A progressive Christian community welcoming all people.")
+          
+          response (html-fragment-response
+                   [:div
+                    [:h1 {:class "text-3xl font-extrabold sm:text-5xl"}
+                     title
+                     [:strong {:class "block font-extrabold text-blue-200"} "United Church of Christ"]]
+                    [:p {:class "mt-4 max-w-lg sm:text-xl/relaxed"}
+                     content]])]
+      
+      ;; Validate HTMX response
+      (validation/validate-htmx-response response "hero-component")
+      
+      (log/info "✅ Hero component rendered successfully for node:" node-id)
+      response)
+    
+    (catch Exception e
+      (log/error "❌ Error in hero component handler:" (.getMessage e))
+      ;; Return fallback response
+      (html-fragment-response
+       [:div {:class "bg-red-50 border border-red-200 rounded p-4"}
+        [:h2 {:class "text-red-800"} "Content Loading Error"]
+        [:p {:class "text-red-600"} "Unable to load hero content. Please try again."]]))))
 
 (defn feature-component-handler [request]
   "Serve feature component data dynamically"
   (let [ctx {}
         node-id (get-in request [:path-params :node-id])
-        result (pathom/query ctx [{:feature/node-id node-id} 
-                                  [:feature/title :feature/content :feature/image :feature/type]])]
-    (log/info "Loading feature component for node:" node-id)
-    (html-fragment-response
-     (htmx-templates/htmx-feature-with-image (get result {:feature/node-id node-id})))))
+        result (pathom/query ctx [{[:feature/node-id node-id] 
+                                  [:feature/title :feature/content :feature/image :feature/type]}])]
+    (log/info "Loading feature component for node:" node-id "result:" result)
+    (let [feature-data (get result [:feature/node-id node-id])]
+      (html-fragment-response
+       (htmx-templates/htmx-feature-with-image feature-data)))))
 
 (defn feature-content-handler [request]
   "Serve just the content portion of a feature component"
@@ -132,11 +156,24 @@
     (log/info "Pathom query:" query)
     (json-response result)))
 
+;; --- TIME API HANDLER ---
+
+(defn time-handler [request]
+  "Return current server time for HTMX demo"
+  (html-fragment-response
+   [:div {:class "bg-green-50 border border-green-200 rounded-md p-4 text-green-800"}
+    [:div {:class "flex items-center"}
+     [:svg {:class "w-5 h-5 mr-2" :fill "currentColor" :viewBox "0 0 20 20"}
+      [:path {:fill-rule "evenodd" :d "M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" :clip-rule "evenodd"}]]
+     [:span {:class "font-medium"} "Server Time: " (str (java.util.Date.))]]]))
+
 ;; --- API ROUTES ---
 
 (def api-routes
   "API routes for HTMX dynamic loading"
   [["/api"
+    ["/time" {:get time-handler}]
+    
     ["/components"
      ["/hero/:node-id" {:get hero-component-handler}]
      ["/feature/:node-id" {:get feature-component-handler}]

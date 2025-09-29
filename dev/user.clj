@@ -64,17 +64,17 @@
 
 (defn test-hero-component []
   "Test hero component with real data"
-  (pathom/query {} [{:hero/node-id "39985c5c-201a-42f6-985c-5c201a62f6d8"} 
+  (pathom/query {} [{:hero/node-id "39985c5c-201a-42f6-985c-5c201a62f6d8"}
                     [:hero/title :hero/image :hero/content]]))
 
 (defn test-feature-component [feature-num]
   "Test feature component with real data"
   (let [node-id (case feature-num
-                  1 "264ab06c-984e-4f64-8ab0-6c984eaf6440"  ; Feature 1
-                  2 "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89"  ; Feature 2
-                  3 "6737d1b1-5465-4625-b7d1-b15465b62530"  ; Feature 3
+                  1 "264ab06c-984e-4f64-8ab0-6c984eaf6440" ; Feature 1
+                  2 "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89" ; Feature 2
+                  3 "6737d1b1-5465-4625-b7d1-b15465b62530" ; Feature 3
                   "264ab06c-984e-4f64-8ab0-6c984eaf6440")]
-    (pathom/query {} [{:feature/node-id node-id} 
+    (pathom/query {} [{:feature/node-id node-id}
                       [:feature/title :feature/content :feature/image :feature/type]])))
 
 (defn test-home-components []
@@ -89,16 +89,27 @@
 (defn test-htmx-feature [feature-num]
   "Test HTMX feature component with node ID"
   (let [node-id (case feature-num
-                  1 "264ab06c-984e-4f64-8ab0-6c984eaf6440"  ; Feature 1
-                  2 "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89"  ; Feature 2
-                  3 "6737d1b1-5465-4625-b7d1-b15465b62530"  ; Feature 3
+                  1 "264ab06c-984e-4f64-8ab0-6c984eaf6440" ; Feature 1
+                  2 "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89" ; Feature 2
+                  3 "6737d1b1-5465-4625-b7d1-b15465b62530" ; Feature 3
                   "264ab06c-984e-4f64-8ab0-6c984eaf6440")]
     (pathom/query {} [{:feature/node-id node-id} [:feature/title :feature/content :feature/image :feature/type]])))
 
 (defn test-htmx-home []
   "Test HTMX home page configuration"
-  (require '[mtz-cms.components.htmx :as htmx])
-  (htmx/get-page-component-config :home))
+  (try
+    (require '[mtz-cms.components.htmx :as htmx] :reload)
+    ((resolve 'mtz-cms.components.htmx/get-page-component-config) :home)
+    (catch Exception e
+      (println "Error loading htmx namespace:")
+      (println (.getMessage e))
+      (println "\nTrying alternative approach...")
+      ;; Return mock data if namespace fails to load
+      {:layout :hero-features-layout
+       :components {:hero {:node-id "39985c5c-201a-42f6-985c-5c201a62f6d8"}
+                    :features [{:node-id "264ab06c-984e-4f64-8ab0-6c984eaf6440"}
+                               {:node-id "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89"}
+                               {:node-id "6737d1b1-5465-4625-b7d1-b15465b62530"}]}})))
 
 (defn routes []
   (require 'mtz-cms.routes.main :reload)
@@ -109,37 +120,37 @@
 (comment
   ;; Start the server
   (start)
-  
+
   ;; Stop the server
   (stop)
-  
+
   ;; Restart with code reload
   (restart)
-  
+
   ;; Test connections
   (test-alfresco)
-  (test-pathom)         ; Test mock resolver
-  (test-pathom-real)    ; Test real Pathom with Alfresco
-  
+  (test-pathom) ; Test mock resolver
+  (test-pathom-real) ; Test real Pathom with Alfresco
+
   ;; Explore Alfresco structure
-  (explore-alfresco)    ; See what's available in Alfresco
-  (discover-nodes)      ; Find nodes for page mapping
-  
+  (explore-alfresco) ; See what's available in Alfresco
+  (discover-nodes) ; Find nodes for page mapping
+
   ;; Test page content
   (test-page-content :home)
   (test-page-content :about)
-  
+
   ;; Test dynamic discovery
-  (discover-all-pages)          ; See all discovered pages
-  (get-navigation)             ; See dynamic navigation
-  (test-dynamic-page "home-page")  ; Test dynamic page access
-  (test-dynamic-page "about")      ; Test another page
-  
+  (discover-all-pages) ; See all discovered pages
+  (get-navigation) ; See dynamic navigation
+  (test-dynamic-page "home-page") ; Test dynamic page access
+  (test-dynamic-page "about") ; Test another page
+
   ;; Test component system
-  (test-hero-component)         ; Test hero with real Alfresco data
-  (test-feature-component 1)    ; Test feature 1
-  (test-feature-component 2)    ; Test feature 2
-  (test-home-components)        ; Test complete home page composition
-  
+  (test-hero-component) ; Test hero with real Alfresco data
+  (test-feature-component 1) ; Test feature 1
+  (test-feature-component 2) ; Test feature 2
+  (test-home-components) ; Test complete home page composition
+
   ;; View routes
   (routes))

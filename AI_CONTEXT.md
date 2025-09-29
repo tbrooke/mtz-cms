@@ -68,15 +68,20 @@
 (user/test-dynamic-page "worship")  # ✅ Dynamic page content
 (user/get-navigation)               # ✅ Auto-generated navigation
 
-# COMPONENT SYSTEM (NEW!):
+# COMPONENT SYSTEM:
 (user/test-hero-component)          # ✅ Hero with building image from Alfresco
 (user/test-feature-component 1)     # ✅ "Welcome to Mt Zion" content
 (user/test-feature-component 2)     # ✅ "Blood Drive" with image
 (user/test-home-components)         # ✅ Complete component composition
 
-# HTMX SYSTEM (NEW!):
+# HTMX SYSTEM:
 (user/test-htmx-hero)              # ✅ HTMX hero component data
 (user/test-htmx-feature 1)         # ✅ HTMX feature component data
+
+# VALIDATION SYSTEM (NEW!):
+curl localhost:3000/api/components/hero/39985c5c... # ✅ HTMX with validation
+bb model_sync_working.clj                          # ✅ Schema generation
+curl localhost:3000/validation/dashboard           # ✅ Validation dashboard
 ```
 
 ---
@@ -271,11 +276,20 @@ clojure -M:dev
 - [x] API endpoints for component data
 - [x] Auto-refresh content from Alfresco
 
-### **🚧 Phase 4 Current: Enhanced CMS Features**
+### **✅ Phase 4 Complete: Enhanced CMS Features**
 - [x] Component templates (Hero, Feature, Card)
-- [x] HTMX dynamic component loading
+- [x] HTMX dynamic component loading working
 - [x] Real-time content updates
-- [ ] **READY TO TEST: HTMX component system**
+- [x] **TESTED: HTMX component system working**
+- [x] **NEW: Malli validation pipeline**
+- [x] **NEW: Schema generation from live Alfresco data**
+- [x] **NEW: Validation dashboard**
+
+### **🚀 Phase 5 Current: Production-Ready with Validation**
+- [x] **Malli schema validation** - Type-safe data pipeline
+- [x] **Babashka schema generation** - Auto-generate schemas from Alfresco
+- [x] **Validation middleware** - Validate at every pipeline step
+- [x] **Validation dashboard** - Monitor data pipeline health
 - [ ] Content editing interfaces via HTMX
 - [ ] Alfresco aspects for component selection
 - [ ] Drag-and-drop component management

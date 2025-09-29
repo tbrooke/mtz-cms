@@ -30,7 +30,7 @@
          :hx-get (str "/api/components/feature/" node-id)
          :hx-trigger "load"
          :hx-swap "innerHTML"
-         :hx-indicator (str "#feature-loading-" node-id)}
+         :hx-indicator "#feature-loading-" node-id}
    ;; Loading state
    [:div {:id (str "feature-loading-" node-id) :class "htmx-indicator"}
     [:div {:class "bg-white p-8 rounded-lg shadow-sm"}
@@ -46,7 +46,7 @@
          :hx-get (str "/api/components/card/" node-id)
          :hx-trigger "load"
          :hx-swap "innerHTML"
-         :hx-indicator (str "#card-loading-" node-id)}
+         :hx-indicator "#card-loading-" node-id}
    ;; Loading state
    [:div {:id (str "card-loading-" node-id) :class "htmx-indicator"}
     [:div {:class "bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300"}
@@ -111,7 +111,7 @@
   [component-type node-id]
   [:div {:class "live-component"
          :hx-get (str "/api/components/" component-type "/" node-id)
-         :hx-trigger "every 30s" ; Poll for changes every 30 seconds
+         :hx-trigger "every 30s"  ; Poll for changes every 30 seconds
          :hx-swap "innerHTML"}])
 
 ;; --- HTMX COMPONENT BUILDER ---
@@ -143,7 +143,7 @@
   [page-key]
   (case page-key
     :home {:layout :hero-features-layout
-           :components {:hero {:node-id "39985c5c-201a-42f6-985c-5c201a62f6d8"} ; Hero folder
+           :components {:hero {:node-id "39985c5c-201a-42f6-985c-5c201a62f6d8"}  ; Hero folder
                         :features [{:node-id "264ab06c-984e-4f64-8ab0-6c984eaf6440"} ; Feature 1
                                    {:node-id "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89"} ; Feature 2
                                    {:node-id "6737d1b1-5465-4625-b7d1-b15465b62530"}]}} ; Feature 3

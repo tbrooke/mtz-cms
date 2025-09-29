@@ -19,22 +19,22 @@
        [:img {:src (str "http://localhost:8080" (:url image))
               :alt (:name image)
               :class "absolute inset-0 h-full w-full object-cover"}])
-
+     
      ;; Content overlay with HTMX refresh capability
      [:div {:class "relative mx-auto max-w-screen-xl px-4 py-32 sm:px-6 lg:flex lg:h-screen lg:items-center lg:px-8"}
       [:div {:class "max-w-xl text-center ltr:sm:text-left rtl:sm:text-right"}
        ;; Dynamic content that can be refreshed
        [:div {:hx-get (str "/api/components/hero/" node-id)
-              :hx-trigger "every 30s" ; Auto-refresh every 30 seconds
+              :hx-trigger "every 30s"  ; Auto-refresh every 30 seconds
               :hx-swap "innerHTML"
               :id "hero-content"}
         [:h1 {:class "text-3xl font-extrabold sm:text-5xl"}
          title
          [:strong {:class "block font-extrabold text-blue-200"} "United Church of Christ"]]
-
+        
         [:p {:class "mt-4 max-w-lg sm:text-xl/relaxed"}
          (or content "A progressive Christian community welcoming all people.")]]
-
+       
        ;; Interactive buttons
        [:div {:class "mt-8 flex flex-wrap gap-4 text-center"}
         [:button {:class "block w-full rounded bg-blue-600 px-12 py-3 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring active:bg-blue-500 sm:w-auto"
@@ -42,12 +42,13 @@
                   :hx-target "#main-content"
                   :hx-push-url "true"}
          "Learn About Us"]
-
+        
         [:button {:class "block w-full rounded bg-white px-12 py-3 text-sm font-medium text-blue-600 shadow hover:bg-gray-100 focus:outline-none focus:ring active:bg-gray-200 sm:w-auto"
                   :hx-get "/page/worship"
-                  :hx-target "#main-content"
+                  :hx-target "#main-content"  
                   :hx-push-url "true"}
          "Join Us for Worship"]]]]]))
+
 
 (defn htmx-feature-with-image
   "HTMX-enhanced feature component with edit capabilities"
@@ -60,7 +61,7 @@
                :id (str "feature-" node-id)}
      [:div {:class "mx-auto max-w-7xl px-6 lg:px-8"}
       [:div {:class "mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2"}
-
+       
        ;; Editable content area
        [:div {:class "lg:pr-8 lg:pt-4"}
         [:div {:class "lg:max-w-lg relative group"}
@@ -70,18 +71,18 @@
                    :hx-target (str "#feature-" node-id)
                    :title "Edit this feature"}
           "✏️"]
-
+         
          [:h2 {:class "text-base font-semibold leading-7 text-blue-600"} "Mount Zion UCC"]
          [:p {:class "mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"}
           title]
-
+         
          ;; Dynamic content area
          [:div {:class "mt-6 text-lg leading-8 text-gray-600 prose"
                 :hx-get (str "/api/components/feature/" node-id "/content")
-                :hx-trigger "every 60s" ; Refresh content periodically
+                :hx-trigger "every 60s"  ; Refresh content periodically
                 :hx-swap "innerHTML"}
           [:div (or content "")]]
-
+         
          [:div {:class "mt-8"}
           [:button {:class "inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
                     :hx-get "/about"
@@ -89,8 +90,8 @@
                     :hx-push-url "true"}
            "Learn More"
            [:svg {:class "h-4 w-4" :fill "none" :viewBox "0 0 24 24" :stroke-width "1.5" :stroke "currentColor"}
-            [:path {:stroke-linecap "round" :stroke-linejoin "round" :d "M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"}]]]]]]
-
+            [:path {:stroke-linecap "round" :stroke-linejoin "round" :d "M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"}]]]]]]  ; <- FIXED: Added missing bracket here
+       
        ;; Image with lazy loading
        [:div {:class "flex items-start justify-end lg:order-first"}
         (if image
@@ -98,13 +99,14 @@
                  :alt (:name image)
                  :class "w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"
                  :loading "lazy"}]
-          [:div {:class "w-[48rem] max-w-none rounded-xl bg-gray-100 shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem] h-96 flex flex-col items-center justify-center"}
+          [:div {:class "w-[48rem] max-w-none rounded-xl bg-gray-100 shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem] h-96 flex items-center justify-center"}
            [:button {:class "text-gray-500 hover:text-blue-600 cursor-pointer"
                      :hx-get (str "/api/components/feature/" node-id "/upload-image")
                      :hx-target (str "#feature-" node-id)}
             [:svg {:class "mx-auto h-12 w-12" :fill "none" :viewBox "0 0 24 24" :stroke "currentColor"}
              [:path {:stroke-linecap "round" :stroke-linejoin "round" :stroke-width "2" :d "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"}]]
-            [:p {:class "mt-2 text-sm"} "Click to add image"]]])]]]]))
+            [:p {:class "mt-2 text-sm"} "Click to add image"]]])]]]))
+
 
 (defn htmx-dynamic-components-container
   "Container that can dynamically load and reorder components"
@@ -114,7 +116,7 @@
            :id "components-container"
            :hx-get "/api/components/refresh"
            :hx-trigger "refreshComponents from:body"}
-
+     
      ;; Component management toolbar
      [:div {:class "bg-gray-50 border-l-4 border-blue-500 p-4 mb-8"}
       [:div {:class "flex items-center justify-between"}
@@ -131,7 +133,7 @@
                   :hx-post "/api/components/refresh"
                   :hx-target "#components-container"}
          "↻ Refresh All"]]]]
-
+     
      ;; Dynamic components
      (for [component components]
        [:div {:key (:feature/node-id component)
@@ -169,14 +171,14 @@
    ;; Hero section
    (when (:home/hero page-data)
      (htmx-hero-with-image (:home/hero page-data)))
-
+   
    ;; Dynamic components container
    (htmx-dynamic-components-container page-data)
-
+   
    ;; Call to action with dynamic content
    [:section {:class "bg-blue-600"
               :hx-get "/api/components/cta"
-              :hx-trigger "every 120s" ; Refresh CTA every 2 minutes
+              :hx-trigger "every 120s"  ; Refresh CTA every 2 minutes
               :hx-swap "innerHTML"}
     [:div {:class "mx-auto max-w-7xl py-12 px-6 lg:px-8 lg:py-24"}
      [:div {:class "lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center"}
@@ -196,7 +198,7 @@
                  :hx-target "#main-content"
                  :hx-push-url "true"}
         "Contact Us"]]]]]
-
+   
    ;; Page editor (only show if in edit mode)
    (htmx-page-editor page-data)])
 

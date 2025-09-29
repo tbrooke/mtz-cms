@@ -7,7 +7,8 @@
    [mtz-cms.ui.pages :as pages]
    [mtz-cms.components.templates :as components]
    [mtz-cms.components.htmx :as htmx]
-   [mtz-cms.routes.api :as api]))
+   [mtz-cms.routes.api :as api]
+   [mtz-cms.validation.dashboard :as dashboard]))
 
 ;; --- HANDLER HELPERS ---
 
@@ -27,8 +28,8 @@
   "Home page with HTMX dynamic components"
   (let [ctx {}
         page-config (htmx/get-page-component-config :home)]
-    (html-response 
-     (pages/base-layout 
+    (html-response
+     (pages/base-layout
       "Mount Zion UCC - Home"
       (htmx/htmx-hero-features-layout page-config)))))
 
@@ -43,18 +44,12 @@
         ;; Test Pathom
         greeting-result (pathom/query ctx [{[:test/name "Mount Zion CMS"] [:test/greeting]}])
         greeting (get-in greeting-result [[:test/name "Mount Zion CMS"] :test/greeting])
-        
+
         ;; Test Alfresco
         alfresco-result (alfresco/test-connection ctx)]
-    
+
     (html-response (pages/demo-page {:greeting greeting
                                      :alfresco alfresco-result}))))
-
-(defn api-pathom-handler [request]
-  (let [ctx {}
-        query (get-in request [:params :query])
-        result (pathom/query ctx query)]
-    (json-response result)))
 
 (defn dynamic-page-handler [request]
   "Handle any page by discovering it from Alfresco"
@@ -82,25 +77,26 @@
   "All application routes including API routes"
   (concat
    [["/" {:get home-handler}]
-    
+
     ["/about" {:get about-handler}]
-    
+
     ["/demo" {:get demo-handler}]
-    
+
     ["/pages" {:get pages-list-handler}]
-    
-    ["/api/pathom" {:post api-pathom-handler}]
-    
-    ;; Dynamic page handler - catches any page slug
+
+;; Dynamic page handler - catches any page slug
     ["/page/:slug" {:get dynamic-page-handler}]
-    
+
     ;; Static assets (basic)
     ["/assets/*" {:get (fn [request]
-                          {:status 404
-                           :body "Static assets not implemented"})}]]
-   
+                         {:status 404
+                          :body "Static assets not implemented"})}]]
+
    ;; API routes for HTMX dynamic loading
-   api/api-routes))
+   api/api-routes
+   
+   ;; Validation dashboard routes
+   dashboard/dashboard-routes))
 
 (comment
   ;; Test routes

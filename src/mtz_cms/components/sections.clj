@@ -1,0 +1,50 @@
+(ns
+ your-app.components.marketing.sections
+ (:require [your-app.pathom :as user/pathom]))
+(defn
+ 1-component
+ "HyperUI marketing/sections/1 component with Pathom integration"
+ [content & {:keys [size], :or {size :full}}]
+ [:div
+  {:class "hyperui-component max-w-full",
+   :data-component-id "1",
+   :data-component-category "marketing",
+   :data-component-collection "sections",
+   :data-size "full"}
+  [:section
+   {}
+   "\n  "
+   [:div
+    {:class "mx-auto max-w-screen-xl px-4 py-8 sm:px-6 lg:px-8"}
+    "\n    "
+    [:div
+     {:class
+      "grid grid-cols-1 gap-4 md:grid-cols-2 md:items-center md:gap-8"}
+     "\n      "
+     [:div
+      {}
+      "\n        "
+      [:div
+       {:class "max-w-prose md:max-w-none"}
+       "\n          "
+       [:h2
+        {:class "text-2xl font-semibold text-gray-900 sm:text-3xl"}
+        (pathom/resolve [:content :subtitle])]
+       "\n\n          "
+       [:p
+        {:class "mt-4 text-gray-700"}
+        (pathom/resolve [:content :body])]
+       "\n        "]
+      "\n      "]
+     "\n\n      "
+     [:div
+      {}
+      "\n        "
+      [:img
+       {:src (pathom/resolve [:content :image-url]),
+        :class "rounded",
+        :alt ""}]
+      "\n      "]
+     "\n    "]
+    "\n  "]
+   "\n"]])
