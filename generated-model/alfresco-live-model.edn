@@ -1,0 +1,1763 @@
+{:fetched-at "2025-10-01T00:15:22.024843Z",
+ :alfresco-host "http://localhost:8080",
+ :types
+ {:count 50,
+  :summary
+  ({:type-id "act:action",
+    :title "Action",
+    :parent "act:actionbase",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "act:actionSchedule",
+    :title "Persistent Action Schedule",
+    :parent "cm:cmobject",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "act:actionbase",
+    :title "Action Base Type",
+    :parent "cm:cmobject",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "act:actioncondition",
+    :title "Action Condition",
+    :parent "act:actionbase",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "act:actionexecutiondetails",
+    :title "Action Execution Details",
+    :parent "cm:cmobject",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "act:actionparameter",
+    :title "Action/Condition Parameter",
+    :parent "cm:cmobject",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "act:compositeaction",
+    :title "Composite Action",
+    :parent "act:action",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "act:compositeactioncondition",
+    :title "Composite Condition",
+    :parent "act:actioncondition",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "act:savedactionfolder",
+    :title "Saved Action Folder",
+    :parent "cm:systemfolder",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "app:configurations",
+    :title "Configurations",
+    :parent "cm:systemfolder",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "app:filelink",
+    :title "File Link Object",
+    :parent "cm:link",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "app:folderlink",
+    :title "Folder Link Object",
+    :parent "cm:link",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "app:glossary",
+    :title "Data Dictionary",
+    :parent "cm:folder",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "bpm:activitiOutcomeTask",
+    :title nil,
+    :parent "bpm:workflowTask",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "bpm:activitiStartTask",
+    :title "Workflow Start Task",
+    :parent "bpm:startTask",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "bpm:package",
+    :title "Package Folder",
+    :parent "cm:systemfolder",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "bpm:startTask",
+    :title "Workflow Start Task",
+    :parent "bpm:workflowTask",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "bpm:task",
+    :title "Task",
+    :parent "cm:content",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "bpm:workflowDefinition",
+    :title "Workflow Process Definition",
+    :parent "cm:content",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "bpm:workflowTask",
+    :title "Workflow Task",
+    :parent "bpm:task",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:authority",
+    :title "Alfresco Authority Abstract Type",
+    :parent "sys:base",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:authorityContainer",
+    :title "Alfresco Authority Type",
+    :parent "cm:authority",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:category",
+    :title "Category",
+    :parent "cm:cmobject",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:category_root",
+    :title "Category Root",
+    :parent "cm:cmobject",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:cmobject",
+    :title "Object",
+    :parent "sys:base",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:content",
+    :title "Content",
+    :parent "cm:cmobject",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:dictionaryModel",
+    :title "Dictionary Model",
+    :parent "cm:content",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:failedThumbnail",
+    :title "Failed Thumbnail",
+    :parent "cm:cmobject",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:folder",
+    :title "Folder",
+    :parent "cm:cmobject",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:link",
+    :title "Link Object",
+    :parent "cm:cmobject",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:mlContainer",
+    :title "Multilingual Container",
+    :parent "sys:container",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:mlRoot",
+    :title "Multilingual Root",
+    :parent "sys:container",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:person",
+    :title "Person",
+    :parent "cm:authority",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:rating",
+    :title "Rating",
+    :parent "sys:base",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:savedquery",
+    :title "Saved Query",
+    :parent "cm:content",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:systemfolder",
+    :title "System Folder",
+    :parent "cm:folder",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:thumbnail",
+    :title "Thumbnail",
+    :parent "cm:content",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cm:zone",
+    :title "Alfresco Authentication Zone Type",
+    :parent "cm:cmobject",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cmis:document",
+    :title "Document",
+    :parent "cmisext:object",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cmis:folder",
+    :title "Folder",
+    :parent "cmisext:object",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cmis:item",
+    :title "Item Type",
+    :parent "cmisext:object",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cmis:policy",
+    :title "Policy",
+    :parent "cmisext:object",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cmis:relationship",
+    :title "Relationship",
+    :parent "cmisext:object",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cmis:secondary",
+    :title "Secondary Type",
+    :parent "cmisext:object",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cmiscustom:document",
+    :title "Custom Document",
+    :parent "cm:content",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cmiscustom:folder",
+    :title "Custom Folder",
+    :parent "cm:folder",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cmisext:aspects",
+    :title "Aspects",
+    :parent "cmis:policy",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "cmisext:object",
+    :title nil,
+    :parent nil,
+    :property-count 0,
+    :property-names ()}
+   {:type-id "dl:contact",
+    :title "Contact List",
+    :parent "dl:dataListItem",
+    :property-count 0,
+    :property-names ()}
+   {:type-id "dl:dataList",
+    :title "Data List folder type",
+    :parent "cm:folder",
+    :property-count 0,
+    :property-names ()}),
+  :full-data
+  [{:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "act:actionmodel",
+      :author "Alfresco",
+      :description "Alfresco Action Model",
+      :namespaceUri "http://www.alfresco.org/model/action/1.0",
+      :namespacePrefix "act"},
+     :id "act:action",
+     :title "Action",
+     :parentId "act:actionbase"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "act:actionmodel",
+      :author "Alfresco",
+      :description "Alfresco Action Model",
+      :namespaceUri "http://www.alfresco.org/model/action/1.0",
+      :namespacePrefix "act"},
+     :id "act:actionSchedule",
+     :title "Persistent Action Schedule",
+     :parentId "cm:cmobject"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "act:actionmodel",
+      :author "Alfresco",
+      :description "Alfresco Action Model",
+      :namespaceUri "http://www.alfresco.org/model/action/1.0",
+      :namespacePrefix "act"},
+     :id "act:actionbase",
+     :title "Action Base Type",
+     :parentId "cm:cmobject"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "act:actionmodel",
+      :author "Alfresco",
+      :description "Alfresco Action Model",
+      :namespaceUri "http://www.alfresco.org/model/action/1.0",
+      :namespacePrefix "act"},
+     :id "act:actioncondition",
+     :title "Action Condition",
+     :parentId "act:actionbase"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "act:actionmodel",
+      :author "Alfresco",
+      :description "Alfresco Action Model",
+      :namespaceUri "http://www.alfresco.org/model/action/1.0",
+      :namespacePrefix "act"},
+     :id "act:actionexecutiondetails",
+     :title "Action Execution Details",
+     :parentId "cm:cmobject"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "act:actionmodel",
+      :author "Alfresco",
+      :description "Alfresco Action Model",
+      :namespaceUri "http://www.alfresco.org/model/action/1.0",
+      :namespacePrefix "act"},
+     :id "act:actionparameter",
+     :title "Action/Condition Parameter",
+     :parentId "cm:cmobject"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "act:actionmodel",
+      :author "Alfresco",
+      :description "Alfresco Action Model",
+      :namespaceUri "http://www.alfresco.org/model/action/1.0",
+      :namespacePrefix "act"},
+     :id "act:compositeaction",
+     :title "Composite Action",
+     :parentId "act:action"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "act:actionmodel",
+      :author "Alfresco",
+      :description "Alfresco Action Model",
+      :namespaceUri "http://www.alfresco.org/model/action/1.0",
+      :namespacePrefix "act"},
+     :id "act:compositeactioncondition",
+     :title "Composite Condition",
+     :parentId "act:actioncondition"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "act:actionmodel",
+      :author "Alfresco",
+      :description "Alfresco Action Model",
+      :namespaceUri "http://www.alfresco.org/model/action/1.0",
+      :namespacePrefix "act"},
+     :id "act:savedactionfolder",
+     :title "Saved Action Folder",
+     :parentId "cm:systemfolder"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :description "Configurations",
+     :isContainer true,
+     :model
+     {:id "app:applicationmodel",
+      :author "Alfresco",
+      :description "Alfresco Application Model",
+      :namespaceUri "http://www.alfresco.org/model/application/1.0",
+      :namespacePrefix "app"},
+     :id "app:configurations",
+     :title "Configurations",
+     :parentId "cm:systemfolder"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "app:applicationmodel",
+      :author "Alfresco",
+      :description "Alfresco Application Model",
+      :namespaceUri "http://www.alfresco.org/model/application/1.0",
+      :namespacePrefix "app"},
+     :id "app:filelink",
+     :title "File Link Object",
+     :parentId "cm:link"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "app:applicationmodel",
+      :author "Alfresco",
+      :description "Alfresco Application Model",
+      :namespaceUri "http://www.alfresco.org/model/application/1.0",
+      :namespacePrefix "app"},
+     :id "app:folderlink",
+     :title "Folder Link Object",
+     :parentId "cm:link"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :description "Data Dictionary",
+     :isContainer true,
+     :model
+     {:id "app:applicationmodel",
+      :author "Alfresco",
+      :description "Alfresco Application Model",
+      :namespaceUri "http://www.alfresco.org/model/application/1.0",
+      :namespacePrefix "app"},
+     :id "app:glossary",
+     :title "Data Dictionary",
+     :parentId "cm:folder"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:activitiOutcomeTask",
+     :parentId "bpm:workflowTask"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :description
+     "Task used to collect information required for initiating Workflow",
+     :isContainer false,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:activitiStartTask",
+     :title "Workflow Start Task",
+     :parentId "bpm:startTask"}}
+   {:entry
+    {:isArchive false,
+     :includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:package",
+     :title "Package Folder",
+     :parentId "cm:systemfolder"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :description
+     "Task used to collect information required for initiating Workflow",
+     :isContainer false,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:startTask",
+     :title "Workflow Start Task",
+     :parentId "bpm:workflowTask"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :description "Task",
+     :isContainer false,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:task",
+     :title "Task",
+     :parentId "cm:content"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:workflowDefinition",
+     :title "Workflow Process Definition",
+     :parentId "cm:content"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :description "Task assigned by a Workflow",
+     :isContainer false,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:workflowTask",
+     :title "Workflow Task",
+     :parentId "bpm:task"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:authority",
+     :title "Alfresco Authority Abstract Type",
+     :parentId "sys:base"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:authorityContainer",
+     :title "Alfresco Authority Type",
+     :parentId "cm:authority"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Category",
+     :isContainer true,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:category",
+     :title "Category",
+     :parentId "cm:cmobject"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Root Category",
+     :isContainer true,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:category_root",
+     :title "Category Root",
+     :parentId "cm:cmobject"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:cmobject",
+     :title "Object",
+     :parentId "sys:base"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :description "Base Content Object",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:content",
+     :title "Content",
+     :parentId "cm:cmobject"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:dictionaryModel",
+     :title "Dictionary Model",
+     :parentId "cm:content"}}
+   {:entry
+    {:isArchive false,
+     :includedInSupertypeQuery false,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:failedThumbnail",
+     :title "Failed Thumbnail",
+     :parentId "cm:cmobject"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :description "Folder",
+     :isContainer true,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:folder",
+     :title "Folder",
+     :parentId "cm:cmobject"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:link",
+     :title "Link Object",
+     :parentId "cm:cmobject"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:mlContainer",
+     :title "Multilingual Container",
+     :parentId "sys:container"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:mlRoot",
+     :title "Multilingual Root",
+     :parentId "sys:container"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Person",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:person",
+     :title "Person",
+     :parentId "cm:authority"}}
+   {:entry
+    {:includedInSupertypeQuery false,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:rating",
+     :title "Rating",
+     :parentId "sys:base"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :description "Saved Query",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:savedquery",
+     :title "Saved Query",
+     :parentId "cm:content"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :description "Folder for containing system-level items",
+     :isContainer true,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:systemfolder",
+     :title "System Folder",
+     :parentId "cm:folder"}}
+   {:entry
+    {:isArchive false,
+     :includedInSupertypeQuery false,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:thumbnail",
+     :title "Thumbnail",
+     :parentId "cm:content"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:zone",
+     :title "Alfresco Authentication Zone Type",
+     :parentId "cm:cmobject"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Document Type",
+     :isContainer false,
+     :model
+     {:id "cmis:cmismodel",
+      :description "CMIS Model Definitions",
+      :namespaceUri "http://www.alfresco.org/model/cmis/1.0/cs01",
+      :namespacePrefix "cmis"},
+     :id "cmis:document",
+     :title "Document",
+     :parentId "cmisext:object"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Folder Type",
+     :isContainer false,
+     :model
+     {:id "cmis:cmismodel",
+      :description "CMIS Model Definitions",
+      :namespaceUri "http://www.alfresco.org/model/cmis/1.0/cs01",
+      :namespacePrefix "cmis"},
+     :id "cmis:folder",
+     :title "Folder",
+     :parentId "cmisext:object"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "CMIS Item",
+     :isContainer false,
+     :model
+     {:id "cmis:cmismodel",
+      :description "CMIS Model Definitions",
+      :namespaceUri "http://www.alfresco.org/model/cmis/1.0/cs01",
+      :namespacePrefix "cmis"},
+     :id "cmis:item",
+     :title "Item Type",
+     :parentId "cmisext:object"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Policy Type",
+     :isContainer false,
+     :model
+     {:id "cmis:cmismodel",
+      :description "CMIS Model Definitions",
+      :namespaceUri "http://www.alfresco.org/model/cmis/1.0/cs01",
+      :namespacePrefix "cmis"},
+     :id "cmis:policy",
+     :title "Policy",
+     :parentId "cmisext:object"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Relationship Type",
+     :isContainer false,
+     :model
+     {:id "cmis:cmismodel",
+      :description "CMIS Model Definitions",
+      :namespaceUri "http://www.alfresco.org/model/cmis/1.0/cs01",
+      :namespacePrefix "cmis"},
+     :id "cmis:relationship",
+     :title "Relationship",
+     :parentId "cmisext:object"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Secondary Type",
+     :isContainer false,
+     :model
+     {:id "cmis:cmismodel",
+      :description "CMIS Model Definitions",
+      :namespaceUri "http://www.alfresco.org/model/cmis/1.0/cs01",
+      :namespacePrefix "cmis"},
+     :id "cmis:secondary",
+     :title "Secondary Type",
+     :parentId "cmisext:object"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cmiscustom:model",
+      :author "Alfresco",
+      :description "CMIS Custom Model",
+      :namespaceUri "http://www.alfresco.org/model/cmis/custom",
+      :namespacePrefix "cmiscustom"},
+     :id "cmiscustom:document",
+     :title "Custom Document",
+     :parentId "cm:content"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "cmiscustom:model",
+      :author "Alfresco",
+      :description "CMIS Custom Model",
+      :namespaceUri "http://www.alfresco.org/model/cmis/custom",
+      :namespacePrefix "cmiscustom"},
+     :id "cmiscustom:folder",
+     :title "Custom Folder",
+     :parentId "cm:folder"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Aspects Type",
+     :isContainer false,
+     :model
+     {:id "cmis:cmismodel",
+      :description "CMIS Model Definitions",
+      :namespaceUri "http://www.alfresco.org/model/cmis/1.0/cs01ext",
+      :namespacePrefix "cmisext"},
+     :id "cmisext:aspects",
+     :title "Aspects",
+     :parentId "cmis:policy"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cmis:cmismodel",
+      :description "CMIS Model Definitions",
+      :namespaceUri "http://www.alfresco.org/model/cmis/1.0/cs01ext",
+      :namespacePrefix "cmisext"},
+     :id "cmisext:object"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :description
+     "Contacts list including first name, last name, full name, email, job title, phone (office), phone (mobile).",
+     :isContainer false,
+     :model
+     {:id "dl:datalistmodel",
+      :author "Mike Hatfield",
+      :description "Alfresco Share Data List Model",
+      :namespaceUri "http://www.alfresco.org/model/datalist/1.0",
+      :namespacePrefix "dl"},
+     :id "dl:contact",
+     :title "Contact List",
+     :parentId "dl:dataListItem"}}
+   {:entry
+    {:isArchive true,
+     :includedInSupertypeQuery true,
+     :description
+     "Holds Data List items of the type specified in the dl:dataListItemType property.",
+     :isContainer true,
+     :model
+     {:id "dl:datalistmodel",
+      :author "Mike Hatfield",
+      :description "Alfresco Share Data List Model",
+      :namespaceUri "http://www.alfresco.org/model/datalist/1.0",
+      :namespacePrefix "dl"},
+     :id "dl:dataList",
+     :title "Data List folder type",
+     :parentId "cm:folder"}}]},
+ :aspects
+ {:count 50,
+  :summary
+  ({:aspect-id "act:actionexecutionhistory",
+    :title "Action Execution History",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "act:actions",
+    :title "Rules",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "aos:checkedOutToLocal",
+    :title "Checked out to local",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "app:configurable",
+    :title "Configurable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "app:defaultViewConfig",
+    :title "Default View Config",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "app:feedsource",
+    :title "Feed Source",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "app:inlineeditable",
+    :title "Inline Editable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "app:linked",
+    :title "Marker aspect to indicate that the node has been linked.",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "app:simpleworkflow",
+    :title "Workflow",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "app:uifacets",
+    :title "UI Facets",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "app:workflow",
+    :title "Workflow",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "audio:audio",
+    :title "Audio",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "blg:blogDetails",
+    :title "Blog Details",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "blg:blogPost",
+    :title "Blog Post",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "bpm:assignee",
+    :title nil,
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "bpm:assignees",
+    :title nil,
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "bpm:endAutomatically",
+    :title nil,
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "bpm:groupAssignee",
+    :title nil,
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "bpm:groupAssignees",
+    :title nil,
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "bpm:workflowPackage",
+    :title "Workflow Package",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:annullable",
+    :title "Annullable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:attachable",
+    :title "Attachable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:auditable",
+    :title "Auditable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:author",
+    :title "Author",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:basable",
+    :title "Basable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:checkedOut",
+    :title "Checked Out",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:classifiable",
+    :title "Classifiable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:cmisCreatedCheckedOut",
+    :title "CMIS Created Checked Out",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:complianceable",
+    :title "Complianceable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:copiedfrom",
+    :title "Copied From",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:countable",
+    :title "Countable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:dublincore",
+    :title "Dublin Core",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:effectivity",
+    :title "Effectivity",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:emailed",
+    :title "Emailed",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:failedThumbnailSource",
+    :title "Failed Thumbnail Source",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:fiveStarRatingSchemeRollups",
+    :title "Five star rating scheme rollups",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:generalclassifiable",
+    :title "Classifiable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:geographic",
+    :title "Geographic",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:indexControl",
+    :title "Index Control",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:likesRatingSchemeRollups",
+    :title "Likes rating scheme rollups",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:localizable",
+    :title "Localizable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:lockable",
+    :title "Lockable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:mlDocument",
+    :title "Multilingual Document",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:mlEmptyTranslation",
+    :title "Empty Translation",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:ownable",
+    :title "Ownable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:partable",
+    :title "Partable",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:personDisabled",
+    :title "Person Disabled",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:preferences",
+    :title "Preferences",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:projectsummary",
+    :title "Project Summary",
+    :property-count 0,
+    :property-names ()}
+   {:aspect-id "cm:rateable",
+    :title "Rateable",
+    :property-count 0,
+    :property-names ()}),
+  :full-data
+  [{:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "act:actionmodel",
+      :author "Alfresco",
+      :description "Alfresco Action Model",
+      :namespaceUri "http://www.alfresco.org/model/action/1.0",
+      :namespacePrefix "act"},
+     :id "act:actionexecutionhistory",
+     :title "Action Execution History"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "act:actionmodel",
+      :author "Alfresco",
+      :description "Alfresco Action Model",
+      :namespaceUri "http://www.alfresco.org/model/action/1.0",
+      :namespacePrefix "act"},
+     :id "act:actions",
+     :title "Rules"}}
+   {:entry
+    {:isArchive false,
+     :includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "aos:aosmodel",
+      :author "Alfresco",
+      :description "Alfresco Office Services Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/aos/1.0",
+      :namespacePrefix "aos"},
+     :id "aos:checkedOutToLocal",
+     :title "Checked out to local"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Configurable",
+     :isContainer true,
+     :model
+     {:id "app:applicationmodel",
+      :author "Alfresco",
+      :description "Alfresco Application Model",
+      :namespaceUri "http://www.alfresco.org/model/application/1.0",
+      :namespacePrefix "app"},
+     :id "app:configurable",
+     :title "Configurable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "app:applicationmodel",
+      :author "Alfresco",
+      :description "Alfresco Application Model",
+      :namespaceUri "http://www.alfresco.org/model/application/1.0",
+      :namespacePrefix "app"},
+     :id "app:defaultViewConfig",
+     :title "Default View Config"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "app:applicationmodel",
+      :author "Alfresco",
+      :description "Alfresco Application Model",
+      :namespaceUri "http://www.alfresco.org/model/application/1.0",
+      :namespacePrefix "app"},
+     :id "app:feedsource",
+     :title "Feed Source"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Inline Editable",
+     :isContainer false,
+     :model
+     {:id "app:applicationmodel",
+      :author "Alfresco",
+      :description "Alfresco Application Model",
+      :namespaceUri "http://www.alfresco.org/model/application/1.0",
+      :namespacePrefix "app"},
+     :id "app:inlineeditable",
+     :title "Inline Editable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "app:applicationmodel",
+      :author "Alfresco",
+      :description "Alfresco Application Model",
+      :namespaceUri "http://www.alfresco.org/model/application/1.0",
+      :namespacePrefix "app"},
+     :id "app:linked",
+     :title
+     "Marker aspect to indicate that the node has been linked."}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Workflow",
+     :isContainer false,
+     :model
+     {:id "app:applicationmodel",
+      :author "Alfresco",
+      :description "Alfresco Application Model",
+      :namespaceUri "http://www.alfresco.org/model/application/1.0",
+      :namespacePrefix "app"},
+     :id "app:simpleworkflow",
+     :title "Workflow",
+     :parentId "app:workflow"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "UI Facets",
+     :isContainer false,
+     :model
+     {:id "app:applicationmodel",
+      :author "Alfresco",
+      :description "Alfresco Application Model",
+      :namespaceUri "http://www.alfresco.org/model/application/1.0",
+      :namespacePrefix "app"},
+     :id "app:uifacets",
+     :title "UI Facets",
+     :parentId "cm:titled"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Workflow",
+     :isContainer false,
+     :model
+     {:id "app:applicationmodel",
+      :author "Alfresco",
+      :description "Alfresco Application Model",
+      :namespaceUri "http://www.alfresco.org/model/application/1.0",
+      :namespacePrefix "app"},
+     :id "app:workflow",
+     :title "Workflow"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Subset of the standard xmpDM Audio metadata",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/audio/1.0",
+      :namespacePrefix "audio"},
+     :id "audio:audio",
+     :title "Audio"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "blg:blogintegration",
+      :author "Roy Wetherall",
+      :description "Blog Integration Model",
+      :namespaceUri
+      "http://www.alfresco.org/model/blogintegration/1.0",
+      :namespacePrefix "blg"},
+     :id "blg:blogDetails",
+     :title "Blog Details"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "blg:blogintegration",
+      :author "Roy Wetherall",
+      :description "Blog Integration Model",
+      :namespaceUri
+      "http://www.alfresco.org/model/blogintegration/1.0",
+      :namespacePrefix "blg"},
+     :id "blg:blogPost",
+     :title "Blog Post"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:assignee"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:assignees"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:endAutomatically"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:groupAssignee"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:groupAssignees"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description
+     "The collection of content routed through the workflow",
+     :isContainer false,
+     :model
+     {:id "bpm:businessprocessmodel",
+      :author "Alfresco",
+      :description "Base definitions of all Business Processes",
+      :namespaceUri "http://www.alfresco.org/model/bpm/1.0",
+      :namespacePrefix "bpm"},
+     :id "bpm:workflowPackage",
+     :title "Workflow Package"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description
+     "Indicates that a node can be deleted if a pending activity is cancelled",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:annullable",
+     :title "Annullable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Allows other repository objects to be attached",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:attachable",
+     :title "Attachable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Auditable",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:auditable",
+     :title "Auditable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Author",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:author",
+     :title "Author"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Basable",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:basable",
+     :title "Basable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:checkedOut",
+     :title "Checked Out"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Classifiable",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:classifiable",
+     :title "Classifiable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:cmisCreatedCheckedOut",
+     :title "CMIS Created Checked Out"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Complianceable",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:complianceable",
+     :title "Complianceable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:copiedfrom",
+     :title "Copied From"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Countable",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:countable",
+     :title "Countable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Dublin Core",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:dublincore",
+     :title "Dublin Core",
+     :parentId "cm:titled"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Effectivity",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:effectivity",
+     :title "Effectivity"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Emailed",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:emailed",
+     :title "Emailed"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:failedThumbnailSource",
+     :title "Failed Thumbnail Source"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:fiveStarRatingSchemeRollups",
+     :title "Five star rating scheme rollups"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Classifiable",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:generalclassifiable",
+     :title "Classifiable",
+     :parentId "cm:classifiable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Geographic",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:geographic",
+     :title "Geographic"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Control Index Behaviour",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:indexControl",
+     :title "Index Control"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:likesRatingSchemeRollups",
+     :title "Likes rating scheme rollups"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Localizable",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:localizable",
+     :title "Localizable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Lockable",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:lockable",
+     :title "Lockable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:mlDocument",
+     :title "Multilingual Document"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:mlEmptyTranslation",
+     :title "Empty Translation"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Ownable",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:ownable",
+     :title "Ownable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Partable",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:partable",
+     :title "Partable"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :description "Indicates that a cm:person type has been disabled.",
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:personDisabled",
+     :title "Person Disabled"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:preferences",
+     :title "Preferences"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer false,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:projectsummary",
+     :title "Project Summary"}}
+   {:entry
+    {:includedInSupertypeQuery true,
+     :isContainer true,
+     :model
+     {:id "cm:contentmodel",
+      :author "Alfresco",
+      :description "Alfresco Content Domain Model",
+      :namespaceUri "http://www.alfresco.org/model/content/1.0",
+      :namespacePrefix "cm"},
+     :id "cm:rateable",
+     :title "Rateable"}}]},
+ :sample-nodes
+ {:hero
+  {:node-data
+   {:entry
+    {:properties
+     {:cm:title "The Hero Graphic Dafault large image or images"},
+     :modifiedByUser {:id "tmb", :displayName "Tom Brooke"},
+     :createdByUser {:id "tmb", :displayName "Tom Brooke"},
+     :nodeType "cm:folder",
+     :isFile false,
+     :name "Hero",
+     :createdAt "2025-09-17T10:51:19.108+0000",
+     :aspectNames ["cm:titled" "cm:auditable"],
+     :id "39985c5c-201a-42f6-985c-5c201a62f6d8",
+     :modifiedAt "2025-09-28T01:26:28.518+0000",
+     :parentId "9faac48b-6c77-4266-aac4-8b6c7752668a",
+     :isFolder true}},
+   :analysis
+   {:node-id "39985c5c-201a-42f6-985c-5c201a62f6d8",
+    :name "Hero",
+    :node-type "cm:folder",
+    :aspects ["cm:titled" "cm:auditable"],
+    :properties
+    {:cm:title "The Hero Graphic Dafault large image or images"},
+    :property-keys (:cm:title)},
+   :children
+   [{:entry
+     {:modifiedByUser {:id "tmb", :displayName "Tom Brooke"},
+      :createdByUser {:id "tmb", :displayName "Tom Brooke"},
+      :nodeType "cm:content",
+      :isFile true,
+      :content
+      {:mimeType "image/png",
+       :mimeTypeName "PNG Image",
+       :sizeInBytes 371088,
+       :encoding "UTF-8"},
+      :name "buildingC.png",
+      :createdAt "2025-09-28T01:26:28.454+0000",
+      :id "4c3485b3-28ae-470e-b485-b328aef70e7e",
+      :modifiedAt "2025-09-28T01:26:28.745+0000",
+      :parentId "39985c5c-201a-42f6-985c-5c201a62f6d8",
+      :isFolder false}}]},
+  :feature1
+  {:node-data
+   {:entry
+    {:properties {:cm:title "First Feature on Homepage"},
+     :modifiedByUser {:id "tmb", :displayName "Tom Brooke"},
+     :createdByUser {:id "tmb", :displayName "Tom Brooke"},
+     :nodeType "cm:folder",
+     :isFile false,
+     :name "Feature 1",
+     :createdAt "2025-09-17T10:51:58.652+0000",
+     :aspectNames ["cm:titled" "cm:auditable"],
+     :id "264ab06c-984e-4f64-8ab0-6c984eaf6440",
+     :modifiedAt "2025-09-30T23:57:51.729+0000",
+     :parentId "9faac48b-6c77-4266-aac4-8b6c7752668a",
+     :isFolder true}},
+   :analysis
+   {:node-id "264ab06c-984e-4f64-8ab0-6c984eaf6440",
+    :name "Feature 1",
+    :node-type "cm:folder",
+    :aspects ["cm:titled" "cm:auditable"],
+    :properties {:cm:title "First Feature on Homepage"},
+    :property-keys (:cm:title)}},
+  :feature2
+  {:node-data
+   {:entry
+    {:properties {:cm:title "Second feature on Home page "},
+     :modifiedByUser {:id "tmb", :displayName "Tom Brooke"},
+     :createdByUser {:id "tmb", :displayName "Tom Brooke"},
+     :nodeType "cm:folder",
+     :isFile false,
+     :name "Feature 2",
+     :createdAt "2025-09-17T10:52:43.527+0000",
+     :aspectNames ["cm:titled" "cm:auditable"],
+     :id "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89",
+     :modifiedAt "2025-09-23T00:52:27.056+0000",
+     :parentId "9faac48b-6c77-4266-aac4-8b6c7752668a",
+     :isFolder true}},
+   :analysis
+   {:node-id "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89",
+    :name "Feature 2",
+    :node-type "cm:folder",
+    :aspects ["cm:titled" "cm:auditable"],
+    :properties {:cm:title "Second feature on Home page "},
+    :property-keys (:cm:title)}}}}

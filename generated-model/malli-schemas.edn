@@ -1,0 +1,5 @@
+{:model-name "cms:mtzCmsModel",
+ :constraints {},
+ :types {},
+ :aspects {},
+ :malli-schemas {:types {}, :aspects {}}}

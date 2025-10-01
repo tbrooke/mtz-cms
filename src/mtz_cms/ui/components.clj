@@ -1,5 +1,7 @@
 (ns mtz-cms.ui.components
-  "UI components for Mount Zion CMS")
+  "UI components for Mount Zion CMS"
+  (:require
+   [mtz-cms.navigation.menu :as menu]))
 
 ;; --- TAILWIND CSS CDN ---
 
@@ -9,18 +11,18 @@
 
 (defn custom-styles []
   "Custom CSS to complement Tailwind"
-  [:style 
+  [:style
    "
    /* HTMX loading indicators */
    .htmx-indicator {
      opacity: 0;
      transition: opacity 200ms ease-in;
    }
-   
+
    .htmx-request .htmx-indicator {
      opacity: 1;
    }
-   
+
    .htmx-request.htmx-indicator {
      opacity: 1;
    }
@@ -28,20 +30,76 @@
 
 ;; --- COMPONENTS ---
 
-(defn site-header []
-  [:header {:class "bg-blue-600 text-white shadow-lg"}
-   [:div {:class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}
-    [:div {:class "flex justify-between items-center py-6"}
-     [:div
-      [:h1 {:class "text-2xl font-bold"} "Mount Zion UCC"]
-      [:p {:class "text-blue-100 text-sm"} "United Church of Christ"]]
-     [:nav {:class "hidden md:flex space-x-8"}
-      [:a {:href "/" :class "text-white hover:text-blue-200 transition-colors"} "Home"]
-      [:a {:href "/about" :class "text-white hover:text-blue-200 transition-colors"} "About"]
-      [:a {:href "/worship" :class "text-white hover:text-blue-200 transition-colors"} "Worship"]
-      [:a {:href "/events" :class "text-white hover:text-blue-200 transition-colors"} "Events"]
-      [:a {:href "/contact" :class "text-white hover:text-blue-200 transition-colors"} "Contact"]
-      [:a {:href "/demo" :class "text-blue-200 hover:text-white transition-colors border border-blue-400 px-3 py-1 rounded"} "Demo"]]]]])
+(defn site-header
+  "Dynamic site header with hierarchical navigation.
+
+   Accepts optional navigation data. If not provided, will use static fallback."
+  ([] (site-header nil))
+  ([nav]
+   (println "site-header received nav:" (pr-str nav))
+   [:header {:class "bg-blue-600 text-white shadow-lg"}
+    [:div {:class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}
+     [:div {:class "flex justify-between items-center py-6"}
+      ;; Logo/Title
+      [:div
+       [:a {:href "/" :class "block"}
+        [:h1 {:class "text-2xl font-bold"} "Mount Zion UCC"]
+        [:p {:class "text-blue-100 text-sm"} "United Church of Christ"]]]
+
+      ;; Navigation Menu
+      [:nav {:class "hidden md:flex space-x-6 items-center"}
+       (concat
+        (if (and nav (seq nav))
+          ;; Dynamic navigation from Alfresco
+          (for [item nav]
+            (if (:has-children? item)
+              ;; Dropdown menu for items with submenus
+              [:div {:class "relative group"}
+               [:button {:class "text-white hover:text-blue-200 transition-colors flex items-center gap-1 py-2"}
+                (:label item)
+                ;; Dropdown arrow
+                [:svg {:class   "w-4 h-4"
+                       :fill    "none"
+                       :stroke  "currentColor"
+                       :viewBox "0 0 24 24"}
+                 [:path {:stroke-linecap  "round"
+                         :stroke-linejoin "round"
+                         :stroke-width    "2"
+                         :d               "M19 9l-7 7-7-7"}]]]
+               ;; Dropdown panel
+               [:div {:class "absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"}
+                (for [sub (:submenu item)]
+                  [:a {:href  (:path sub)
+                       :class "block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 first:rounded-t-md last:rounded-b-md"}
+                   (:label sub)])]]
+
+              ;; Regular link (no submenu)
+              [:a {:href  (:path item)
+                   :class "text-white hover:text-blue-200 transition-colors"}
+               (:label item)]))
+
+          ;; Fallback: static navigation
+          [[:a {:href  "/"
+                :class "text-white hover:text-blue-200 transition-colors"} "Home"]
+           [:a {:href  "/about"
+                :class "text-white hover:text-blue-200 transition-colors"} "About"]
+           [:a {:href  "/worship"
+                :class "text-white hover:text-blue-200 transition-colors"} "Worship"]
+           [:a {:href  "/events"
+                :class "text-white hover:text-blue-200 transition-colors"} "Events"]
+           [:a {:href  "/activities"
+                :class "text-white hover:text-blue-200 transition-colors"} "Activities"]
+           [:a {:href  "/contact"
+                :class "text-white hover:text-blue-200 transition-colors"} "Contact"]])
+
+        ;; Demo link (always shown)
+        [[:a {:href  "/demo"
+              :class "text-blue-200 hover:text-white transition-colors border border-blue-400 px-3 py-1 rounded"} "Demo"]])]
+
+      ;; Mobile menu button (for future mobile implementation)
+      [:div {:class "md:hidden"}
+       [:button {:class "text-white" :aria-label "Open menu"}
+        "☰ Menu"]]]]]))  ;; Now properly closes: button, mobile-div, flex-div, container-div, header
 
 (defn site-footer []
   [:footer {:class "bg-gray-50 border-t border-gray-200 mt-12"}

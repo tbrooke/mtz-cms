@@ -27,12 +27,13 @@
 
 (defn home-handler [request]
   "Home page with HTMX dynamic components"
-  (let [ctx {}
+  (let [ctx {}  ; Alfresco client uses default-config
         page-config (htmx/get-page-component-config :home)]
     (html-response
      (pages/base-layout
       "Mount Zion UCC - Home"
-      (htmx/htmx-hero-features-layout page-config)))))
+      (htmx/htmx-hero-features-layout page-config)
+      ctx))))
 
 (defn about-handler [request]
   (let [ctx {}

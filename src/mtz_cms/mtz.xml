@@ -1,0 +1,155 @@
+<!-- File: mtz-cms-model.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="cms:mtzCmsModel"
+       xmlns="http://www.alfresco.org/model/dictionary/1.0">
+  <description>Mount Zion CMS content model</description>
+  <author>Tom Brooke</author>
+  <version>1.0</version>
+
+  <imports>
+    <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+    <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+  </imports>
+
+  <namespaces>
+    <namespace uri="http://www.mtzcg.com/model/cms/1.0" prefix="cms"/>
+  </namespaces>
+
+  <constraints>
+    <constraint name="cms:componentTypeConstraint" type="LIST">
+      <parameter name="allowedValues">
+        <list>
+          <value>hero</value>
+          <value>section</value>
+          <value>feature</value>
+          <value>card</value>
+          <value>cta</value>
+          <value>gallery</value>
+          <value>testimonial</value>
+          <value>accordion</value>
+          <value>tabs</value>
+          <value>custom</value>
+        </list>
+      </parameter>
+    </constraint>
+
+    <constraint name="cms:regionConstraint" type="LIST">
+      <parameter name="allowedValues">
+        <list>
+          <value>header</value>
+          <value>hero</value>
+          <value>main</value>
+          <value>sidebar</value>
+          <value>footer</value>
+          <value>menu</value>
+        </list>
+      </parameter>
+    </constraint>
+  </constraints>
+
+  <types>
+    <type name="cms:item">
+      <title>CMS Content Item</title>
+      <parent>cm:content</parent>
+      <properties>
+        <property name="cms:title">
+          <type>d:text</type>
+          <mandatory>true</mandatory>
+        </property>
+
+        <property name="cms:slug">
+          <type>d:text</type>
+          <mandatory>false</mandatory>
+        </property>
+
+        <!-- Choose d:text (inline HTML) or switch to d:content for streamed HTML -->
+        <property name="cms:body">
+          <type>d:text</type>
+          <mandatory>false</mandatory>
+        </property>
+
+        <property name="cms:componentType">
+          <type>d:text</type>
+          <mandatory>true</mandatory>
+          <constraints>
+            <constraint ref="cms:componentTypeConstraint"/>
+          </constraints>
+        </property>
+
+        <property name="cms:ordering">
+          <type>d:int</type>
+          <default>0</default>
+        </property>
+
+        <property name="cms:imageRef">
+          <type>d:noderef</type>
+          <mandatory>false</mandatory>
+        </property>
+
+        <property name="cms:metadata">
+          <type>d:text</type>
+          <mandatory>false</mandatory>
+          <description>JSON metadata for component-specific properties</description>
+        </property>
+      </properties>
+    </type>
+  </types>
+
+  <aspects>
+    <aspect name="cms:placeable">
+      <title>Placeable Content</title>
+      <properties>
+        <property name="cms:sitePath">
+          <type>d:text</type>
+        </property>
+        <property name="cms:pagePath">
+          <type>d:text</type>
+        </property>
+        <property name="cms:region">
+          <type>d:text</type>
+          <constraints>
+            <constraint ref="cms:regionConstraint"/>
+          </constraints>
+        </property>
+        <property name="cms:slot">
+          <type>d:int</type>
+        </property>
+      </properties>
+    </aspect>
+
+    <aspect name="cms:publishable">
+      <title>Publishable Content</title>
+      <properties>
+        <property name="cms:publishStatus">
+          <type>d:text</type>
+          <default>draft</default>
+          <constraints>
+            <constraint name="cms:statusConstraint" type="LIST">
+              <parameter name="allowedValues">
+                <list>
+                  <value>draft</value>
+                  <value>review</value>
+                  <value>published</value>
+                  <value>archived</value>
+                </list>
+              </parameter>
+            </constraint>
+          </constraints>
+        </property>
+        <property name="cms:publishedDate">
+          <type>d:datetime</type>
+        </property>
+        <property name="cms:publishedBy">
+          <type>d:text</type>
+        </property>
+        <property name="cms:embargoDate">
+          <type>d:datetime</type>
+        </property>
+        <property name="cms:expiryDate">
+          <type>d:datetime</type>
+        </property>
+      </properties>
+    </aspect>
+  </aspects>
+</model>
+

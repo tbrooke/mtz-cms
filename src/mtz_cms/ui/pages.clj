@@ -2,24 +2,43 @@
   "Page templates for Mount Zion CMS"
   (:require
    [mtz-cms.ui.components :as ui]
-   [mtz-cms.components.layouts :as layouts]))
+   [mtz-cms.components.layouts :as layouts]
+   [mtz-cms.navigation.menu :as menu]))
 
 ;; --- PAGE LAYOUTS ---
 
-(defn base-layout [title content]
-  [:html {:class "h-full"}
-   [:head
-    [:meta {:charset "utf-8"}]
-    [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
-    [:title title]
-    (ui/tailwind-cdn)
-    [:script {:src "/js/htmx.min.js"}]
-    (ui/custom-styles)]
-   [:body {:class "h-full bg-gray-50"}
-    (ui/site-header)
-    [:main {:class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"}
-     content]
-    (ui/site-footer)]])
+(defn base-layout
+  "Base page layout with dynamic navigation.
+
+   Accepts optional ctx (Pathom context) to build navigation from Alfresco."
+  ([title content] (base-layout title content nil))
+  ([title content ctx]
+   (let [nav (when ctx
+               (try
+                 (let [result (menu/build-navigation ctx)]
+                   (println "Navigation built successfully:" (count result) "items")
+                   result)
+                 (catch Exception e
+                   ;; Log error but don't break the page
+                   (println "ERROR building navigation:" (.getMessage e))
+                   (println "Stack trace:")
+                   (.printStackTrace e)
+                   nil)))]
+     (when nav
+       (println "Rendering navigation with" (count nav) "items"))
+     [:html {:class "h-full"}
+      [:head
+       [:meta {:charset "utf-8"}]
+       [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
+       [:title title]
+       (ui/tailwind-cdn)
+       [:script {:src "/js/htmx.min.js"}]
+       (ui/custom-styles)]
+      [:body {:class "h-full bg-gray-50"}
+       (ui/site-header nav)
+       [:main {:class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"}
+        content]
+       (ui/site-footer)]])))
 
 ;; --- PAGE TEMPLATES ---
 

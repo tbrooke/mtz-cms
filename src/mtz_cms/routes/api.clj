@@ -5,6 +5,7 @@
    [mtz-cms.pathom.resolvers :as pathom]
    [mtz-cms.components.htmx-templates :as htmx-templates]
    [mtz-cms.components.templates :as templates]
+   [mtz-cms.components.sections :as sections]
    [mtz-cms.validation.middleware :as validation]
    [mtz-cms.alfresco.client :as alfresco]
    [clojure.tools.logging :as log]))
@@ -140,6 +141,36 @@
                :hx-push-url "true"}
       "Contact Us"]]]))
 
+(defn section-component-handler [request]
+  "Serve section component data dynamically from Alfresco"
+  (try
+    (let [ctx {}
+          node-id (get-in request [:path-params :node-id])
+          _ (log/info "🔍 Loading section component for node:" node-id)
+
+          ;; Query Pathom for section data
+          result (pathom/query ctx [{[:section/node-id node-id]
+                                    [:section/title :section/subtitle :section/body
+                                     :section/description :section/image :section/type]}])
+          _ (log/debug "Pathom section query result:" result)
+
+          section-data (get result [:section/node-id node-id])
+
+          ;; Render section using the smart renderer
+          response (html-fragment-response
+                   (sections/render-section section-data))]
+
+      (log/info "✅ Section component rendered successfully for node:" node-id)
+      response)
+
+    (catch Exception e
+      (log/error "❌ Error in section component handler:" (.getMessage e))
+      ;; Return fallback response
+      (html-fragment-response
+       [:div {:class "bg-red-50 border border-red-200 rounded p-4"}
+        [:h2 {:class "text-red-800"} "Content Loading Error"]
+        [:p {:class "text-red-600"} "Unable to load section content. Please try again."]]))))
+
 ;; --- PAGE API HANDLERS ---
 
 (defn page-publish-handler [request]
@@ -210,6 +241,7 @@
      ["/hero/:node-id" {:get hero-component-handler}]
      ["/feature/:node-id" {:get feature-component-handler}]
      ["/feature/:node-id/content" {:get feature-content-handler}]
+     ["/section/:node-id" {:get section-component-handler}]
      ["/refresh" {:get components-refresh-handler
                   :post components-refresh-handler}]
      ["/add" {:get component-add-handler}]
