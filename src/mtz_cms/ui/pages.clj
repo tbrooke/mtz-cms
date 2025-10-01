@@ -2,7 +2,7 @@
   "Page templates for Mount Zion CMS"
   (:require
    [mtz-cms.ui.components :as ui]
-   [mtz-cms.components.layouts :as layouts]
+   [mtz-cms.layouts.templates :as layouts]
    [mtz-cms.navigation.menu :as menu]))
 
 ;; --- PAGE LAYOUTS ---
