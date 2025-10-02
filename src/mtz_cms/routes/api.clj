@@ -8,6 +8,7 @@
    [mtz-cms.components.sections :as sections]
    [mtz-cms.validation.middleware :as validation]
    [mtz-cms.alfresco.client :as alfresco]
+   [mtz-cms.cache.simple :as cache]
    [clojure.tools.logging :as log]))
 
 ;; --- RESPONSE HELPERS ---
@@ -206,14 +207,19 @@
 ;; --- IMAGE PROXY HANDLER ---
 
 (defn image-proxy-handler [request]
-  "Proxy images from Alfresco with authentication"
+  "Proxy images from Alfresco with authentication and caching.
+   Images are cached for 24 hours (86400 seconds) since they rarely change."
   (let [node-id (get-in request [:path-params :node-id])
         ctx {}
-        result (alfresco/get-node-content ctx node-id)]
+        ;; Cache images for 24 hours - they rarely change
+        result (cache/cached
+                (keyword "image" node-id)
+                86400  ;; 24 hours in seconds
+                #(alfresco/get-node-content ctx node-id))]
     (if (:success result)
       {:status 200
        :headers {"Content-Type" "image/png"
-                 "Cache-Control" "public, max-age=3600"}
+                 "Cache-Control" "public, max-age=86400"}  ;; Tell browser to cache too
        :body (:data result)}
       {:status 404
        :headers {"Content-Type" "text/plain"}

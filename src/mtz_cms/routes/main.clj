@@ -9,6 +9,7 @@
    [mtz-cms.components.htmx :as htmx]
    [mtz-cms.routes.api :as api]
    [mtz-cms.validation.dashboard :as dashboard]
+   [mtz-cms.cache.simple :as cache]
    [clojure.tools.logging :as log]))
 
 ;; --- HANDLER HELPERS ---
@@ -74,12 +75,16 @@
     (html-response (pages/pages-list-page {:pages pages :navigation navigation}))))
 
 (defn image-proxy-handler [request]
-  "Proxy images from Alfresco by node ID"
+  "Proxy images from Alfresco by node ID with caching"
   (let [ctx {}
         node-id (get-in request [:path-params :node-id])]
     (log/debug "Proxying image for node:" node-id)
     (try
-      (let [result (alfresco/get-node-content ctx node-id)]
+      ;; Cache images for 24 hours
+      (let [result (cache/cached
+                    (keyword "image" node-id)
+                    86400  ;; 24 hours
+                    #(alfresco/get-node-content ctx node-id))]
         (if (:success result)
           (let [node-info (alfresco/get-node ctx node-id)
                 mime-type (if (:success node-info)

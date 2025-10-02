@@ -3,26 +3,20 @@
   (:require
    [mtz-cms.ui.components :as ui]
    [mtz-cms.layouts.templates :as layouts]
-   [mtz-cms.navigation.menu :as menu]
-   [mtz-cms.cache.simple :as cache]))
+   [mtz-cms.navigation.menu :as menu]))
 
 ;; --- PAGE LAYOUTS ---
 
 (defn base-layout
   "Base page layout with dynamic navigation.
 
-   Accepts optional ctx (Pathom context) to build navigation from Alfresco.
-   Navigation is cached for 1 hour (3600 seconds) to improve performance."
+   Accepts optional ctx (Pathom context) to build navigation from Alfresco."
   ([title content] (base-layout title content nil))
   ([title content ctx]
    (let [nav (when ctx
                (try
-                 ;; Cache navigation for 1 hour (3600 seconds)
-                 (let [result (cache/cached
-                               :site-navigation
-                               3600
-                               #(menu/build-navigation ctx))]
-                   (println "Navigation ready:" (count result) "items")
+                 (let [result (menu/build-navigation ctx)]
+                   (println "Navigation built successfully:" (count result) "items")
                    result)
                  (catch Exception e
                    ;; Log error but don't break the page
