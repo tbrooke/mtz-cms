@@ -83,18 +83,18 @@
         [:h3 {:class "font-medium text-gray-900 group-hover:text-blue-600"} "Contact"]
         [:p {:class "text-sm text-gray-500 mt-1"} "Get in touch with us"]]]]]))
 
-(defn about-page [page-data]
+(defn about-page [page-data ctx]
   (base-layout
     "About Us - Mount Zion UCC"
     [:div
      [:h1 "About Mount Zion UCC"]
-     
+
      (if page-data
        [:div {:class "page-content"}
         [:div (:page/content page-data)]]
        [:div {:class "placeholder"}
         [:p "Our story of faith, community, and service."]])
-     
+
      [:div {:class "ministry-areas"}
       [:h2 "Ministry Areas"]
       [:div {:class "grid"}
@@ -106,9 +106,10 @@
         [:p "Growing in faith through learning."]]
        [:div {:class "card"}
         [:h3 "Community"]
-        [:p "Building connections and fellowship."]]]]]))
+        [:p "Building connections and fellowship."]]]]]
+    ctx))
 
-(defn demo-page [data]
+(defn demo-page [data ctx]
   (base-layout
     "Demo - Mount Zion CMS"
     [:div
@@ -198,23 +199,24 @@
 
 ;; --- DYNAMIC PAGES ---
 
-(defn dynamic-page [page-data]
+(defn dynamic-page [page-data ctx]
   "Template for dynamically discovered pages"
-  (base-layout 
+  (base-layout
     (:page/title page-data)
     [:div
-     [:h1 {:class "text-3xl font-bold text-gray-900 mb-6"} 
+     [:h1 {:class "text-3xl font-bold text-gray-900 mb-6"}
       (:page/title page-data)]
-     
+
      [:div {:class "bg-white rounded-lg shadow-sm p-6 mb-8"}
       [:div {:class "prose max-w-none"}
        (:page/content page-data)]]
-     
+
      [:div {:class "bg-blue-50 rounded-lg p-4"}
       [:p {:class "text-sm text-blue-600"}
        "📁 This is a dynamically discovered page from Alfresco"]
       [:p {:class "text-xs text-blue-500 mt-1"}
-       "Node ID: " (:page/node-id page-data)]]]))
+       "Node ID: " (:page/node-id page-data)]]]
+    ctx))
 
 (defn pages-list-page [{:keys [pages navigation]}]
   "Template for listing all discovered pages"

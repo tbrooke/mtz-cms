@@ -99,11 +99,7 @@
           [:a {:href  "/activities"
                :class "text-white hover:text-blue-200 transition-colors"} "Activities"]
           [:a {:href  "/contact"
-               :class "text-white hover:text-blue-200 transition-colors"} "Contact"]])
-
-       ;; Demo link (always shown)
-       [[:a {:href  "/demo"
-             :class "text-blue-200 hover:text-white transition-colors border border-blue-400 px-3 py-1 rounded"} "Demo"]])]
+               :class "text-white hover:text-blue-200 transition-colors"} "Contact"]])]
 
      ;; Mobile menu button (placeholder for future)
      [:div {:class "md:hidden"}

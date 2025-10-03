@@ -8,6 +8,15 @@
             [clojure.string :as str]
             [mtz-cms.alfresco.client :as alfresco]))
 
+(defn slugify
+  "Convert a string to URL-friendly slug
+   Example: 'Pickle Ball' -> 'pickle-ball'"
+  [s]
+  (-> s
+      str/lower-case
+      (str/replace #"\s+" "-")
+      (str/replace #"[^a-z0-9\-]" "")))  ; Remove non-alphanumeric except hyphens
+
 (def config
   "Sync configuration"
   {:output-dir "resources/content/static"
@@ -29,13 +38,15 @@
           (println "   ✅ Found" (count entries) "static pages")
           (mapv (fn [entry]
                   (let [node (get entry :entry)
-                        props (:properties node)]
+                        props (:properties node)
+                        title (or (get props :cm:title) (:name node))
+                        menu-label (get props :web:menuLabel)]
                     {:node-id (:id node)
                      :name (:name node)
-                     :title (or (get props :cm:title) (:name node))
-                     :slug (or (get props :web:menuLabel)
-                              (:name node))
-                     :menu-label (get props :web:menuLabel)
+                     :title title
+                     :slug (slugify (or menu-label title (:name node)))  ; URL-friendly slug
+                     :original-name (:name node)
+                     :menu-label menu-label
                      :menu-item (get props :web:menuItem)}))
                 entries))
         (do
@@ -58,13 +69,17 @@
           node-data (get-in node-result [:data :entry])
           is-folder (:isFolder node-data)
 
-          ;; Get content - if folder, look for HTML file in children
+          ;; Get content - if folder, look for HTML content in children
           content (if is-folder
                     (let [children-result (alfresco/get-node-children ctx node-id)
                           children (get-in children-result [:data :list :entries])
-                          html-file (first (filter #(str/ends-with?
-                                                     (get-in % [:entry :name])
-                                                     ".html")
+                          ;; Look for HTML files (either .html extension OR text/html mime type)
+                          html-file (first (filter (fn [child]
+                                                     (let [entry (:entry child)
+                                                           name (:name entry)
+                                                           mime (get-in entry [:content :mimeType])]
+                                                       (or (str/ends-with? name ".html")
+                                                           (= mime "text/html"))))
                                                   children))]
                       (if html-file
                         (let [file-id (get-in html-file [:entry :id])
@@ -72,7 +87,8 @@
                           (if (:success content-result)
                             (String. (:data content-result) "UTF-8")
                             "<p>Unable to read HTML content</p>"))
-                        "<p>No HTML file found in folder</p>"))
+                        (str "<p>No HTML content found in folder</p>"
+                             "<p>Children: " (pr-str (map #(get-in % [:entry :name]) children)) "</p>")))
                     ;; If it's a file, get its content directly
                     (let [content-result (alfresco/get-node-content ctx node-id)]
                       (if (:success content-result)
@@ -81,6 +97,7 @@
 
       {:title (:title page-meta)
        :slug (:slug page-meta)
+       :original-name (:original-name page-meta)
        :node-id node-id
        :content content
        :menu-label (:menu-label page-meta)

@@ -41,7 +41,7 @@
   (let [ctx {}
         result (pathom/query ctx [{[:page/key :about] [:page/title :page/content]}])
         page-data (get result [:page/key :about])]
-    (html-response (pages/about-page page-data))))
+    (html-response (pages/about-page page-data ctx))))
 
 (defn demo-handler [request]
   (let [ctx {}
@@ -53,7 +53,7 @@
         alfresco-result (alfresco/test-connection ctx)]
 
     (html-response (pages/demo-page {:greeting greeting
-                                     :alfresco alfresco-result}))))
+                                     :alfresco alfresco-result} ctx))))
 
 (defn dynamic-page-handler [request]
   "Handle any page - checks static-first, then falls back to Alfresco
@@ -81,7 +81,7 @@
                         :page/content (:content static-content)
                         :page/node-id (:node-id static-content)
                         :page/exists true
-                        :page/static true})))
+                        :page/static true} ctx)))
 
       ;; Fall back to dynamic (Alfresco)
       (let [result (pathom/query ctx [{[:page/slug slug] [:page/title :page/content :page/exists]}])
@@ -90,14 +90,14 @@
         (if (:page/exists page-data)
           (do
             (log/info "🔄 Serving DYNAMIC page:" slug)
-            (html-response (pages/dynamic-page page-data)))
+            (html-response (pages/dynamic-page page-data ctx)))
 
           ;; Not found
           (do
             (log/warn "404 - Page not found:" slug)
             {:status 404
              :headers {"Content-Type" "text/html"}
-             :body (hiccup/html (pages/not-found-page slug))}))))
+             :body (hiccup/html (pages/not-found-page slug))}))))))
 
 (defn pages-list-handler [request]
   "List all discovered pages"
@@ -169,5 +169,4 @@
 (comment
   ;; Test routes
   (home-handler {})
-  (demo-handler {})))
-)
+  (demo-handler {}))

@@ -134,14 +134,44 @@
 ;; --- SEARCH FUNCTIONS ---
 
 (defn search-nodes
-  "Search for nodes using AFTS query"
+  "Search for nodes using AFTS query via Search API
+
+   Uses the Search API v1 endpoint:
+   POST /search/versions/1/search
+
+   Example:
+     (search-nodes ctx \"web:pagetype:'Static'\")"
   [ctx query-string & [options]]
-  (let [query-params (merge {:q query-string}
-                           options)
-        param-string (str/join "&" 
-                              (for [[k v] query-params]
-                                (str (name k) "=" (java.net.URLEncoder/encode (str v) "UTF-8"))))]
-    (make-request ctx :get (str "/search/nodes?" param-string))))
+  (let [{:keys [base-url username password]} (get-config ctx)
+        search-url (str base-url "/alfresco/api/-default-/public/search/versions/1/search")
+        body {:query {:query query-string
+                     :language "afts"}
+              :include ["properties" "aspectNames"]  ; Include properties in results
+              :paging {:maxItems (get options :maxItems 100)
+                      :skipCount (get options :skipCount 0)}}]
+
+    (log/debug "Alfresco Search API request:" query-string)
+
+    (try
+      (let [response (http/post search-url
+                               {:basic-auth [username password]
+                                :content-type :json
+                                :accept :json
+                                :body (json/write-str body)
+                                :throw-exceptions false})]
+
+        (if (< (:status response) 400)
+          {:success true
+           :status (:status response)
+           :data (json/read-str (:body response) :key-fn keyword)}
+          {:success false
+           :status (:status response)
+           :error (:body response)}))
+
+      (catch Exception e
+        (log/error "Search API request failed:" (.getMessage e))
+        {:success false
+         :error (.getMessage e)}))))
 
 (defn find-nodes-by-name
   "Find nodes by name pattern"

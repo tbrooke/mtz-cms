@@ -12,7 +12,7 @@
 
 (def static-content-dir
   "Directory containing static EDN files"
-  "resources/content/static")
+  "content/static")
 
 ;; --- LOADING ---
 
@@ -98,6 +98,26 @@
   [slug]
   (when-let [content (load-static-page slug)]
     (select-keys content [:title :node-id :generated-at :slug])))
+
+(defn build-node-id-to-slug-map
+  "Build a mapping of node-id → slug for all static pages.
+
+   Returns:
+     Map like {\"node-id-123\" \"pickle-ball\", \"node-id-456\" \"about\"}
+
+   This is used by the menu system to generate correct URLs for static pages."
+  []
+  (try
+    (let [slugs (list-static-pages)]
+      (reduce (fn [acc slug]
+                (if-let [metadata (page-metadata slug)]
+                  (assoc acc (:node-id metadata) slug)
+                  acc))
+              {}
+              slugs))
+    (catch Exception e
+      (log/error "Error building node-id to slug map:" (.getMessage e))
+      {})))
 
 ;; --- REPL HELPERS ---
 

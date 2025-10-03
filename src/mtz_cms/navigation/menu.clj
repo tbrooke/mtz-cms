@@ -8,6 +8,7 @@
    [mtz-cms.config.core :as config]
    [mtz-cms.alfresco.client :as alfresco]
    [mtz-cms.components.aspect-discovery :as aspect]
+   [mtz-cms.content.static-loader :as static]
    [clojure.string :as str]
    [clojure.tools.logging :as log]))
 
@@ -81,9 +82,11 @@
    Returns list of maps with :label, :path, :node-id"
   [ctx parent-node-id]
   (try
-    ;; IMPORTANT: Must include aspectNames and properties to check web:menuItem
-    (let [children-result (alfresco/get-node-children ctx parent-node-id
-                                                       {:include "aspectNames,properties"})]
+    ;; Build node-id to slug mapping for static pages
+    (let [static-slugs (static/build-node-id-to-slug-map)
+          ;; IMPORTANT: Must include aspectNames and properties to check web:menuItem
+          children-result (alfresco/get-node-children ctx parent-node-id
+                                                         {:include "aspectNames,properties"})]
       (if (:success children-result)
         (let [children (get-in children-result [:data :list :entries])
               ;; Filter to pages with menuItem=true and published
@@ -97,10 +100,13 @@
           ;; Transform to menu structure
           (map (fn [item]
                  (let [node (:entry item)
-                       label (aspect/get-menu-label node)]
+                       node-id (:id node)
+                       label (aspect/get-menu-label node)
+                       ;; Use slug if static page, otherwise node-id
+                       path-segment (get static-slugs node-id node-id)]
                    {:label label
-                    :path (str "/page/" (:id node))
-                    :node-id (:id node)
+                    :path (str "/page/" path-segment)
+                    :node-id node-id
                     :name (:name node)}))
                menu-items))
 
