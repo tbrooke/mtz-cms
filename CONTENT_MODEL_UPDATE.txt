@@ -1,0 +1,149 @@
+Content Model Updates - Migration Summary
+=========================================
+
+## Changes Made
+
+### 1. Documented Content Model
+✅ Created admin/docs/CONTENT_MODEL.md
+   - Complete reference for all web: aspects
+   - Constraint values for web:pagetype and web:componentType
+   - Usage examples and decision matrices
+   - Migration guide from web:generateStatic
+
+### 2. Updated Constraint Values
+
+**web:pagetype** (5 values):
+- Static      → Pre-generated static pages
+- Dynamic     → Fetched from Alfresco at runtime
+- Listing     → Pages that list other content
+- Gallery     → Image gallery pages
+- Form        → Pages containing forms
+
+**web:componentType** (11 values):
+- Plain HTML
+- Hero
+- Section
+- Feature
+- Card
+- Blog Post
+- Gallery Item
+- List Item
+- Banner
+- Image
+- Video
+
+### 3. Migration from web:generateStatic
+
+**OLD:**
+```javascript
+{
+  "aspectNames": ["web:generateStatic", "web:pageType"],
+  "properties": {
+    "web:kind": "page"
+  }
+}
+```
+
+**NEW:**
+```javascript
+{
+  "aspectNames": ["web:pageType"],
+  "properties": {
+    "web:kind": "page",
+    "web:pagetype": "Static"  // ← Use this instead
+  }
+}
+```
+
+### 4. Updated Sync Script
+
+✅ admin/scripts/Babashka/sync-content.clj
+   - Changed query from: ASPECT:'web:generateStatic'
+   - Changed query to:   web:pagetype:'Static' AND web:kind:'page'
+   - Updated comments and documentation
+
+### 5. Updated Documentation
+
+✅ admin/docs/STATIC_CONTENT_GUIDE.md
+   - Changed from web:generateStatic aspect
+   - Changed to web:pagetype="Static" property
+   - Updated examples
+
+✅ admin/docs/INDEX.md
+   - Added CONTENT_MODEL.md reference
+
+## API Query Examples
+
+### Find Static Pages (NEW):
+```bash
+curl -X POST "http://localhost:8080/alfresco/api/-default-/public/search/versions/1/search" \
+  -u admin:admin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "query": "web:pagetype:\"Static\" AND web:kind:\"page\""
+    }
+  }'
+```
+
+### Find Hero Components:
+```bash
+curl -X POST "http://localhost:8080/alfresco/api/-default-/public/search/versions/1/search" \
+  -u admin:admin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "query": "web:componentType:\"Hero\" AND web:kind:\"component\""
+    }
+  }'
+```
+
+### Find All Gallery Pages:
+```bash
+curl -X POST "http://localhost:8080/alfresco/api/-default-/public/search/versions/1/search" \
+  -u admin:admin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "query": "web:pagetype:\"Gallery\" AND web:kind:\"page\""
+    }
+  }'
+```
+
+## Next Steps
+
+### Immediate:
+1. ✅ Review admin/docs/CONTENT_MODEL.md
+2. ⏳ Update existing Alfresco pages to use new properties
+3. ⏳ Test sync script with new query
+4. ⏳ Update Pathom resolvers if needed
+
+### Content Migration:
+1. Find all pages with web:generateStatic aspect
+2. For each, set web:pagetype="Static"
+3. Remove web:generateStatic aspect (optional cleanup)
+
+### Code Updates Needed:
+1. Update Pathom resolvers to query by web:pagetype
+2. Add resolvers for new page types (Listing, Gallery, Form)
+3. Add component type-specific rendering
+
+## Files Modified
+
+admin/docs/
+  ✅ CONTENT_MODEL.md (NEW)
+  ✅ INDEX.md
+  ✅ STATIC_CONTENT_GUIDE.md
+
+admin/scripts/Babashka/
+  ✅ sync-content.clj
+
+## Reference
+
+See admin/docs/CONTENT_MODEL.md for:
+- Complete aspect reference
+- All constraint values
+- Usage examples
+- Migration guide
+- REPL commands
+- Validation rules

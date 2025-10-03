@@ -1,0 +1,51 @@
+Mount Zion CMS - Organization Summary
+=====================================
+
+✅ All scripts and documentation have been organized into admin/
+
+Directory Structure:
+-------------------
+admin/
+├── docs/              # All markdown documentation
+│   ├── INDEX.md      # Documentation index
+│   ├── README.md     # Project overview
+│   ├── STATIC_CONTENT_GUIDE.md
+│   ├── CACHE_MANAGEMENT.md
+│   └── ... (11 more docs)
+│
+└── scripts/           # All admin scripts
+    ├── README.md     # Script documentation
+    ├── Babashka/     # Clojure/Babashka scripts (4 files)
+    ├── Bash/         # Bash scripts (4 files)
+    └── Repl/         # REPL commands (admin.clj)
+
+Root Directory (Clean):
+----------------------
+- deploy.sh           # Wrapper → admin/scripts/Bash/deploy.sh
+- start-server.sh     # Wrapper → admin/scripts/Bash/start-server.sh
+- deps.edn
+- docker-compose.yml
+- Dockerfile
+- src/, resources/, dev/
+
+Key Changes:
+-----------
+1. Moved all *.md files → admin/docs/
+2. Moved scripts → admin/scripts/{Babashka,Bash,Repl}/
+3. Updated script paths to work from new locations
+4. Created wrapper scripts in root for convenience
+5. Made all scripts executable
+6. Created comprehensive documentation (README, INDEX)
+
+Usage:
+-----
+# Run from anywhere
+./deploy.sh
+admin/scripts/Bash/deploy.sh
+
+# Load REPL commands
+(load-file "admin/scripts/Repl/admin.clj")
+
+# View documentation
+cat admin/docs/INDEX.md
+cat admin/scripts/README.md

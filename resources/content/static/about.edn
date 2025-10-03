@@ -1,0 +1,42 @@
+{:title "About Mount Zion UCC"
+ :slug "about"
+ :node-id "8158a6aa-dbd7-4f5b-98a6-aadbd72f5b3b"
+ :content
+ "<div class=\"prose max-w-none\">
+    <h2 class=\"text-3xl font-bold text-gray-900 mb-6\">Welcome to Mount Zion United Church of Christ</h2>
+
+    <p class=\"text-lg text-gray-700 mb-4\">
+      Mount Zion UCC is a progressive Christian community where all are welcome.
+      We celebrate diversity, embrace inclusivity, and seek justice in our community and beyond.
+    </p>
+
+    <h3 class=\"text-2xl font-semibold text-gray-900 mt-8 mb-4\">Our Mission</h3>
+    <p class=\"text-gray-700 mb-4\">
+      To be a beacon of God's love in our community, welcoming all people regardless of race,
+      ethnicity, gender identity, sexual orientation, age, or ability.
+    </p>
+
+    <h3 class=\"text-2xl font-semibold text-gray-900 mt-8 mb-4\">Our Values</h3>
+    <ul class=\"list-disc list-inside text-gray-700 space-y-2 mb-4\">
+      <li><strong>Inclusion:</strong> Everyone is welcome at God's table</li>
+      <li><strong>Justice:</strong> We advocate for the marginalized and oppressed</li>
+      <li><strong>Community:</strong> We grow together in faith and service</li>
+      <li><strong>Love:</strong> God's love transforms and heals</li>
+    </ul>
+
+    <h3 class=\"text-2xl font-semibold text-gray-900 mt-8 mb-4\">Our History</h3>
+    <p class=\"text-gray-700 mb-4\">
+      Founded in [YEAR], Mount Zion has been a spiritual home for generations of families
+      in our community. We are part of the United Church of Christ, a denomination known
+      for its commitment to social justice and progressive theology.
+    </p>
+
+    <div class=\"bg-blue-50 border-l-4 border-blue-600 p-6 mt-8\">
+      <p class=\"text-blue-900 font-medium\">
+        📝 This is a STATIC page - generated from Alfresco and served from resources.
+        Fast loading, no runtime Alfresco calls!
+      </p>
+    </div>
+  </div>"
+ :generated-at "2025-10-01T22:00:00Z"
+ :static true}
