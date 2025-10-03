@@ -5,8 +5,8 @@
    [com.wsscode.pathom3.connect.indexes :as pci]
    [com.wsscode.pathom3.interface.eql :as p.eql]
    [mtz-cms.alfresco.client :as alfresco]
+   [mtz-cms.alfresco.resolvers :as components]
    [mtz-cms.config.core :as config]
-   [mtz-cms.components.resolvers :as components]
    [clojure.string :as str]
    [clojure.tools.logging :as log]))
 
