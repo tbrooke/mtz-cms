@@ -1,50 +1,23 @@
 (ns mtz-cms.ui.pages
-  "Page templates for Mount Zion CMS"
-  (:require
-   [mtz-cms.ui.components :as ui]
-   [mtz-cms.layouts.templates :as layouts]
-   [mtz-cms.navigation.menu :as menu]
-   [mtz-cms.cache.simple :as cache]))
+  "Page templates for Mount Zion CMS
 
-;; --- PAGE LAYOUTS ---
+   All pages use the unified base-page from ui/base.clj.
+   This file only contains page-specific content composition."
+  (:require
+   [mtz-cms.ui.base :as base]
+   [mtz-cms.layouts.templates :as layouts]))
+
+;; --- COMPATIBILITY LAYER ---
+;;
+;; base-layout is kept for backward compatibility during transition.
+;; New code should use base/base-page directly.
 
 (defn base-layout
-  "Base page layout with dynamic navigation.
+  "DEPRECATED: Use mtz-cms.ui.base/base-page instead.
 
-   Accepts optional ctx (Pathom context) to build navigation from Alfresco.
-   Navigation is cached for 1 hour (3600 seconds) to improve performance."
-  ([title content] (base-layout title content nil))
-  ([title content ctx]
-   (let [nav (when ctx
-               (try
-                 ;; Cache navigation for 1 hour (3600 seconds)
-                 (let [result (cache/cached
-                               :site-navigation
-                               3600
-                               #(menu/build-navigation ctx))]
-                   (println "Navigation ready:" (count result) "items")
-                   result)
-                 (catch Exception e
-                   ;; Log error but don't break the page
-                   (println "ERROR building navigation:" (.getMessage e))
-                   (println "Stack trace:")
-                   (.printStackTrace e)
-                   nil)))]
-     (when nav
-       (println "Rendering navigation with" (count nav) "items"))
-     [:html {:class "h-full"}
-      [:head
-       [:meta {:charset "utf-8"}]
-       [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
-       [:title title]
-       (ui/tailwind-cdn)
-       [:script {:src "/js/htmx.min.js"}]
-       (ui/custom-styles)]
-      [:body {:class "h-full bg-gray-50"}
-       (ui/site-header nav)
-       [:main {:class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"}
-        content]
-       (ui/site-footer)]])))
+   This wrapper exists for backward compatibility during refactoring."
+  ([title content] (base/base-page title content nil))
+  ([title content ctx] (base/base-page title content ctx)))
 
 ;; --- PAGE TEMPLATES ---
 
