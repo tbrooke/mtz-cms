@@ -99,7 +99,7 @@
           [:a {:href  "/activities"
                :class "text-white hover:text-blue-200 transition-colors"} "Activities"]
           [:a {:href  "/contact"
-               :class "text-white hover:text-blue-200 transition-colors"} "Contact"]])]
+               :class "text-white hover:text-blue-200 transition-colors"} "Contact"]]))]
 
      ;; Mobile menu button (placeholder for future)
      [:div {:class "md:hidden"}
