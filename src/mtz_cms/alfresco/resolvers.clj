@@ -1,5 +1,8 @@
-(ns mtz-cms.components.resolvers
-  "Component-based Pathom resolvers for Mount Zion CMS with Malli validation"
+(ns mtz-cms.alfresco.resolvers
+  "Pathom resolvers for Alfresco content with Malli validation
+
+   Handles data resolution from Alfresco CMS to application data structures.
+   Moved from components/ to alfresco/ as part of architecture refactoring."
   (:require
    [com.wsscode.pathom3.connect.operation :as pco :refer [defresolver]]
    [mtz-cms.alfresco.client :as alfresco]
