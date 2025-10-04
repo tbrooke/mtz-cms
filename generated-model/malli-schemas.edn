@@ -1,5 +1,257 @@
 {:model-name "cms:mtzCmsModel",
- :constraints {},
- :types {},
- :aspects {},
- :malli-schemas {:types {}, :aspects {}}}
+ :constraints
+ {"cms:componentTypeConstraint"
+  {:name "cms:componentTypeConstraint",
+   :type :list,
+   :allowed-values
+   #{"hero"
+     "custom"
+     "cta"
+     "feature"
+     "section"
+     "tabs"
+     "gallery"
+     "card"
+     "accordion"
+     "testimonial"}},
+  "cms:regionConstraint"
+  {:name "cms:regionConstraint",
+   :type :list,
+   :allowed-values
+   #{"hero" "menu" "sidebar" "footer" "main" "header"}}},
+ :types
+ {"cms:item"
+  {:type-id "cms:item",
+   :title "CMS Content Item",
+   :parent "cm:content",
+   :properties
+   ({:name "cms:title",
+     :alfresco-type "d:text",
+     :malli-type :string,
+     :mandatory? true,
+     :default nil,
+     :constraints (),
+     :final-schema [:cms:title :string]}
+    {:name "cms:slug",
+     :alfresco-type "d:text",
+     :malli-type :string,
+     :mandatory? false,
+     :default nil,
+     :constraints (),
+     :final-schema [:cms:slug {:optional true} :string]}
+    {:name "cms:body",
+     :alfresco-type "d:text",
+     :malli-type :string,
+     :mandatory? false,
+     :default nil,
+     :constraints (),
+     :final-schema [:cms:body {:optional true} :string]}
+    {:name "cms:componentType",
+     :alfresco-type "d:text",
+     :malli-type :string,
+     :mandatory? true,
+     :default nil,
+     :constraints ("cms:componentTypeConstraint"),
+     :final-schema
+     [:cms:componentType
+      [:enum
+       {:description
+        "Allowed: #{\"hero\" \"custom\" \"cta\" \"feature\" \"section\" \"tabs\" \"gallery\" \"card\" \"accordion\" \"testimonial\"}"}
+       ["accordion"
+        "card"
+        "cta"
+        "custom"
+        "feature"
+        "gallery"
+        "hero"
+        "section"
+        "tabs"
+        "testimonial"]]]}
+    {:name "cms:ordering",
+     :alfresco-type "d:int",
+     :malli-type :int,
+     :mandatory? false,
+     :default "0",
+     :constraints (),
+     :final-schema [:cms:ordering {:optional true} :int]}
+    {:name "cms:imageRef",
+     :alfresco-type "d:noderef",
+     :malli-type :string,
+     :mandatory? false,
+     :default nil,
+     :constraints (),
+     :final-schema [:cms:imageRef {:optional true} :string]}
+    {:name "cms:metadata",
+     :alfresco-type "d:text",
+     :malli-type :string,
+     :mandatory? false,
+     :default nil,
+     :constraints (),
+     :final-schema [:cms:metadata {:optional true} :string]}),
+   :malli-schema
+   [:map
+    {:description "CMS Content Item"}
+    [:cms:title :string]
+    [:cms:slug {:optional true} :string]
+    [:cms:body {:optional true} :string]
+    [:cms:componentType
+     [:enum
+      {:description
+       "Allowed: #{\"hero\" \"custom\" \"cta\" \"feature\" \"section\" \"tabs\" \"gallery\" \"card\" \"accordion\" \"testimonial\"}"}
+      ["accordion"
+       "card"
+       "cta"
+       "custom"
+       "feature"
+       "gallery"
+       "hero"
+       "section"
+       "tabs"
+       "testimonial"]]]
+    [:cms:ordering {:optional true} :int]
+    [:cms:imageRef {:optional true} :string]
+    [:cms:metadata {:optional true} :string]]}},
+ :aspects
+ {"cms:placeable"
+  {:aspect-id "cms:placeable",
+   :title "Placeable Content",
+   :properties
+   ({:name "cms:sitePath",
+     :alfresco-type "d:text",
+     :malli-type :string,
+     :mandatory? false,
+     :default nil,
+     :constraints (),
+     :final-schema [:cms:sitePath {:optional true} :string]}
+    {:name "cms:pagePath",
+     :alfresco-type "d:text",
+     :malli-type :string,
+     :mandatory? false,
+     :default nil,
+     :constraints (),
+     :final-schema [:cms:pagePath {:optional true} :string]}
+    {:name "cms:region",
+     :alfresco-type "d:text",
+     :malli-type :string,
+     :mandatory? false,
+     :default nil,
+     :constraints ("cms:regionConstraint"),
+     :final-schema
+     [:cms:region
+      {:optional true}
+      [:enum
+       {:description
+        "Allowed: #{\"hero\" \"menu\" \"sidebar\" \"footer\" \"main\" \"header\"}"}
+       ["footer" "header" "hero" "main" "menu" "sidebar"]]]}
+    {:name "cms:slot",
+     :alfresco-type "d:int",
+     :malli-type :int,
+     :mandatory? false,
+     :default nil,
+     :constraints (),
+     :final-schema [:cms:slot {:optional true} :int]}),
+   :malli-schema
+   [:map
+    {:description "Placeable Content"}
+    [:cms:sitePath {:optional true} :string]
+    [:cms:pagePath {:optional true} :string]
+    [:cms:region
+     {:optional true}
+     [:enum
+      {:description
+       "Allowed: #{\"hero\" \"menu\" \"sidebar\" \"footer\" \"main\" \"header\"}"}
+      ["footer" "header" "hero" "main" "menu" "sidebar"]]]
+    [:cms:slot {:optional true} :int]]},
+  "cms:publishable"
+  {:aspect-id "cms:publishable",
+   :title "Publishable Content",
+   :properties
+   ({:name "cms:publishStatus",
+     :alfresco-type "d:text",
+     :malli-type :string,
+     :mandatory? false,
+     :default "draft",
+     :constraints (),
+     :final-schema [:cms:publishStatus {:optional true} :string]}
+    {:name "cms:publishedDate",
+     :alfresco-type "d:datetime",
+     :malli-type :string,
+     :mandatory? false,
+     :default nil,
+     :constraints (),
+     :final-schema [:cms:publishedDate {:optional true} :string]}
+    {:name "cms:publishedBy",
+     :alfresco-type "d:text",
+     :malli-type :string,
+     :mandatory? false,
+     :default nil,
+     :constraints (),
+     :final-schema [:cms:publishedBy {:optional true} :string]}
+    {:name "cms:embargoDate",
+     :alfresco-type "d:datetime",
+     :malli-type :string,
+     :mandatory? false,
+     :default nil,
+     :constraints (),
+     :final-schema [:cms:embargoDate {:optional true} :string]}
+    {:name "cms:expiryDate",
+     :alfresco-type "d:datetime",
+     :malli-type :string,
+     :mandatory? false,
+     :default nil,
+     :constraints (),
+     :final-schema [:cms:expiryDate {:optional true} :string]}),
+   :malli-schema
+   [:map
+    {:description "Publishable Content"}
+    [:cms:publishStatus {:optional true} :string]
+    [:cms:publishedDate {:optional true} :string]
+    [:cms:publishedBy {:optional true} :string]
+    [:cms:embargoDate {:optional true} :string]
+    [:cms:expiryDate {:optional true} :string]]}},
+ :malli-schemas
+ {:types
+  {"cms:item"
+   [:map
+    {:description "CMS Content Item"}
+    [:cms:title :string]
+    [:cms:slug {:optional true} :string]
+    [:cms:body {:optional true} :string]
+    [:cms:componentType
+     [:enum
+      {:description
+       "Allowed: #{\"hero\" \"custom\" \"cta\" \"feature\" \"section\" \"tabs\" \"gallery\" \"card\" \"accordion\" \"testimonial\"}"}
+      ["accordion"
+       "card"
+       "cta"
+       "custom"
+       "feature"
+       "gallery"
+       "hero"
+       "section"
+       "tabs"
+       "testimonial"]]]
+    [:cms:ordering {:optional true} :int]
+    [:cms:imageRef {:optional true} :string]
+    [:cms:metadata {:optional true} :string]]},
+  :aspects
+  {"cms:placeable"
+   [:map
+    {:description "Placeable Content"}
+    [:cms:sitePath {:optional true} :string]
+    [:cms:pagePath {:optional true} :string]
+    [:cms:region
+     {:optional true}
+     [:enum
+      {:description
+       "Allowed: #{\"hero\" \"menu\" \"sidebar\" \"footer\" \"main\" \"header\"}"}
+      ["footer" "header" "hero" "main" "menu" "sidebar"]]]
+    [:cms:slot {:optional true} :int]],
+   "cms:publishable"
+   [:map
+    {:description "Publishable Content"}
+    [:cms:publishStatus {:optional true} :string]
+    [:cms:publishedDate {:optional true} :string]
+    [:cms:publishedBy {:optional true} :string]
+    [:cms:embargoDate {:optional true} :string]
+    [:cms:expiryDate {:optional true} :string]]}}}
