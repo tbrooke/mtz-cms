@@ -57,7 +57,10 @@
 ;; --- HTMX DYNAMIC LAYOUTS ---
 
 (defn htmx-hero-features-layout
-  "HTMX-powered layout that loads components dynamically"
+  "HTMX-powered layout that loads components dynamically
+
+   NOTE: This wraps HTMX loading containers with the standard layout structure.
+   The actual layout logic comes from ui/layouts.clj to avoid duplication."
   [page-config]
   (let [hero-node-id (get-in page-config [:components :hero :node-id])
         feature-nodes (get-in page-config [:components :features])]
@@ -75,12 +78,31 @@
           [:p {:class "mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"}
            "What's Happening at Mount Zion"]]
 
-         ;; Dynamic features grid
+         ;; Dynamic features grid with HTMX loading
          [:div {:class "mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none"}
           [:dl {:class "grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3"}
            (for [feature-node feature-nodes]
              [:div {:key (:node-id feature-node)}
               (htmx-feature-container (:node-id feature-node))])]]]])
+
+     ;; Call to action section (static, same as regular layout)
+     [:section {:class "bg-blue-600"}
+      [:div {:class "mx-auto max-w-7xl py-12 px-6 lg:px-8 lg:py-24"}
+       [:div {:class "lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center"}
+        [:div
+         [:h2 {:class "text-3xl font-bold tracking-tight text-white sm:text-4xl"}
+          "Join Our Community"]
+         [:p {:class "mt-3 max-w-3xl text-lg text-blue-100"}
+          "Experience the warmth and fellowship of Mount Zion UCC. All are welcome in our progressive Christian community."]]
+        [:div {:class "mt-8 lg:mt-0"}
+         [:div {:class "inline-flex rounded-md shadow"}
+          [:a {:href "/worship"
+               :class "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50"}
+           "Plan Your Visit"]]
+         [:div {:class "ml-3 inline-flex"}
+          [:a {:href "/contact"
+               :class "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-400"}
+           "Contact Us"]]]]]]
 
      ;; Refresh button for content editors
      [:div {:class "fixed bottom-4 right-4 z-50"}

@@ -5,7 +5,7 @@
    This file only contains page-specific content composition."
   (:require
    [mtz-cms.ui.base :as base]
-   [mtz-cms.layouts.templates :as layouts]))
+   [mtz-cms.ui.layouts :as layouts]))
 
 ;; --- COMPATIBILITY LAYER ---
 ;;
