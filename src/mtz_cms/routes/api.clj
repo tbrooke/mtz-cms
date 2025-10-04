@@ -5,7 +5,7 @@
    [mtz-cms.pathom.resolvers :as pathom]
    [mtz-cms.components.htmx-templates :as htmx-templates]
    [mtz-cms.components.templates :as templates]
-   [mtz-cms.components.sections :as sections]
+   [mtz-cms.components.section :as section]
    [mtz-cms.validation.middleware :as validation]
    [mtz-cms.alfresco.client :as alfresco]
    [mtz-cms.cache.simple :as cache]
@@ -159,7 +159,7 @@
 
           ;; Render section using the smart renderer
           response (html-fragment-response
-                   (sections/render-section section-data))]
+                   (section/render-section section-data))]
 
       (log/info "✅ Section component rendered successfully for node:" node-id)
       response)

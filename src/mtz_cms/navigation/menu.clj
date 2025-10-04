@@ -7,7 +7,7 @@
   (:require
    [mtz-cms.config.core :as config]
    [mtz-cms.alfresco.client :as alfresco]
-   [mtz-cms.components.aspect-discovery :as aspect]
+   [mtz-cms.alfresco.discovery :as aspect]
    [mtz-cms.content.static-loader :as static]
    [clojure.string :as str]
    [clojure.tools.logging :as log]))

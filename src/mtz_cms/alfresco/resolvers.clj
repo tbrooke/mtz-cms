@@ -1,5 +1,8 @@
-(ns mtz-cms.components.resolvers
-  "Component-based Pathom resolvers for Mount Zion CMS with Malli validation"
+(ns mtz-cms.alfresco.resolvers
+  "Pathom resolvers for Alfresco content with Malli validation
+
+   Handles data resolution from Alfresco CMS to application data structures.
+   Moved from components/ to alfresco/ as part of architecture refactoring."
   (:require
    [com.wsscode.pathom3.connect.operation :as pco :refer [defresolver]]
    [mtz-cms.alfresco.client :as alfresco]
@@ -126,27 +129,39 @@
 ;; --- COMPONENT DATA RESOLVERS ---
 
 (defresolver hero-component
-  "Resolve Hero component data from Alfresco using cached generic resolver"
+  "Resolve Hero component data from Alfresco with validation & transformation"
   [ctx {:hero/keys [node-id]}]
   {::pco/input [:hero/node-id]
    ::pco/output [:hero/title :hero/image :hero/content]}
   ;; Use the cached generic resolver
-  (let [data (resolve-content-component ctx node-id :hero)]
-    {:hero/title (:title data)
-     :hero/image (:image data)
-     :hero/content (:content data)}))
+  (let [raw-data (resolve-content-component ctx node-id :hero)
+        result {:hero/title (:title raw-data)
+                :hero/image (:image raw-data)
+                :hero/content (:content raw-data)}
+        ;; Validate and transform
+        validated (schemas/validate-and-transform :hero/output result schemas/component-transformer)]
+    (when-not (:valid? validated)
+      (log/warn "Hero component validation failed:" (:errors validated)))
+    ;; Return cleaned data (or original if validation failed)
+    (or (:data validated) result)))
 
 (defresolver feature-component
-  "Resolve Feature component data from Alfresco using cached generic resolver"
+  "Resolve Feature component data from Alfresco with validation & transformation"
   [ctx {:feature/keys [node-id]}]
   {::pco/input [:feature/node-id]
    ::pco/output [:feature/title :feature/content :feature/image :feature/type]}
   ;; Use the cached generic resolver
-  (let [data (resolve-content-component ctx node-id :feature)]
-    {:feature/title (:title data)
-     :feature/content (:content data)
-     :feature/image (:image data)
-     :feature/type (:type data)}))
+  (let [raw-data (resolve-content-component ctx node-id :feature)
+        result {:feature/title (:title raw-data)
+                :feature/content (:content raw-data)
+                :feature/image (:image raw-data)
+                :feature/type (:type raw-data)}
+        ;; Validate and transform
+        validated (schemas/validate-and-transform :feature/output result schemas/component-transformer)]
+    (when-not (:valid? validated)
+      (log/warn "Feature component validation failed:" (:errors validated)))
+    ;; Return cleaned data (or original if validation failed)
+    (or (:data validated) result)))
 
 (defresolver card-component
   "Resolve Card component data from Alfresco"

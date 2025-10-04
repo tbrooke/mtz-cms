@@ -1,5 +1,8 @@
-(ns mtz-cms.components.aspect-discovery
-  "Aspect-based component discovery for Mount Zion CMS"
+(ns mtz-cms.alfresco.discovery
+  "Aspect-based content discovery for Alfresco CMS
+
+   Handles discovery and classification of content based on Alfresco aspects.
+   Moved from components/ to alfresco/ as part of architecture refactoring."
   (:require
    [mtz-cms.alfresco.client :as alfresco]
    [clojure.string :as str]

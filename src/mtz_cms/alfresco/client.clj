@@ -1,10 +1,11 @@
 (ns mtz-cms.alfresco.client
-  "Alfresco REST API client for Mount Zion CMS"
-  (:require 
+  "Alfresco REST API client for Mount Zion CMS with Malli validation"
+  (:require
    [clj-http.client :as http]
    [clojure.data.json :as json]
    [clojure.string :as str]
-   [clojure.tools.logging :as log]))
+   [clojure.tools.logging :as log]
+   [mtz-cms.validation.schemas :as schemas]))
 
 ;; --- CONFIGURATION ---
 
@@ -60,9 +61,19 @@
   (make-request ctx :get "/nodes/-root-"))
 
 (defn get-node
-  "Get a specific node by ID"
+  "Get a specific node by ID with validation
+
+   Returns validated node data or logs validation warnings."
   [ctx node-id]
-  (make-request ctx :get (str "/nodes/" node-id)))
+  (let [response (make-request ctx :get (str "/nodes/" node-id))]
+    (when (:success response)
+      ;; Validate the node data structure
+      (let [node-data (get-in response [:data :entry])
+            validation (schemas/validate :alfresco/node node-data)]
+        (when-not (:valid? validation)
+          (log/warn "Alfresco node validation failed for" node-id
+                   ":" (:errors validation)))))
+    response))
 
 (defn get-node-children
   "Get children of a node with optional filtering"

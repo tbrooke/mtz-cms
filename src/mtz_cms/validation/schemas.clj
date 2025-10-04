@@ -9,26 +9,26 @@
    [malli.error :as me]
    [clojure.tools.logging :as log]))
 
-;; --- GENERATED ALFRESCO SCHEMAS (from your babashka scripts) ---
+;; --- ALFRESCO BASE SCHEMAS (lightweight, grows as needed) ---
 
 (def alfresco-node-schema
-  "Schema for Alfresco node data (generated from live API)"
+  "Lightweight schema for Alfresco node - validates core fields only
+
+   Philosophy: We don't control Alfresco, so validate minimally.
+   This schema checks that we have the essential fields we need."
   [:map
    [:id :string]
    [:name :string]
    [:nodeType :string]
-   [:isFile :boolean]
-   [:isFolder :boolean]
-   [:createdAt :string]
-   [:modifiedAt :string]
-   [:properties [:map]]
-   [:aspectNames [:sequential :string]]
-   [:createdByUser [:map
-                    [:id :string]
-                    [:displayName :string]]]
-   [:modifiedByUser [:map
-                     [:id :string]
-                     [:displayName :string]]]])
+   [:isFile {:optional true} :boolean]
+   [:isFolder {:optional true} :boolean]
+   ;; Everything else is optional - Alfresco can have any properties
+   [:properties {:optional true} [:map-of :keyword :any]]
+   [:aspectNames {:optional true} [:sequential :string]]
+   [:createdAt {:optional true} :string]
+   [:modifiedAt {:optional true} :string]
+   [:createdByUser {:optional true} [:map [:id :string] [:displayName :string]]]
+   [:modifiedByUser {:optional true} [:map [:id :string] [:displayName :string]]]])
 
 (def alfresco-children-response-schema
   "Schema for Alfresco children API response"
@@ -103,6 +103,41 @@
               ["Content-Type" [:= "text/html"]]]]
    [:body :string]])
 
+;; --- DATA TRANSFORMERS ---
+
+(def string-transformer
+  "Transformer for cleaning string data"
+  (mt/transformer
+   {:name :string-cleaner
+    :decoders
+    {:string {:compile (fn [_ _]
+                        (fn [x]
+                          (when x
+                            (-> x
+                                str
+                                clojure.string/trim))))}}}))
+
+(def html-strip-transformer
+  "Transformer for stripping HTML tags from strings"
+  (mt/transformer
+   {:name :html-stripper
+    :decoders
+    {:string {:compile (fn [_ _]
+                        (fn [x]
+                          (when x
+                            (-> x
+                                str
+                                (clojure.string/replace #"<[^>]+>" " ")
+                                (clojure.string/replace #"\s+" " ")
+                                clojure.string/trim))))}}}))
+
+(def component-transformer
+  "Combined transformer for component data (trim + strip HTML)"
+  (mt/transformer
+   string-transformer
+   html-strip-transformer
+   mt/strip-extra-keys-transformer))
+
 ;; --- VALIDATION REGISTRY ---
 
 (def schema-registry
@@ -153,11 +188,36 @@
                        :data data})))))
 
 (defn transform
-  "Transform data using Malli transformers"
+  "Transform data using Malli transformers
+
+   Usage:
+     (transform :hero/output raw-data component-transformer)
+
+   This will trim strings, strip HTML, and remove extra keys."
   [schema-key data transformer]
   (if-let [schema (get schema-registry schema-key)]
     (m/decode schema data transformer)
     data))
+
+(defn validate-and-transform
+  "Validate and transform data in one step
+
+   Returns: {:valid? true :data cleaned-data} or {:valid? false :errors ...}"
+  [schema-key data transformer]
+  (if-let [schema (get schema-registry schema-key)]
+    (let [;; First transform
+          cleaned (m/decode schema data transformer)
+          ;; Then validate
+          result (m/validate schema cleaned)]
+      (if result
+        {:valid? true :data cleaned}
+        {:valid? false
+         :errors (me/humanize (m/explain schema cleaned))
+         :schema-key schema-key
+         :original-data data}))
+    {:valid? false
+     :errors {:schema "Schema not found in registry"}
+     :schema-key schema-key}))
 
 ;; --- PIPELINE VALIDATION ---
 
