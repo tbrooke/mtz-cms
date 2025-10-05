@@ -137,7 +137,8 @@
           "Sermon Video"]
          [:video {:controls true
                   :class "w-full rounded-lg border border-gray-300"
-                  :preload "metadata"}
+                  :preload "auto"
+                  :poster "/images/pulpit.jpg"}
           [:source {:src (:video/url video)
                     :type (:video/mime-type video)}]
           "Your browser does not support the video tag."]]))
