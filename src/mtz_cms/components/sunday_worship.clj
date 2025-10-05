@@ -129,6 +129,25 @@
     [:h2 {:class "text-2xl font-bold text-gray-900 mb-8 text-center"}
      (:worship/date-formatted service)]
 
+    ;; Debug: Show video data
+    [:div {:class "mb-4 p-4 bg-yellow-100 border border-yellow-400"}
+     [:p "Video data: " (pr-str (:worship/video service))]]
+
+    ;; Video player (if video exists)
+    (if (:worship/video service)
+      (let [video (:worship/video service)]
+        [:div {:class "mb-8"}
+         [:h3 {:class "text-lg font-semibold text-gray-900 mb-4"}
+          "Sermon Video"]
+         [:video {:controls true
+                  :class "w-full rounded-lg border border-gray-300"
+                  :preload "metadata"}
+          [:source {:src (:video/url video)
+                    :type (:video/mime-type video)}]
+          "Your browser does not support the video tag."]])
+      [:div {:class "mb-8 p-4 bg-red-100"}
+       [:p "No video found in service data"]])
+
     ;; PDFs side by side
     [:div {:class "grid grid-cols-1 md:grid-cols-2 gap-8 mb-8"}
      (pdf-card (:worship/bulletin service) "Bulletin")

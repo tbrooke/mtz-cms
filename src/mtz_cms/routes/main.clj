@@ -236,7 +236,8 @@
                                              [:worship/date-formatted
                                               :worship/folder-id
                                               :worship/bulletin
-                                              :worship/presentation]}])
+                                              :worship/presentation
+                                              :worship/video]}])
           service (get service-result [:worship/date date])]
 
       (if (:worship/folder-id service)
@@ -291,6 +292,34 @@
         {:status 500
          :body "PDF error"}))))
 
+(defn media-handler [request]
+  "Serve media files (video/audio) from Alfresco with range request support"
+  (let [node-id (get-in request [:path-params :node-id])
+        ctx {}]
+    (log/info "🎥 Serving media:" node-id)
+    (try
+      ;; Get node info for MIME type
+      (let [node-info (alfresco/get-node ctx node-id)
+            mime-type (if (:success node-info)
+                       (get-in node-info [:data :entry :content :mimeType])
+                       "video/mp4")
+            ;; Don't cache large video files - serve directly
+            result (alfresco/get-node-content ctx node-id)]
+        (if (:success result)
+          {:status 200
+           :headers {"Content-Type" mime-type
+                     "Accept-Ranges" "bytes"
+                     "Cache-Control" "public, max-age=3600"}
+           :body (:data result)}
+          (do
+            (log/error "Failed to fetch media:" (:error result))
+            {:status 404
+             :body "Media not found"})))
+      (catch Exception e
+        (log/error "Error serving media:" (.getMessage e))
+        {:status 500
+         :body "Media error"}))))
+
 ;; --- ROUTES ---
 
 (def all-routes
@@ -314,6 +343,9 @@
 
     ;; PDF serving
     ["/api/pdf/:node-id" {:get pdf-handler}]
+
+    ;; Media serving (video/audio)
+    ["/api/media/:node-id" {:get media-handler}]
 
     ;; Image proxy - must come before dynamic page handler
     ["/proxy/image/:node-id" {:get image-proxy-handler}]

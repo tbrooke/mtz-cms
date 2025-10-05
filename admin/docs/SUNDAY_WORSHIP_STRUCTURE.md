@@ -114,18 +114,92 @@ Example:
 - `GET /api/pdf/:node-id` - Serve PDF with proper headers
 - PDF thumbnails use existing `/api/image/:node-id` (Alfresco generates PDF thumbnails)
 
-## Implementation Plan
+## Implementation Status
 
-1. **Malli Schemas** - Validate worship service data
-2. **Pathom Resolver** - Fetch and transform date folders + PDFs
-3. **Helper Functions** - Identify bulletin vs presentation
-4. **List Component** - Display services with bulletin thumbnails
-5. **Detail Component** - Display both PDFs side-by-side
-6. **Routes** - `/worship/sunday` and `/worship/sunday/:date`
+✅ **COMPLETE** - All features implemented and deployed
+
+### Completed Components
+
+1. ✅ **Malli Schemas** (`validation/schemas.clj`)
+   - `worship-pdf-schema` - PDF document structure
+   - `worship-service-schema` - Single service data
+   - `worship-list-schema` - List of services
+
+2. ✅ **Pathom Resolver** (`alfresco/sunday_worship_resolvers.clj`)
+   - `sunday-worship-list-resolver` - Fetches all services
+   - `sunday-worship-detail-resolver` - Fetches single service by date
+   - Helper functions for bulletin identification and date formatting
+
+3. ✅ **UI Components** (`components/sunday_worship.clj`)
+   - `worship-list-item` - List item with pulpit thumbnail
+   - `sunday-worship-list-page` - Full list page
+   - `pdf-card` - PDF viewer with inline iframe
+   - `sunday-worship-detail-page` - Detail page with both PDFs
+
+4. ✅ **Routes** (`routes/main.clj`)
+   - `/worship/sunday` - List page
+   - `/worship/sunday/:date` - Detail page
+   - `/api/pdf/:node-id` - PDF serving with caching
+
+5. ✅ **Navigation** (`navigation/menu.clj`)
+   - Added "Sunday Worship" to Worship submenu
+   - Set `web:menuItem=false` in Alfresco to prevent duplicate menu items
+
+### Implementation Details
+
+**Thumbnail Strategy**:
+- **List page**: Uses static pulpit image (`/images/pulpit.jpg`) for all thumbnails
+- **Detail page**: Embeds PDFs inline using `<iframe>` elements
+- Alfresco PDF renditions not used due to availability issues
+
+**PDF Identification**:
+- Primary: Check for bulletin tag ID in `cm:taggable` property
+- Fallback: Assume shorter filename is bulletin
+
+**Date Formatting**:
+- Input: "09-21-25" (folder name)
+- Output: "September 21, 2025" (human-readable)
+
+**Caching**:
+- PDFs cached for 24 hours via `cache/cached`
+- Image proxy handles both regular images and PDF thumbnails
+
+## Future Enhancements
+
+### Phase 2: Metadata Enhancement
+**Status**: Planned (not started)
+
+Add additional metadata to Sunday Worship services:
+
+1. **Sermon Information**
+   - Sermon title
+   - Scripture references
+   - Preacher name
+
+2. **Hymn Information**
+   - Opening hymn
+   - Closing hymn
+   - Special music
+
+3. **Media**
+   - Video recording of sermon
+   - Audio recording
+   - Embed video player in detail page
+
+4. **Implementation Approach**
+   - Add custom aspects to Alfresco content model
+   - Update schemas to include new fields
+   - Enhance resolver to extract metadata
+   - Update UI components to display new fields
+
+**Storage Options**:
+- Option A: Store as Alfresco properties on date folder
+- Option B: Create separate metadata file in each date folder
+- Option C: Use aspect properties on bulletin PDF
 
 ## Notes
 
-- Date folders may be empty (like 09-07-25) - handle gracefully
-- PDFs may not always have tags - use fallback identification
-- Thumbnails come from Alfresco's PDF rendition system
+- Date folders may be empty (like 09-07-25) - gracefully filtered out
+- PDFs may not always have tags - fallback identification works well
 - Sort by date (newest first) for list view
+- Menu item set to static to avoid conflicts with dynamic discovery

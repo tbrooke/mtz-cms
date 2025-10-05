@@ -73,6 +73,21 @@
      :pdf/url (str "/api/pdf/" (:id pdf-node))
      :pdf/thumbnail (str "/api/image/" (:id pdf-node))}))
 
+(defn video-to-map
+  "Convert video node to our data structure
+
+   For large videos, we link directly to Alfresco instead of proxying
+   to avoid memory issues with streaming."
+  [video-node]
+  (when video-node
+    {:video/id (:id video-node)
+     :video/name (:name video-node)
+     ;; Direct link to Alfresco for streaming large videos
+     :video/url (str "http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/nodes/"
+                     (:id video-node)
+                     "/content")
+     :video/mime-type (get-in video-node [:content :mimeType])}))
+
 (defn process-date-folder
   "Process a single date folder into worship service data"
   [ctx folder-entry]
@@ -82,17 +97,28 @@
 
     (log/debug "Processing date folder:" date-str)
 
-    ;; Get PDFs in this folder
+    ;; Get children in this folder
     (let [children-result (alfresco/get-node-children ctx folder-id
                                                         {:include "properties,aspectNames"})
           children (when (:success children-result)
                     (get-in children-result [:data :list :entries]))
 
-          ;; Filter to PDFs only
+          ;; Filter to PDFs
           pdf-nodes (filter #(and (get-in % [:entry :isFile])
                                  (= (get-in % [:entry :content :mimeType]) "application/pdf"))
                            children)
-          pdf-entries (map :entry pdf-nodes)]
+          pdf-entries (map :entry pdf-nodes)
+
+          ;; Filter to video files (optional)
+          video-nodes (filter #(and (get-in % [:entry :isFile])
+                                   (let [mime (get-in % [:entry :content :mimeType])]
+                                     (and mime (str/starts-with? mime "video/"))))
+                             children)
+          video-entry (first (map :entry video-nodes))]
+
+      (log/debug "Found" (count children) "children," (count pdf-entries) "PDFs," (count video-nodes) "videos")
+      (when video-entry
+        (log/info "Video found:" (:name video-entry) "ID:" (:id video-entry)))
 
       (if (seq pdf-entries)
         (let [bulletin-pdf (identify-bulletin pdf-entries)
@@ -100,13 +126,15 @@
 
           (log/info "  ✅" date-str "-"
                    "Bulletin:" (:name bulletin-pdf)
-                   "Presentation:" (:name presentation-pdf))
+                   "Presentation:" (:name presentation-pdf)
+                   (when video-entry (str "Video: " (:name video-entry))))
 
           {:worship/date date-str
            :worship/date-formatted (format-date date-str)
            :worship/folder-id folder-id
            :worship/bulletin (pdf-to-map bulletin-pdf)
-           :worship/presentation (pdf-to-map presentation-pdf)})
+           :worship/presentation (pdf-to-map presentation-pdf)
+           :worship/video (when video-entry (video-to-map video-entry))})
 
         ;; No PDFs in this folder
         (do
@@ -174,7 +202,8 @@
    ::pco/output [:worship/date-formatted
                  :worship/folder-id
                  :worship/bulletin
-                 :worship/presentation]}
+                 :worship/presentation
+                 :worship/video]}
   (try
     (log/info "📄 Fetching Sunday Worship service for date:" date)
 

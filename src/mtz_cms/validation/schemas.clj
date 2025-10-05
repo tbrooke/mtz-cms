@@ -86,6 +86,14 @@
    [:pdf/url :string]
    [:pdf/thumbnail [:maybe :string]]])
 
+(def worship-video-schema
+  "Schema for a video file (sermon recording)"
+  [:map
+   [:video/id :string]
+   [:video/name :string]
+   [:video/url :string]
+   [:video/mime-type :string]])
+
 (def worship-service-schema
   "Schema for a Sunday Worship service (one date folder)"
   [:map
@@ -93,7 +101,8 @@
    [:worship/date-formatted :string]           ; e.g., "September 21, 2025"
    [:worship/folder-id :string]
    [:worship/bulletin [:maybe worship-pdf-schema]]
-   [:worship/presentation [:maybe worship-pdf-schema]]])
+   [:worship/presentation [:maybe worship-pdf-schema]]
+   [:worship/video {:optional true} [:maybe worship-video-schema]]])
 
 (def worship-list-schema
   "Schema for list of Sunday Worship services"
