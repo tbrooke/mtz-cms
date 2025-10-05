@@ -6,6 +6,8 @@
    [com.wsscode.pathom3.interface.eql :as p.eql]
    [mtz-cms.alfresco.client :as alfresco]
    [mtz-cms.alfresco.resolvers :as components]
+   [mtz-cms.alfresco.blog-resolvers :as blog]
+   [mtz-cms.alfresco.sunday-worship-resolvers :as worship]
    [mtz-cms.config.core :as config]
    [clojure.string :as str]
    [clojure.tools.logging :as log]))
@@ -260,7 +262,11 @@
     dynamic-page-content
     site-navigation]
    ;; Add component resolvers
-   components/component-resolvers))
+   components/component-resolvers
+   ;; Add blog resolvers
+   blog/blog-resolvers
+   ;; Add Sunday Worship resolvers
+   worship/sunday-worship-resolvers))
 
 ;; --- PATHOM PROCESSOR ---
 

@@ -122,6 +122,47 @@
         {:success false
          :error (.getMessage e)}))))
 
+(defn get-pdf-thumbnail
+  "Get thumbnail rendition for a PDF node
+
+   Tries common Alfresco rendition names for PDF thumbnails.
+   Falls back to default SVG if no rendition available."
+  [ctx node-id]
+  (let [{:keys [base-url username password]} (get-config ctx)
+        api-base (str base-url "/alfresco/api/-default-/public/alfresco/versions/1")
+        rendition-names ["imgpreview" "doclib" "medium" "pdf"]]
+
+    (log/debug "Fetching PDF thumbnail for node:" node-id)
+
+    (loop [names rendition-names]
+      (if (empty? names)
+        ;; No rendition worked, return failure
+        (do
+          (log/warn "No PDF rendition available for node:" node-id)
+          {:success false
+           :error "No rendition available"})
+
+        ;; Try this rendition name
+        (let [rendition-name (first names)
+              full-url (str api-base "/nodes/" node-id "/renditions/" rendition-name "/content")
+              response (try
+                        (http/get full-url
+                                  {:basic-auth [username password]
+                                   :throw-exceptions false
+                                   :as :byte-array})
+                        (catch Exception e
+                          (log/debug "Rendition" rendition-name "failed, trying next...")
+                          nil))]
+
+          (if (and response (< (:status response) 400))
+            (do
+              (log/info "✅ Found PDF thumbnail using rendition:" rendition-name)
+              {:success true
+               :status (:status response)
+               :data (:body response)})
+            ;; This rendition didn't work, try next
+            (recur (rest names))))))))
+
 ;; --- CONTENT EXTRACTION ---
 
 (defn extract-node-metadata

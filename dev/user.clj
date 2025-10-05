@@ -115,6 +115,91 @@
   (require 'mtz-cms.routes.main :reload)
   @(resolve 'mtz-cms.routes.main/all-routes))
 
+;; --- BLOG DISCOVERY FUNCTIONS ---
+
+(defn find-blog-folder []
+  "Find the blog folder in Alfresco at Sites/swsdp/blog"
+  (alfresco/find-nodes-by-path {} "//cm:swsdp/cm:blog"))
+
+(defn explore-blog []
+  "Explore the blog folder structure and content"
+  (let [blog-result (find-blog-folder)]
+    (if (:success blog-result)
+      (let [entries (get-in blog-result [:data :list :entries])]
+        (if (seq entries)
+          (let [blog-node (first entries)
+                blog-id (get-in blog-node [:entry :id])]
+            (println "📁 Found blog folder:" blog-id)
+            (alfresco/get-node-children {} blog-id {:include "properties,aspectNames"}))
+          {:error "Blog folder not found at Sites/swsdp/blog"}))
+      blog-result)))
+
+(defn get-blog-post [node-id]
+  "Get detailed information about a specific blog post"
+  (let [node-result (alfresco/get-node {} node-id)]
+    (when (:success node-result)
+      (let [node-data (get-in node-result [:data :entry])]
+        {:node-id node-id
+         :name (:name node-data)
+         :title (get-in node-data [:properties :cm:title])
+         :description (get-in node-data [:properties :cm:description])
+         :created-at (:createdAt node-data)
+         :modified-at (:modifiedAt node-data)
+         :created-by (get-in node-data [:createdByUser :displayName])
+         :aspect-names (:aspectNames node-data)
+         :properties (:properties node-data)
+         :full-node node-data}))))
+
+(defn analyze-blog-structure []
+  "Analyze blog structure and extract schema information"
+  (let [blog-result (explore-blog)]
+    (if (:success blog-result)
+      (let [entries (get-in blog-result [:data :list :entries])]
+        (println "\n📊 Blog Analysis:")
+        (println "  Total blog posts:" (count entries))
+        (println "\n📝 Blog Post Details:\n")
+        (doseq [entry entries]
+          (let [node-id (get-in entry [:entry :id])
+                post (get-blog-post node-id)]
+            (println "  ---")
+            (println "  Title:" (:title post))
+            (println "  Name:" (:name post))
+            (println "  Description:" (:description post))
+            (println "  Node ID:" node-id)
+            (println "  Created:" (:created-at post))
+            (println "  Author:" (:created-by post))
+            (println "  Aspects:" (:aspect-names post))
+            (println "  Properties:")
+            (doseq [[k v] (:properties post)]
+              (println "    " k "=" v))))
+        {:entries (map #(get-blog-post (get-in % [:entry :id])) entries)})
+      blog-result)))
+
+;; --- BLOG TEST FUNCTIONS ---
+
+(defn test-blog-list []
+  "Test blog list retrieval"
+  (pathom/query {} [:blog/list]))
+
+(defn test-blog-detail [node-id]
+  "Test blog detail retrieval by node ID"
+  (pathom/query {} [{[:blog/id node-id]
+                     [:blog/slug
+                      :blog/title
+                      :blog/content
+                      :blog/published-at
+                      :blog/author
+                      :blog/tags]}]))
+
+(defn test-blog-by-slug [slug]
+  "Test blog retrieval by slug"
+  (pathom/query {} [{[:blog/slug slug]
+                     [:blog/id
+                      :blog/title
+                      :blog/content
+                      :blog/published-at
+                      :blog/author]}]))
+
 ;; --- REPL HELPERS ---
 
 (comment

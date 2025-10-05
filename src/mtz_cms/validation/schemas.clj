@@ -76,6 +76,82 @@
                             [:name :string]
                             [:url :string]]]]])
 
+;; --- SUNDAY WORSHIP SCHEMAS ---
+
+(def worship-pdf-schema
+  "Schema for a PDF document (bulletin or presentation)"
+  [:map
+   [:pdf/id :string]
+   [:pdf/name :string]
+   [:pdf/url :string]
+   [:pdf/thumbnail [:maybe :string]]])
+
+(def worship-service-schema
+  "Schema for a Sunday Worship service (one date folder)"
+  [:map
+   [:worship/date :string]                     ; e.g., "09-21-25"
+   [:worship/date-formatted :string]           ; e.g., "September 21, 2025"
+   [:worship/folder-id :string]
+   [:worship/bulletin [:maybe worship-pdf-schema]]
+   [:worship/presentation [:maybe worship-pdf-schema]]])
+
+(def worship-list-schema
+  "Schema for list of Sunday Worship services"
+  [:sequential worship-service-schema])
+
+;; --- BLOG SCHEMAS ---
+
+(def blog-post-alfresco-schema
+  "Schema for blog post from Alfresco (raw data)
+   Based on discovered structure from Sites/swsdp/blog"
+  [:map
+   [:node-id :string]
+   [:name :string]
+   [:title [:maybe :string]]
+   [:description [:maybe :string]]
+   [:created :string]
+   [:modified :string]
+   [:author [:maybe :string]]
+   [:aspects [:sequential :string]]
+   [:properties [:map
+                 [:cm:title {:optional true} [:maybe :string]]
+                 [:cm:published {:optional true} [:maybe :string]]
+                 [:cm:updated {:optional true} [:maybe :string]]
+                 [:cm:taggable {:optional true} [:maybe [:or :string [:sequential :string]]]]
+                 [:cm:lastThumbnailModification {:optional true} :any]]]])
+
+(def blog-post-display-schema
+  "Schema for blog post transformed for display"
+  [:map
+   [:blog/id :string]
+   [:blog/slug :string]
+   [:blog/title :string]
+   [:blog/description [:maybe :string]]
+   [:blog/excerpt [:maybe :string]]
+   [:blog/published-at [:maybe :string]]
+   [:blog/updated-at [:maybe :string]]
+   [:blog/author [:maybe :string]]
+   [:blog/tags {:optional true} [:sequential :string]]
+   [:blog/thumbnail {:optional true} [:maybe :string]]])
+
+(def blog-list-schema
+  "Schema for list of blog posts"
+  [:sequential blog-post-display-schema])
+
+(def blog-detail-schema
+  "Schema for full blog post with content"
+  [:map
+   [:blog/id :string]
+   [:blog/slug :string]
+   [:blog/title :string]
+   [:blog/content :string]
+   [:blog/description [:maybe :string]]
+   [:blog/published-at [:maybe :string]]
+   [:blog/updated-at [:maybe :string]]
+   [:blog/author [:maybe :string]]
+   [:blog/tags {:optional true} [:sequential :string]]
+   [:blog/thumbnail {:optional true} [:maybe :string]]])
+
 ;; --- PAGE COMPOSITION SCHEMAS ---
 
 (def home-page-config-schema
@@ -146,11 +222,22 @@
    :alfresco/node alfresco-node-schema
    :alfresco/children-response alfresco-children-response-schema
 
-   ;; Pathom component layer  
+   ;; Pathom component layer
    :hero/input hero-component-input-schema
    :hero/output hero-component-output-schema
    :feature/input feature-component-input-schema
    :feature/output feature-component-output-schema
+
+   ;; Blog layer
+   :blog/post-alfresco blog-post-alfresco-schema
+   :blog/post-display blog-post-display-schema
+   :blog/list blog-list-schema
+   :blog/detail blog-detail-schema
+
+   ;; Sunday Worship layer
+   :worship/pdf worship-pdf-schema
+   :worship/service worship-service-schema
+   :worship/list worship-list-schema
 
    ;; Page composition layer
    :home/config home-page-config-schema

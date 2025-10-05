@@ -5,8 +5,11 @@
    [mtz-cms.pathom.resolvers :as pathom]
    [mtz-cms.alfresco.client :as alfresco]
    [mtz-cms.ui.pages :as pages]
+   [mtz-cms.ui.base :as base]
    [mtz-cms.components.templates :as components]
    [mtz-cms.components.htmx :as htmx]
+   [mtz-cms.components.blog :as blog]
+   [mtz-cms.components.sunday-worship :as worship]
    [mtz-cms.routes.api :as api]
    [mtz-cms.validation.dashboard :as dashboard]
    [mtz-cms.cache.simple :as cache]
@@ -113,28 +116,180 @@
         node-id (get-in request [:path-params :node-id])]
     (log/debug "Proxying image for node:" node-id)
     (try
-      ;; Cache images for 24 hours
-      (let [result (cache/cached
-                    (keyword "image" node-id)
-                    86400  ;; 24 hours
-                    #(alfresco/get-node-content ctx node-id))]
-        (if (:success result)
-          (let [node-info (alfresco/get-node ctx node-id)
-                mime-type (if (:success node-info)
-                            (get-in node-info [:data :entry :content :mimeType])
-                            "image/jpeg")]
+      ;; First check if it's a PDF
+      (let [node-info (alfresco/get-node ctx node-id)
+            mime-type (get-in node-info [:data :entry :content :mimeType])
+            is-pdf? (= mime-type "application/pdf")]
+
+        ;; Cache images for 24 hours
+        (let [result (cache/cached
+                      (keyword "image" node-id)
+                      86400  ;; 24 hours
+                      (if is-pdf?
+                        #(alfresco/get-pdf-thumbnail ctx node-id)
+                        #(alfresco/get-node-content ctx node-id)))]
+          (if (:success result)
             {:status 200
-             :headers {"Content-Type" mime-type
+             :headers {"Content-Type" (if is-pdf? "image/png" (or mime-type "image/jpeg"))
                        "Cache-Control" "public, max-age=3600"}
-             :body (:data result)})
-          (do
-            (log/error "Failed to fetch image from Alfresco:" (:error result))
-            {:status 404
-             :body "Image not found"})))
+             :body (:data result)}
+            (do
+              (log/error "Failed to fetch image from Alfresco:" (:error result))
+              {:status 404
+               :body "Image not found"}))))
       (catch Exception e
         (log/error "Error proxying image:" (.getMessage e))
         {:status 500
          :body "Image proxy error"}))))
+
+;; --- BLOG HANDLERS ---
+
+(defn blog-list-handler [request]
+  "Display list of all blog posts - Pastor Jim Reflects"
+  (let [ctx {}
+        result (pathom/query ctx [:blog/list])
+        posts (:blog/list result)]
+
+    (log/info "📚 Blog list requested, found" (count posts) "posts")
+
+    (html-response
+     (base/base-page
+      "Pastor Jim Reflects - Mount Zion UCC"
+      (blog/blog-list-page posts)
+      ctx))))
+
+(defn blog-detail-handler [request]
+  "Display individual blog post by slug"
+  (let [slug (get-in request [:path-params :slug])
+        ctx {}]
+
+    (log/info "📄 Blog post requested:" slug)
+
+    ;; First get the ID from slug
+    (let [id-result (pathom/query ctx [{[:blog/slug slug] [:blog/id]}])
+          blog-id (get-in id-result [[:blog/slug slug] :blog/id])]
+
+      (if blog-id
+        ;; Fetch full post details
+        (let [post-result (pathom/query ctx [{[:blog/id blog-id]
+                                              [:blog/slug
+                                               :blog/title
+                                               :blog/content
+                                               :blog/description
+                                               :blog/published-at
+                                               :blog/updated-at
+                                               :blog/author
+                                               :blog/tags
+                                               :blog/thumbnail]}])
+              post (get post-result [:blog/id blog-id])]
+
+          (log/info "✅ Blog post found:" (:blog/title post))
+
+          (html-response
+           (base/base-page
+            (str (:blog/title post) " - Pastor Jim Reflects")
+            (blog/blog-detail-page post)
+            ctx)))
+
+        ;; Blog post not found
+        (do
+          (log/warn "⚠️ Blog post not found:" slug)
+          {:status 404
+           :headers {"Content-Type" "text/html"}
+           :body (hiccup/html
+                  (base/base-page
+                   "Post Not Found"
+                   [:div {:class "max-w-4xl mx-auto px-4 py-12 text-center"}
+                    [:h1 {:class "text-3xl font-bold text-gray-900 mb-4"}
+                     "Blog Post Not Found"]
+                    [:p {:class "text-gray-600 mb-6"}
+                     "The blog post you're looking for doesn't exist."]
+                    [:a {:href "/blog"
+                         :class "text-blue-600 hover:text-blue-800 font-medium"}
+                     "← Back to Pastor Jim Reflects"]]
+                   ctx))})))))
+
+;; --- SUNDAY WORSHIP HANDLERS ---
+
+(defn sunday-worship-list-handler [request]
+  "Display list of Sunday Worship services"
+  (let [ctx {}
+        result (pathom/query ctx [:worship/list])
+        services (:worship/list result)]
+
+    (log/info "📅 Sunday Worship list requested, found" (count services) "services")
+
+    (html-response
+     (base/base-page
+      "Sunday Worship - Mount Zion UCC"
+      (worship/sunday-worship-list-page services)
+      ctx))))
+
+(defn sunday-worship-detail-handler [request]
+  "Display individual Sunday Worship service by date"
+  (let [date (get-in request [:path-params :date])
+        ctx {}]
+
+    (log/info "📄 Sunday Worship service requested:" date)
+
+    (let [service-result (pathom/query ctx [{[:worship/date date]
+                                             [:worship/date-formatted
+                                              :worship/folder-id
+                                              :worship/bulletin
+                                              :worship/presentation]}])
+          service (get service-result [:worship/date date])]
+
+      (if (:worship/folder-id service)
+        (do
+          (log/info "✅ Sunday Worship service found:" (:worship/date-formatted service))
+
+          (html-response
+           (base/base-page
+            (str "Sunday Worship - " (:worship/date-formatted service))
+            (worship/sunday-worship-detail-page service)
+            ctx)))
+
+        ;; Service not found
+        (do
+          (log/warn "⚠️ Sunday Worship service not found:" date)
+          {:status 404
+           :headers {"Content-Type" "text/html"}
+           :body (hiccup/html
+                  (base/base-page
+                   "Service Not Found"
+                   [:div {:class "max-w-4xl mx-auto px-4 py-12 text-center"}
+                    [:h1 {:class "text-3xl font-bold text-gray-900 mb-4"}
+                     "Worship Service Not Found"]
+                    [:p {:class "text-gray-600 mb-6"}
+                     "The worship service you're looking for doesn't exist."]
+                    [:a {:href "/worship/sunday"
+                         :class "text-blue-600 hover:text-blue-800 font-medium"}
+                     "← Back to Sunday Worship"]]
+                   ctx))})))))
+
+(defn pdf-handler [request]
+  "Serve PDF files from Alfresco"
+  (let [node-id (get-in request [:path-params :node-id])
+        ctx {}]
+    (log/info "📄 Serving PDF:" node-id)
+    (try
+      (let [result (cache/cached
+                    (keyword "pdf" node-id)
+                    86400  ;; Cache 24 hours
+                    #(alfresco/get-node-content ctx node-id))]
+        (if (:success result)
+          {:status 200
+           :headers {"Content-Type" "application/pdf"
+                     "Cache-Control" "public, max-age=86400"}
+           :body (:data result)}
+          (do
+            (log/error "Failed to fetch PDF:" (:error result))
+            {:status 404
+             :body "PDF not found"})))
+      (catch Exception e
+        (log/error "Error serving PDF:" (.getMessage e))
+        {:status 500
+         :body "PDF error"}))))
 
 ;; --- ROUTES ---
 
@@ -149,10 +304,21 @@
 
     ["/pages" {:get pages-list-handler}]
 
+    ;; Blog routes
+    ["/blog" {:get blog-list-handler}]
+    ["/blog/:slug" {:get blog-detail-handler}]
+
+    ;; Sunday Worship routes
+    ["/worship/sunday" {:get sunday-worship-list-handler}]
+    ["/worship/sunday/:date" {:get sunday-worship-detail-handler}]
+
+    ;; PDF serving
+    ["/api/pdf/:node-id" {:get pdf-handler}]
+
     ;; Image proxy - must come before dynamic page handler
     ["/proxy/image/:node-id" {:get image-proxy-handler}]
 
-;; Dynamic page handler - catches any page slug
+    ;; Dynamic page handler - catches any page slug
     ["/page/:slug" {:get dynamic-page-handler}]
 
     ;; Static assets (basic)

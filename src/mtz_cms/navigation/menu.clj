@@ -31,7 +31,11 @@
    {:key :worship
     :label "Worship"
     :path "/worship"
-    :icon "church"}
+    :icon "church"
+    :has-submenu? true
+    :static-submenu [{:label "Sunday Worship"
+                      :path "/worship/sunday"
+                      :icon "calendar"}]}
 
    {:key :events
     :label "Events"
@@ -47,7 +51,11 @@
    {:key :news
     :label "News"
     :path "/news"
-    :icon "newspaper"}
+    :icon "newspaper"
+    :has-submenu? true
+    :static-submenu [{:label "Pastor Jim Reflects"
+                      :path "/blog"
+                      :icon "book"}]}
 
    {:key :outreach
     :label "Outreach"
@@ -124,19 +132,31 @@
 (defn build-top-level-item
   "Build a single top-level menu item with optional submenu.
 
-   If the item has :has-submenu? true, fetches child pages with web:menuItem=true."
+   If the item has :has-submenu? true, fetches child pages with web:menuItem=true.
+   If the item has :static-submenu, uses that instead of dynamic discovery."
   [ctx menu-item]
   (let [node-id (config/get-node-id (:key menu-item))
         base-item (assoc menu-item :node-id node-id)]
 
-    (if (:has-submenu? menu-item)
-      ;; Fetch submenu items dynamically
+    (cond
+      ;; Static submenu (like blog under news)
+      (:static-submenu menu-item)
+      (let [static-items (:static-submenu menu-item)
+            dynamic-submenu (if node-id (get-submenu-items ctx node-id) [])
+            combined-submenu (concat static-items dynamic-submenu)]
+        (assoc base-item
+               :submenu combined-submenu
+               :has-children? (boolean (seq combined-submenu))))
+
+      ;; Dynamic submenu only
+      (:has-submenu? menu-item)
       (let [submenu (get-submenu-items ctx node-id)]
         (assoc base-item
                :submenu submenu
                :has-children? (boolean (seq submenu))))
 
       ;; No submenu
+      :else
       base-item)))
 
 (defn build-navigation
