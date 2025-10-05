@@ -296,8 +296,8 @@
 (defn media-handler [request]
   "Serve media files (video/audio) from Alfresco by proxying the stream
 
-   This creates a streaming proxy to avoid loading large files into memory.
-   The video player can seek through the video using HTTP range requests."
+   Handles HTTP Range requests for video seeking.
+   Proxies Range headers to Alfresco and returns partial content."
   (let [node-id (get-in request [:path-params :node-id])
         ctx {}
         config (alfresco/get-config ctx)
@@ -305,31 +305,55 @@
         username (:username config)
         password (:password config)
         alfresco-url (str base-url "/alfresco/api/-default-/public/alfresco/versions/1/nodes/"
-                         node-id "/content")]
+                         node-id "/content")
 
-    (log/info "🎥 Streaming media:" node-id)
+        ;; Get Range header from client request
+        range-header (get-in request [:headers "range"])]
+
+    (log/info "🎥 Streaming media:" node-id (when range-header (str "Range: " range-header)))
 
     (try
-      ;; Get node info for MIME type
+      ;; Get node info for MIME type and size
       (let [node-info (alfresco/get-node ctx node-id)
             mime-type (if (:success node-info)
                        (get-in node-info [:data :entry :content :mimeType])
                        "video/mp4")
 
-            ;; Proxy the request to Alfresco with authentication
-            ;; This creates an InputStream that Ring can stream
+            ;; Build headers for Alfresco request (include Range if present)
+            alfresco-headers (if range-header
+                              {"Range" range-header}
+                              {})
+
+            ;; Proxy the request to Alfresco with authentication and Range header
             stream-response (clj-http.client/get alfresco-url
                                                  {:basic-auth [username password]
+                                                  :headers alfresco-headers
                                                   :as :stream
                                                   :throw-exceptions false})]
 
-        (if (= 200 (:status stream-response))
+        ;; Return the response with proper status and headers
+        (cond
+          ;; Partial content (206) - Range request
+          (= 206 (:status stream-response))
+          {:status 206
+           :headers {"Content-Type" mime-type
+                     "Accept-Ranges" "bytes"
+                     "Content-Range" (get-in stream-response [:headers "Content-Range"])
+                     "Content-Length" (get-in stream-response [:headers "Content-Length"])
+                     "Cache-Control" "public, max-age=3600"}
+           :body (:body stream-response)}
+
+          ;; Full content (200)
+          (= 200 (:status stream-response))
           {:status 200
            :headers {"Content-Type" mime-type
                      "Accept-Ranges" "bytes"
+                     "Content-Length" (get-in stream-response [:headers "Content-Length"])
                      "Cache-Control" "public, max-age=3600"}
-           ;; Stream the body directly
            :body (:body stream-response)}
+
+          ;; Error
+          :else
           (do
             (log/error "Failed to stream media from Alfresco:" (:status stream-response))
             {:status (:status stream-response)
