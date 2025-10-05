@@ -14,6 +14,7 @@
    [mtz-cms.validation.dashboard :as dashboard]
    [mtz-cms.cache.simple :as cache]
    [mtz-cms.content.static-loader :as static]
+   [clj-http.client]
    [clojure.tools.logging :as log]))
 
 ;; --- HANDLER HELPERS ---
@@ -293,32 +294,51 @@
          :body "PDF error"}))))
 
 (defn media-handler [request]
-  "Serve media files (video/audio) from Alfresco with range request support"
+  "Serve media files (video/audio) from Alfresco by proxying the stream
+
+   This creates a streaming proxy to avoid loading large files into memory.
+   The video player can seek through the video using HTTP range requests."
   (let [node-id (get-in request [:path-params :node-id])
-        ctx {}]
-    (log/info "🎥 Serving media:" node-id)
+        ctx {}
+        config (alfresco/get-config ctx)
+        base-url (:base-url config)
+        username (:username config)
+        password (:password config)
+        alfresco-url (str base-url "/alfresco/api/-default-/public/alfresco/versions/1/nodes/"
+                         node-id "/content")]
+
+    (log/info "🎥 Streaming media:" node-id)
+
     (try
       ;; Get node info for MIME type
       (let [node-info (alfresco/get-node ctx node-id)
             mime-type (if (:success node-info)
                        (get-in node-info [:data :entry :content :mimeType])
                        "video/mp4")
-            ;; Don't cache large video files - serve directly
-            result (alfresco/get-node-content ctx node-id)]
-        (if (:success result)
+
+            ;; Proxy the request to Alfresco with authentication
+            ;; This creates an InputStream that Ring can stream
+            stream-response (clj-http.client/get alfresco-url
+                                                 {:basic-auth [username password]
+                                                  :as :stream
+                                                  :throw-exceptions false})]
+
+        (if (= 200 (:status stream-response))
           {:status 200
            :headers {"Content-Type" mime-type
                      "Accept-Ranges" "bytes"
                      "Cache-Control" "public, max-age=3600"}
-           :body (:data result)}
+           ;; Stream the body directly
+           :body (:body stream-response)}
           (do
-            (log/error "Failed to fetch media:" (:error result))
-            {:status 404
+            (log/error "Failed to stream media from Alfresco:" (:status stream-response))
+            {:status (:status stream-response)
              :body "Media not found"})))
+
       (catch Exception e
-        (log/error "Error serving media:" (.getMessage e))
+        (log/error "Error streaming media:" (.getMessage e))
         {:status 500
-         :body "Media error"}))))
+         :body "Media streaming error"}))))
 
 ;; --- ROUTES ---
 

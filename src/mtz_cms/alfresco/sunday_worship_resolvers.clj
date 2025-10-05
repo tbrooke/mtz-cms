@@ -74,18 +74,12 @@
      :pdf/thumbnail (str "/api/image/" (:id pdf-node))}))
 
 (defn video-to-map
-  "Convert video node to our data structure
-
-   For large videos, we link directly to Alfresco instead of proxying
-   to avoid memory issues with streaming."
+  "Convert video node to our data structure"
   [video-node]
   (when video-node
     {:video/id (:id video-node)
      :video/name (:name video-node)
-     ;; Direct link to Alfresco for streaming large videos
-     :video/url (str "http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/nodes/"
-                     (:id video-node)
-                     "/content")
+     :video/url (str "/api/media/" (:id video-node))
      :video/mime-type (get-in video-node [:content :mimeType])}))
 
 (defn process-date-folder
