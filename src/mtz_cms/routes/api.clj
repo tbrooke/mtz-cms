@@ -6,6 +6,7 @@
    [mtz-cms.components.htmx-templates :as htmx-templates]
    [mtz-cms.components.templates :as templates]
    [mtz-cms.components.section :as section]
+   [mtz-cms.components.hero :as hero]
    [mtz-cms.validation.middleware :as validation]
    [mtz-cms.alfresco.client :as alfresco]
    [mtz-cms.cache.simple :as cache]
@@ -33,49 +34,42 @@
 ;; --- COMPONENT API HANDLERS ---
 
 (defn hero-component-handler [request]
-  "Serve hero component data dynamically with validation"
+  "Serve hero component data dynamically via HTMX
+
+   Fetches hero data from Pathom and delegates rendering to hero/hero-carousel component.
+   This is the API handler - the actual component logic lives in components/hero.clj"
   (try
     (let [ctx {}
           node-id (get-in request [:path-params :node-id])
           _ (log/info "🔍 Loading hero component for node:" node-id)
-          
-          ;; Query Pathom with validation
-          result (pathom/query ctx [{[:hero/node-id node-id] 
-                                    [:hero/title :hero/image :hero/content]}])
-          _ (log/debug "Pathom query result:" result)
-          
-          hero-data (get result [:hero/node-id node-id])
-          image-url (get-in hero-data [:hero/image :url])
-          content (or (:hero/content hero-data) "A progressive Christian community welcoming all people.")
 
-          ;; Create hero section with background image
-          response (html-fragment-response
-                   [:div {:class "relative bg-gradient-to-r from-blue-600 to-blue-800 text-white py-32"
-                          :style (when image-url
-                                   (str "background-image: linear-gradient(rgba(37, 99, 235, 0.8), rgba(29, 78, 216, 0.8)), url('" image-url "'); background-size: cover; background-position: center;"))}
-                    [:div {:class "mx-auto max-w-screen-xl px-4 text-center relative z-10"}
-                     [:h1 {:class "text-4xl font-extrabold sm:text-6xl text-white drop-shadow-lg"}
-                      "Welcome to Mount Zion UCC"
-                      [:strong {:class "block font-extrabold text-blue-200 mt-2"} "United Church of Christ"]]
-                     [:p {:class "mt-6 max-w-lg mx-auto sm:text-xl/relaxed text-blue-100 drop-shadow"}
-                      content]
-                     [:div {:class "mt-8"}
-                      [:button {:class "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition-colors shadow-lg"}
-                       "Learn More"]]]])]
-      
+          ;; Query Pathom for hero data
+          result (pathom/query ctx [{[:hero/node-id node-id]
+                                    [:hero/title :hero/image :hero/images :hero/content]}])
+          _ (log/info "📊 Pathom query result:" result)
+
+          hero-data (get result [:hero/node-id node-id])
+          _ (log/info "🎨 Hero data extracted:" hero-data)
+          _ (log/info "🖼️  Images count:" (count (:hero/images hero-data [])))
+
+          ;; Delegate rendering to hero component
+          response (html-fragment-response (hero/hero-carousel hero-data))]
+
       ;; Validate HTMX response
       (validation/validate-htmx-response response "hero-component")
-      
+
       (log/info "✅ Hero component rendered successfully for node:" node-id)
       response)
-    
+
     (catch Exception e
       (log/error "❌ Error in hero component handler:" (.getMessage e))
+      (log/error "Stack trace:" e)
       ;; Return fallback response
       (html-fragment-response
        [:div {:class "bg-red-50 border border-red-200 rounded p-4"}
         [:h2 {:class "text-red-800"} "Content Loading Error"]
-        [:p {:class "text-red-600"} "Unable to load hero content. Please try again."]]))))
+        [:p {:class "text-red-600"} "Unable to load hero content. Please try again."]
+        [:p {:class "text-red-500 text-sm mt-2"} (str "Error: " (.getMessage e))]]))))
 
 (defn feature-component-handler [request]
   "Serve feature component data dynamically"

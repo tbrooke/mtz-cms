@@ -85,6 +85,13 @@
                          {:id (get-in img [:entry :id])
                           :name (get-in img [:entry :name])
                           :url (str "/api/image/" (get-in img [:entry :id]))}))
+               ;; Return all images for carousel (hero uses this)
+               :images (when (seq image-files)
+                        (mapv (fn [img]
+                                {:id (get-in img [:entry :id])
+                                 :name (get-in img [:entry :name])
+                                 :url (str "/api/image/" (get-in img [:entry :id]))})
+                              image-files))
                :type content-type
                :component-type component-type})
 
@@ -132,11 +139,12 @@
   "Resolve Hero component data from Alfresco with validation & transformation"
   [ctx {:hero/keys [node-id]}]
   {::pco/input [:hero/node-id]
-   ::pco/output [:hero/title :hero/image :hero/content]}
+   ::pco/output [:hero/title :hero/image :hero/images :hero/content]}
   ;; Use the cached generic resolver
   (let [raw-data (resolve-content-component ctx node-id :hero)
         result {:hero/title (:title raw-data)
                 :hero/image (:image raw-data)
+                :hero/images (:images raw-data)
                 :hero/content (:content raw-data)}
         ;; Validate and transform
         validated (schemas/validate-and-transform :hero/output result schemas/component-transformer)]

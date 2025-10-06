@@ -58,7 +58,11 @@
    [:hero/image [:maybe [:map
                          [:id :string]
                          [:name :string]
-                         [:url :string]]]]])
+                         [:url :string]]]]
+   [:hero/images {:optional true} [:maybe [:vector [:map
+                                                     [:id :string]
+                                                     [:name :string]
+                                                     [:url :string]]]]]])
 
 (def feature-component-input-schema
   "Schema for feature component input"

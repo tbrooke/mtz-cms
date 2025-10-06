@@ -16,12 +16,12 @@
              :hx-indicator "#hero-loading"}
    ;; Loading state
    [:div {:id "hero-loading" :class "htmx-indicator"}
-    [:div {:class "bg-gradient-to-r from-blue-600 to-blue-800 text-white py-32"}
+    [:div {:class "bg-white text-gray-900 py-32 min-h-screen flex items-center"}
      [:div {:class "mx-auto max-w-screen-xl px-4 text-center"}
       [:div {:class "animate-pulse"}
-       [:div {:class "h-8 bg-blue-300 rounded w-3/4 mx-auto mb-4"}]
-       [:div {:class "h-4 bg-blue-400 rounded w-1/2 mx-auto mb-8"}]
-       [:div {:class "h-10 bg-blue-500 rounded w-32 mx-auto"}]]]]]])
+       [:div {:class "h-8 bg-gray-300 rounded w-3/4 mx-auto mb-4"}]
+       [:div {:class "h-4 bg-gray-400 rounded w-1/2 mx-auto mb-8"}]
+       [:div {:class "h-10 bg-gray-500 rounded w-32 mx-auto"}]]]]]])
 
 (defn htmx-feature-container
   "HTMX container that dynamically loads feature content from Alfresco"

@@ -64,7 +64,7 @@
            (if (:has-children? item)
              ;; Dropdown menu for items with submenus
              [:div {:class "relative group"}
-              [:button {:class "text-white hover:text-blue-200 transition-colors flex items-center gap-1 py-2"}
+              [:button {:class "text-white hover:text-blue-200 transition-colors flex items-center gap-1 py-2 text-lg font-medium"}
                (:label item)
                ;; Dropdown arrow
                [:svg {:class   "w-4 h-4"
@@ -75,31 +75,31 @@
                         :stroke-linejoin "round"
                         :stroke-width    "2"
                         :d               "M19 9l-7 7-7-7"}]]]
-              ;; Dropdown panel - SIMPLE BOX, NO ROUNDED CORNERS
-              [:div {:class "absolute left-0 mt-2 w-48 bg-white shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"}
+              ;; Dropdown panel - Blue background matching header
+              [:div {:class "absolute left-0 mt-2 w-48 bg-blue-600 shadow-lg border border-blue-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"}
                (for [sub (:submenu item)]
                  [:a {:href  (:path sub)
-                      :class "block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 first:rounded-t-md last:rounded-b-md"}
+                      :class "block px-4 py-2 text-white hover:bg-blue-700 hover:text-blue-100 first:rounded-t-md last:rounded-b-md"}
                   (:label sub)])]]
 
              ;; Regular link (no submenu)
              [:a {:href  (:path item)
-                  :class "text-white hover:text-blue-200 transition-colors"}
+                  :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"}
               (:label item)]))
 
          ;; Fallback: static navigation
          [[:a {:href  "/"
-               :class "text-white hover:text-blue-200 transition-colors"} "Home"]
+               :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"} "Home"]
           [:a {:href  "/about"
-               :class "text-white hover:text-blue-200 transition-colors"} "About"]
+               :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"} "About"]
           [:a {:href  "/worship"
-               :class "text-white hover:text-blue-200 transition-colors"} "Worship"]
+               :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"} "Worship"]
           [:a {:href  "/events"
-               :class "text-white hover:text-blue-200 transition-colors"} "Events"]
+               :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"} "Events"]
           [:a {:href  "/activities"
-               :class "text-white hover:text-blue-200 transition-colors"} "Activities"]
+               :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"} "Activities"]
           [:a {:href  "/contact"
-               :class "text-white hover:text-blue-200 transition-colors"} "Contact"]]))]
+               :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"} "Contact"]]))]
 
      ;; Mobile menu button (placeholder for future)
      [:div {:class "md:hidden"}

@@ -4,50 +4,8 @@
    [clojure.string :as str]))
 
 ;; --- HTMX-ENHANCED COMPONENTS ---
-
-(defn htmx-hero-with-image
-  "HTMX-enhanced hero component with dynamic content loading"
-  [hero-data]
-  (let [title (or (:hero/title hero-data) "Welcome")
-        content (:hero/content hero-data)
-        image (:hero/image hero-data)
-        node-id (:hero/node-id hero-data)]
-    [:section {:class "relative bg-gradient-to-r from-blue-600 to-blue-800 text-white"
-               :id "hero-section"}
-     ;; Background image
-     (when image
-       [:img {:src (str "http://localhost:8080" (:url image))
-              :alt (:name image)
-              :class "absolute inset-0 h-full w-full object-cover"}])
-
-     ;; Content overlay with HTMX refresh capability
-     [:div {:class "relative mx-auto max-w-screen-xl px-4 py-32 sm:px-6 lg:flex lg:h-screen lg:items-center lg:px-8"}
-      [:div {:class "max-w-xl text-center ltr:sm:text-left rtl:sm:text-right"}
-       ;; Dynamic content that can be refreshed
-       [:div {:hx-get (str "/api/components/hero/" node-id)
-              :hx-trigger "every 30s" ; Auto-refresh every 30 seconds
-              :hx-swap "innerHTML"
-              :id "hero-content"}
-        [:h1 {:class "text-3xl font-extrabold sm:text-5xl"}
-         title
-         [:strong {:class "block font-extrabold text-blue-200"} "United Church of Christ"]]
-
-        [:p {:class "mt-4 max-w-lg sm:text-xl/relaxed"}
-         (or content "A progressive Christian community welcoming all people.")]]
-
-       ;; Interactive buttons
-       [:div {:class "mt-8 flex flex-wrap gap-4 text-center"}
-        [:button {:class "block w-full rounded bg-blue-600 px-12 py-3 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring active:bg-blue-500 sm:w-auto"
-                  :hx-get "/page/about"
-                  :hx-target "#main-content"
-                  :hx-push-url "true"}
-         "Learn About Us"]
-
-        [:button {:class "block w-full rounded bg-white px-12 py-3 text-sm font-medium text-blue-600 shadow hover:bg-gray-100 focus:outline-none focus:ring active:bg-gray-200 sm:w-auto"
-                  :hx-get "/page/worship"
-                  :hx-target "#main-content"
-                  :hx-push-url "true"}
-         "Join Us for Worship"]]]]]))
+;; NOTE: Hero component is in routes/api.clj (HTMX endpoint)
+;; This file contains feature and page editor components only
 
 (defn htmx-feature-with-image
   "HTMX-enhanced feature component with edit capabilities"
@@ -161,44 +119,8 @@
       "👁️ Preview"]]]])
 
 ;; --- HTMX LAYOUT WITH PARTIAL UPDATES ---
-
-(defn htmx-hero-features-layout
-  "HTMX-enhanced layout with partial page updates"
-  [page-data]
-  [:div {:id "main-content"}
-   ;; Hero section
-   (when (:home/hero page-data)
-     (htmx-hero-with-image (:home/hero page-data)))
-
-   ;; Dynamic components container
-   (htmx-dynamic-components-container page-data)
-
-   ;; Call to action with dynamic content
-   [:section {:class "bg-blue-600"
-              :hx-get "/api/components/cta"
-              :hx-trigger "every 120s" ; Refresh CTA every 2 minutes
-              :hx-swap "innerHTML"}
-    [:div {:class "mx-auto max-w-7xl py-12 px-6 lg:px-8 lg:py-24"}
-     [:div {:class "lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center"}
-      [:div
-       [:h2 {:class "text-3xl font-bold tracking-tight text-white sm:text-4xl"}
-        "Join Our Community"]
-       [:p {:class "mt-3 max-w-3xl text-lg text-blue-100"}
-        "Experience the warmth and fellowship of Mount Zion UCC."]]
-      [:div {:class "mt-8 lg:mt-0"}
-       [:button {:class "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50"
-                 :hx-get "/page/worship"
-                 :hx-target "#main-content"
-                 :hx-push-url "true"}
-        "Plan Your Visit"]
-       [:button {:class "ml-3 inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-400"
-                 :hx-get "/page/contact"
-                 :hx-target "#main-content"
-                 :hx-push-url "true"}
-        "Contact Us"]]]]]
-
-   ;; Page editor (only show if in edit mode)
-   (htmx-page-editor page-data)])
+;; NOTE: The actual htmx-hero-features-layout is in components/htmx.clj
+;; This file only contains feature and editor components
 
 ;; --- NOTIFICATION SYSTEM ---
 
