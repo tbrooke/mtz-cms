@@ -25,8 +25,18 @@
         metosin/malli             {:mvn/version "0.13.0"}}
  
  :aliases {:dev {:extra-paths ["dev"]
-                 :extra-deps {org.clojure/tools.namespace {:mvn/version "1.4.4"}}}
-           
+                 :extra-deps {org.clojure/tools.namespace {:mvn/version "1.4.4"}
+                              nrepl/nrepl {:mvn/version "1.0.0"}
+                              cider/cider-nrepl {:mvn/version "0.45.0"}}
+                 :main-opts ["-m" "nrepl.cmdline" "--port" "7888" "--middleware" "[cider.nrepl/cider-middleware]"]}
+
+           :rebel {:extra-paths ["dev"]
+                   :extra-deps {org.clojure/tools.namespace {:mvn/version "1.4.4"}
+                                com.bhauman/rebel-readline {:mvn/version "0.1.4"}
+                                nrepl/nrepl {:mvn/version "1.0.0"}
+                                cider/cider-nrepl {:mvn/version "0.45.0"}}
+                   :main-opts ["-m" "rebel-readline.main" "--nrepl-port" "7888"]}
+
            :repl {:main-opts ["-m" "nrepl.cmdline" "--port" "7888" "--middleware" "[cider.nrepl/cider-middleware]"]
                   :extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}
                                cider/cider-nrepl {:mvn/version "0.45.0"}}}}}
