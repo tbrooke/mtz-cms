@@ -233,7 +233,7 @@
 
 (defn not-found-page [slug]
   "Template for 404 pages"
-  (base-layout 
+  (base-layout
     "Page Not Found - Mount Zion UCC"
     [:div {:class "text-center py-12"}
      [:h1 {:class "text-4xl font-bold text-gray-900 mb-4"} "Page Not Found"]
@@ -245,6 +245,141 @@
      [:a {:href "/pages"
           :class "bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"}
       "View All Available Pages"]]))
+
+;; --- FEATURE DETAIL PAGE ---
+
+(defn feature-detail-page
+  "Template for individual feature detail pages
+
+   Data structure:
+   {:feature/title \"Welcome to Mount Zion\"
+    :feature/content \"<div>...HTML content...</div>\"
+    :feature/image {:url \"/proxy/image/123\" :alt \"Image\"}
+    :feature/id \"feature1\"}"
+  [feature-data ctx]
+  (base-layout
+   (str (:feature/title feature-data "Feature") " - Mount Zion UCC")
+   [:div
+    ;; Breadcrumb navigation
+    [:nav {:class "mb-6"}
+     [:ol {:class "flex items-center space-x-2 text-sm text-gray-600"}
+      [:li
+       [:a {:href "/" :class "hover:text-blue-600"} "Home"]]
+      [:li [:span {:class "mx-2"} "→"]]
+      [:li {:class "text-gray-900 font-medium"}
+       (:feature/title feature-data)]]]
+
+    ;; Feature content container
+    [:div {:class "bg-white rounded-lg shadow-lg overflow-hidden"}
+
+     ;; Hero image (if available)
+     (when-let [image (:feature/image feature-data)]
+       [:div {:class "h-64 md:h-96 bg-gradient-to-br from-blue-50 to-blue-100 overflow-hidden"}
+        [:img {:src (:url image)
+               :alt (or (:alt image) (:feature/title feature-data))
+               :class "w-full h-full object-cover"}]])
+
+     ;; Content section
+     [:div {:class "p-8 md:p-12"}
+      ;; Title
+      [:h1 {:class "text-4xl md:text-5xl font-bold text-gray-900 mb-6"}
+       (or (:feature/title feature-data) "Untitled Feature")]
+
+      ;; Feature content (full HTML)
+      [:div {:class "prose prose-lg max-w-none mb-8"}
+       (if (:feature/content feature-data)
+         [:div {:dangerouslySetInnerHTML {:__html (:feature/content feature-data)}}]
+         [:p {:class "text-gray-500 italic"} "No content available for this feature."])]
+
+      ;; Back to home button
+      [:div {:class "pt-6 border-t border-gray-200"}
+       [:a {:href "/"
+            :class "inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"}
+        [:svg {:class "mr-2 w-5 h-5"
+               :fill "none"
+               :stroke "currentColor"
+               :viewBox "0 0 24 24"}
+         [:path {:stroke-linecap "round"
+                 :stroke-linejoin "round"
+                 :stroke-width "2"
+                 :d "M15 19l-7-7 7-7"}]]
+        [:span "Back to Home"]]]]]]
+   ctx))
+
+;; --- HERO DETAIL PAGE ---
+
+(defn hero-detail-page
+  "Template for individual hero image detail pages
+
+   Data structure:
+   {:hero/id \"img-123\"
+    :hero/title \"Welcome to Mount Zion\"
+    :hero/description \"Join us for worship...\"
+    :hero/content \"<div>...additional HTML content...</div>\"  ; optional
+    :hero/image {:url \"/api/image/123\" :alt \"Church\"}}     ; the image
+
+   Displays:
+   - Image centered at top
+   - Title centered below (H1)
+   - Description below as lead paragraph
+   - Additional content if available
+   - Back to home link"
+  [hero-data ctx]
+  (base-layout
+   (str (:hero/title hero-data "Hero") " - Mount Zion UCC")
+   [:div
+    ;; Breadcrumb navigation
+    [:nav {:class "mb-6"}
+     [:ol {:class "flex items-center space-x-2 text-sm text-gray-600"}
+      [:li
+       [:a {:href "/" :class "hover:text-blue-600"} "Home"]]
+      [:li [:span {:class "mx-2"} "→"]]
+      [:li {:class "text-gray-900 font-medium"}
+       (:hero/title hero-data)]]]
+
+    ;; Hero content container
+    [:div {:class "bg-white rounded-lg shadow-lg overflow-hidden max-w-4xl mx-auto"}
+
+     ;; Hero image centered at top
+     (when-let [image (:hero/image hero-data)]
+       [:div {:class "flex justify-center bg-gray-50 p-8"}
+        [:div {:class "relative w-full max-w-3xl overflow-hidden rounded-lg shadow-md"
+               :style "padding-bottom: 56.25%;"} ;; 16:9 aspect ratio
+         [:img {:src (:url image)
+                :alt (or (:alt image) (:hero/title hero-data))
+                :class "absolute inset-0 w-full h-full object-cover"}]]])
+
+     ;; Content section
+     [:div {:class "p-8 md:p-12"}
+      ;; Title centered
+      [:h1 {:class "text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center"}
+       (or (:hero/title hero-data) "Untitled")]
+
+      ;; Description as lead paragraph
+      (when (:hero/description hero-data)
+        [:p {:class "text-xl text-gray-700 mb-8 text-center leading-relaxed"}
+         (:hero/description hero-data)])
+
+      ;; Additional content (if provided)
+      (when (:hero/content hero-data)
+        [:div {:class "prose prose-lg max-w-none mb-8 border-t border-gray-200 pt-8"}
+         [:div {:dangerouslySetInnerHTML {:__html (:hero/content hero-data)}}]])
+
+      ;; Back to home button
+      [:div {:class "pt-6 border-t border-gray-200 text-center"}
+       [:a {:href "/"
+            :class "inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"}
+        [:svg {:class "mr-2 w-5 h-5"
+               :fill "none"
+               :stroke "currentColor"
+               :viewBox "0 0 24 24"}
+         [:path {:stroke-linecap "round"
+                 :stroke-linejoin "round"
+                 :stroke-width "2"
+                 :d "M15 19l-7-7 7-7"}]]
+        [:span "Back to Home"]]]]]
+   ]  ; Close outer div from line 330
+   ctx))
 
 (comment
   ;; Test pages

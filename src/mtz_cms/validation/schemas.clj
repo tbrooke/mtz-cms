@@ -51,7 +51,10 @@
    [:hero/node-id :string]])
 
 (def hero-component-output-schema
-  "Schema for hero component output"
+  "Schema for hero component output
+
+   NOTE: Hero images are limited to 1 or 2 images max.
+   The schema enforces this constraint."
   [:map
    [:hero/title :string]
    [:hero/content :string]
@@ -59,10 +62,19 @@
                          [:id :string]
                          [:name :string]
                          [:url :string]]]]
-   [:hero/images {:optional true} [:maybe [:vector [:map
-                                                     [:id :string]
-                                                     [:name :string]
-                                                     [:url :string]]]]]])
+   [:hero/images {:optional true}
+    [:maybe
+     [:and
+      [:vector {:min 1 :max 2} [:map
+                                [:id :string]
+                                [:name :string]
+                                [:url :string]
+                                [:title {:optional true} [:maybe :string]]
+                                [:description {:optional true} [:maybe :string]]
+                                [:link {:optional true} :string]]]
+      ;; Custom validation message
+      [:fn {:error/message "Hero component must have 1 or 2 images only"}
+       (fn [images] (<= 1 (count images) 2))]]]]])
 
 (def feature-component-input-schema
   "Schema for feature component input"

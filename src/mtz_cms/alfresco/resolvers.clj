@@ -85,13 +85,26 @@
                          {:id (get-in img [:entry :id])
                           :name (get-in img [:entry :name])
                           :url (str "/api/image/" (get-in img [:entry :id]))}))
-               ;; Return all images for carousel (hero uses this)
+               ;; Return images with metadata (hero uses this)
+               ;; NOTE: Hero component only supports 1-2 images, limit and warn if more
                :images (when (seq image-files)
-                        (mapv (fn [img]
-                                {:id (get-in img [:entry :id])
-                                 :name (get-in img [:entry :name])
-                                 :url (str "/api/image/" (get-in img [:entry :id]))})
-                              image-files))
+                        (let [image-count (count image-files)]
+                          (when (> image-count 2)
+                            (log/warn "⚠️ Hero folder has" image-count "images. Only first 2 will be used. Please remove extra images."))
+                          (mapv (fn [img]
+                                  (let [img-id (get-in img [:entry :id])
+                                        ;; Fetch image node to get title and description
+                                        img-node-result (alfresco/get-node ctx img-id)
+                                        img-props (when (:success img-node-result)
+                                                   (get-in img-node-result [:data :entry :properties]))]
+                                    {:id img-id
+                                     :name (get-in img [:entry :name])
+                                     :url (str "/api/image/" img-id)
+                                     :title (get img-props :cm:title)
+                                     :description (get img-props :cm:description)
+                                     :link (str "/hero/" img-id)}))
+                                ;; Take only first 2 images for hero
+                                (take 2 image-files))))
                :type content-type
                :component-type component-type})
 

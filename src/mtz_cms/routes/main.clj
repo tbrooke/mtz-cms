@@ -269,6 +269,79 @@
                      "← Back to Sunday Worship"]]
                    ctx))})))))
 
+;; --- HERO HANDLERS ---
+
+(defn hero-detail-handler [request]
+  "Display individual hero image detail page"
+  (let [image-id (get-in request [:path-params :image-id])
+        ctx {}]
+
+    (log/info "🎯 Hero detail requested for image:" image-id)
+
+    ;; Fetch image node to get metadata
+    (let [node-result (alfresco/get-node ctx image-id)]
+      (if (:success node-result)
+        (let [node-data (get-in node-result [:data :entry])
+              props (:properties node-data)
+
+              ;; Build hero detail data
+              hero-data {:hero/id image-id
+                        :hero/title (or (:cm:title props) (:name node-data) "Untitled")
+                        :hero/description (:cm:description props)
+                        :hero/content (:cm:content props)  ; Optional additional content
+                        :hero/image {:url (str "/api/image/" image-id)
+                                    :alt (or (:cm:title props) (:name node-data))}}]
+
+          (log/info "✅ Hero image found:" (:hero/title hero-data))
+
+          (html-response
+           (pages/hero-detail-page hero-data ctx)))
+
+        ;; Image not found
+        (do
+          (log/warn "⚠️ Hero image not found:" image-id)
+          {:status 404
+           :headers {"Content-Type" "text/html"}
+           :body (hiccup/html (pages/not-found-page image-id))})))))
+
+;; --- FEATURE HANDLERS ---
+
+(defn feature-detail-handler [request]
+  "Display individual feature detail page by slug"
+  (let [slug (get-in request [:path-params :slug])
+        ctx {}]
+
+    (log/info "🎯 Feature detail requested:" slug)
+
+    ;; Map slug to node-id (feature1, feature2, feature3)
+    (let [feature-mapping {"feature1" "264ab06c-984e-4f64-8ab0-6c984eaf6440"
+                           "feature2" "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89"
+                           "feature3" "6737d1b1-5465-4625-b7d1-b15465b62530"}
+          node-id (get feature-mapping slug)]
+
+      (if node-id
+        ;; Fetch feature content from Alfresco
+        (let [result (pathom/query ctx [{[:feature/node-id node-id]
+                                         [:feature/title
+                                          :feature/content
+                                          :feature/description
+                                          :feature/image]}])
+              feature (get result [:feature/node-id node-id])]
+
+          (log/info "✅ Feature found:" (:feature/title feature))
+
+          (html-response
+           (pages/feature-detail-page
+            (assoc feature :feature/id slug)
+            ctx)))
+
+        ;; Feature not found
+        (do
+          (log/warn "⚠️ Feature not found:" slug)
+          {:status 404
+           :headers {"Content-Type" "text/html"}
+           :body (hiccup/html (pages/not-found-page slug))})))))
+
 (defn pdf-handler [request]
   "Serve PDF files from Alfresco"
   (let [node-id (get-in request [:path-params :node-id])
@@ -380,6 +453,12 @@
     ;; Blog routes
     ["/blog" {:get blog-list-handler}]
     ["/blog/:slug" {:get blog-detail-handler}]
+
+    ;; Hero routes
+    ["/hero/:image-id" {:get hero-detail-handler}]
+
+    ;; Feature routes
+    ["/features/:slug" {:get feature-detail-handler}]
 
     ;; Sunday Worship routes
     ["/worship/sunday" {:get sunday-worship-list-handler}]

@@ -13,6 +13,7 @@
 - [MENU_SYSTEM](MENU_SYSTEM.md) - Navigation system architecture
 - [COMPONENT_UPDATE](COMPONENT_UPDATE.md) - Component system updates
 - [DYNAMIC_PAGES_SUCCESS](DYNAMIC_PAGES_SUCCESS.md) - Dynamic page implementation
+- [HOMEPAGE_FEATURES](HOMEPAGE_FEATURES.md) - Homepage feature cards system
 
 ## Alfresco Integration
 - [CONTENT_MODEL](CONTENT_MODEL.md) - Complete content model reference (web: aspects)

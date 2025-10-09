@@ -6,9 +6,16 @@
 
 **Architecture**: Alfresco → Pathom → HTMX → Tailwind CSS
 
-## 🚀 **Latest Development Phase: Content Model Integration Complete**
+## 🚀 **Latest Development Phase: Homepage Feature Cards Complete**
 
-### ✅ **Completed Tasks**
+### ✅ **Recent Additions (October 2025)**
+1. **Homepage Feature Cards**: Tall card-based UI (600px height) for three featured content items
+2. **Feature Detail Pages**: Individual pages for each feature with full content display
+3. **Card-Based UX**: Modern, clickable cards with hover effects and responsive design
+4. **Dynamic Loading**: HTMX-powered card loading from Alfresco
+5. **See**: [HOMEPAGE_FEATURES.md](HOMEPAGE_FEATURES.md) for complete documentation
+
+### ✅ **Previously Completed Tasks**
 1. **Content Model Discovery**: Successfully ran Babashka schema generator and discovered actual Alfresco Content Model structure
 2. **Node Analysis**: Analyzed Hero and Feature nodes - they are `cm:folder` types with `cm:title` properties containing typed children
 3. **Pathom Resolver Rewrite**: Completely rewrote hero and feature component resolvers to use Content Model instead of file-system approach
@@ -85,9 +92,10 @@ The CMS now successfully:
    │   ├── pathom/resolvers.clj            # Real Alfresco data (✅ Working)
    │   ├── components/                     # NEW COMPONENT SYSTEM:
    │   │   ├── resolvers.clj               # Component data resolvers (✅)
-   │   │   ├── templates.clj               # HyperUI templates (✅) 
+   │   │   ├── templates.clj               # HyperUI templates (✅)
    │   │   ├── htmx_templates.clj          # HTMX-enhanced templates (✅)
    │   │   ├── htmx.clj                    # HTMX containers (✅)
+   │   │   ├── home_features.clj           # Homepage feature cards (✅)
    │   │   └── layouts.clj                 # Layout system (✅)
    │   ├── config/core.clj                 # Page mappings (✅ Working)
    │   ├── alfresco/client.clj             # Enhanced API client (✅ Working)
@@ -399,11 +407,16 @@ ssh -L 8080:localhost:8080 -N -f tmb@trust
 
 ### **Current Working Features:**
 - ✅ **Hero Component**: Building image loads from Alfresco Hero folder
-- ✅ **Feature 1**: "Welcome to Mt Zion" + "45th Homecoming" content  
+- ✅ **Homepage Feature Cards**: Tall card-based UI (600px) with 3 clickable cards linking to detail pages
+- ✅ **Feature Detail Pages**: Individual pages for each feature with full content and hero images
+- ✅ **Feature 1**: "Welcome to Mt Zion" + "45th Homecoming" content
 - ✅ **Feature 2**: "Blood Drive" with HTML content + embedded image
+- ✅ **Feature 3**: Placeholder for future content
 - ✅ **Dynamic Pages**: All 9 Mt Zion pages auto-discovered and accessible
 - ✅ **HTMX API**: Endpoints ready for dynamic component loading
 - ✅ **Real-time Updates**: Components can poll Alfresco for changes
+- ✅ **Blog System**: "Pastor Jim Reflects" with list and detail pages
+- ✅ **Sunday Worship**: PDF bulletins and presentations with inline display
 
 ### **Architecture Highlights:**
 

@@ -7,9 +7,11 @@
    [mtz-cms.components.templates :as templates]
    [mtz-cms.components.section :as section]
    [mtz-cms.components.hero :as hero]
+   [mtz-cms.components.home-features :as home-features]
    [mtz-cms.validation.middleware :as validation]
    [mtz-cms.alfresco.client :as alfresco]
    [mtz-cms.cache.simple :as cache]
+   [clojure.string :as str]
    [clojure.tools.logging :as log]))
 
 ;; --- RESPONSE HELPERS ---
@@ -93,6 +95,51 @@
       {:status 200
        :headers {"Content-Type" "text/html"}
        :body (str "<div>" (or content "") "</div>")})))
+
+(defn feature-card-handler [request]
+  "Serve feature card for homepage HTMX loading
+
+   Returns a feature card with title, description, and link to detail page"
+  (try
+    (let [ctx {}
+          node-id (get-in request [:path-params :node-id])
+          _ (log/info "🃏 Loading feature card for node:" node-id)
+
+          ;; Query Pathom for feature data
+          result (pathom/query ctx [{[:feature/node-id node-id]
+                                    [:feature/title :feature/content :feature/image]}])
+          feature-raw (get result [:feature/node-id node-id])
+
+          ;; Map node-id to feature slug
+          slug-mapping {"264ab06c-984e-4f64-8ab0-6c984eaf6440" "feature1"
+                        "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89" "feature2"
+                        "6737d1b1-5465-4625-b7d1-b15465b62530" "feature3"}
+          slug (get slug-mapping node-id "feature-unknown")
+
+          ;; Extract description from content (first 150 chars)
+          description (when (:feature/content feature-raw)
+                        (home-features/extract-text-from-html
+                         (:feature/content feature-raw)
+                         150))
+
+          ;; Build card data
+          feature-card-data {:feature/id slug
+                            :feature/title (or (:feature/title feature-raw) "Feature")
+                            :feature/description (or description "Click to learn more about this feature.")
+                            :feature/image (:feature/image feature-raw)
+                            :feature/link (str "/features/" slug)}
+
+          response (html-fragment-response
+                   (home-features/feature-card feature-card-data))]
+
+      (log/info "✅ Feature card rendered for node:" node-id "slug:" slug)
+      response)
+
+    (catch Exception e
+      (log/error "❌ Error in feature card handler:" (.getMessage e))
+      ;; Return placeholder card on error
+      (html-fragment-response
+       (home-features/placeholder-feature-card "error")))))
 
 (defn components-refresh-handler [request]
   "Refresh all components on a page"
@@ -246,6 +293,9 @@
                   :post components-refresh-handler}]
      ["/add" {:get component-add-handler}]
      ["/cta" {:get cta-component-handler}]]
+
+    ["/features"
+     ["/card/:node-id" {:get feature-card-handler}]]
     
     ["/page"
      ["/publish" {:post page-publish-handler}]]

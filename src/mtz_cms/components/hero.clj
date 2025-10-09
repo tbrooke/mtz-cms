@@ -1,14 +1,11 @@
 (ns mtz-cms.components.hero
-  "Hero component - large banner at top of page
-
-   NOTE: For HTMX dynamic pages, the hero is rendered by routes/api.clj
-   This component is used by non-HTMX layouts via components/templates.clj wrappers
+  "Hero component - large banner at top of page with 16:9 images
 
    Architecture:
    - One component per file for clarity
    - Pure presentation - accepts data, returns Hiccup
    - No Alfresco calls, no business logic
-   - Utility functions for text processing included"
+   - Fixed layout (no carousel) - displays 1 or 2 images in 16:9 format"
   (:require
    [clojure.string :as str]))
 
@@ -25,23 +22,115 @@
         (str/replace #"\s+" " ")         ; Normalize whitespace
         str/trim)))
 
-;; --- HERO COMPONENT ---
+;; --- HERO IMAGE CARD ---
 
-(defn hero
-  "Hero banner component for page headers
+(defn hero-image-card
+  "Single hero image card with title, description, and link
 
    Data structure:
-   {:hero/title \"Welcome to Mount Zion UCC\"
-    :hero/content \"<p>A progressive Christian community</p>\"
-    :hero/image \"/path/to/image.jpg\"     ; optional
-    :hero/cta-primary {:text \"Learn More\" :href \"/about\"}  ; optional
-    :hero/cta-secondary {:text \"Join Us\" :href \"/worship\"}} ; optional
+   {:url \"/api/image/123\"
+    :id \"image-123\"
+    :name \"Church Building\"
+    :title \"Welcome to Mount Zion\"      ; from image cm:title
+    :description \"Join us for worship\"  ; from image cm:description
+    :link \"/hero/image-123\"}
 
-   Renders a large banner with:
-   - Title (required)
-   - Content text (optional, HTML will be stripped)
-   - Background image (optional)
-   - Up to 2 call-to-action buttons (optional)"
+   Renders a 16:9 image card with:
+   - 16:9 aspect ratio image
+   - Title (H2) centered below
+   - Description text
+   - 'click for more' link"
+  [image-data]
+  [:div {:class "flex flex-col group"}
+   ;; 16:9 Image container
+   [:a {:href (:link image-data (str "/hero/" (:id image-data)))
+        :class "block"}
+    [:div {:class "relative w-full overflow-hidden rounded-lg shadow-lg group-hover:shadow-xl transition-shadow"
+           :style "padding-bottom: 56.25%;"} ;; 16:9 aspect ratio
+     [:img {:src (:url image-data)
+            :alt (:title image-data (:name image-data))
+            :class "absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"}]]]
+
+   ;; Content below image
+   [:div {:class "mt-4 text-center"}
+    ;; Title (H2) - from cm:title property, not filename
+    [:h2 {:class "text-2xl font-bold text-gray-900 mb-2"}
+     (or (:title image-data) "Untitled")]
+
+    ;; Description - from cm:description property
+    (when-let [desc (:description image-data)]
+      (when (not (empty? desc))
+        [:p {:class "text-gray-600 mb-3"}
+         desc]))
+
+    ;; "Click for more" link
+    [:a {:href (:link image-data (str "/hero/" (:id image-data)))
+         :class "inline-block text-blue-600 hover:text-blue-800 text-sm font-medium"}
+     "...click for more →"]]])
+
+;; --- MAIN HERO COMPONENT ---
+
+(defn hero-carousel
+  "Fixed hero component - displays 1 or 2 images in 16:9 format (NO carousel)
+
+   Data structure:
+   {:hero/title \"Mount Zion UCC\"
+    :hero/images [{:id \"123\"
+                   :url \"/api/image/123\"
+                   :name \"Church\"
+                   :title \"Welcome\"        ; from cm:title
+                   :description \"Join us\"}] ; from cm:description
+    :hero/content \"A progressive Christian community\"}
+
+   Renders:
+   - Site title at top
+   - 1 image: Single large 16:9 image (full width)
+   - 2 images: Two side-by-side 16:9 images
+   - Title, description, and 'click for more' below each image
+
+   NOTE: Only 1 or 2 images allowed (enforced by schema)
+   NOTE: Named hero-carousel for backwards compatibility, but NO carousel"
+  [hero-data]
+  (let [images (or (:hero/images hero-data) [])
+        image-count (count images)]
+    [:div {:class "bg-white py-8"}
+     ;; Site title at top
+     [:div {:class "mx-auto max-w-screen-xl px-4 pb-8 text-center"}
+      [:h1 {:class "text-4xl font-extrabold sm:text-6xl text-gray-900"}
+       "Mount Zion UCC"
+       [:strong {:class "block font-extrabold text-blue-600 mt-2"} "United Church of Christ"]]]
+
+     ;; Hero images section - ONLY 1 or 2 images
+     (when (seq images)
+       [:div {:class "mx-auto max-w-screen-xl px-4"}
+        (cond
+          ;; Single image - large full width display (max-w-6xl = 1152px)
+          (= image-count 1)
+          [:div {:class "max-w-6xl mx-auto"}
+           (hero-image-card (first images))]
+
+          ;; Two images - side by side
+          (= image-count 2)
+          [:div {:class "grid grid-cols-1 md:grid-cols-2 gap-8"}
+           (for [[idx img] (map-indexed vector images)]
+             [:div {:key (or (:id img) idx)}
+              (hero-image-card img)])]
+
+          ;; More than 2 images - ERROR (should be caught by schema)
+          :else
+          [:div {:class "max-w-4xl mx-auto bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 text-center"}
+           [:p {:class "text-yellow-800 font-semibold"}
+            "⚠️ Warning: Hero component has " image-count " images"]
+           [:p {:class "text-yellow-700 text-sm mt-2"}
+            "Only 1 or 2 images are allowed. Please remove extra images from the Hero folder in Alfresco."]])])]))
+
+;; --- BACKWARDS COMPATIBILITY ---
+
+(defn hero
+  "DEPRECATED: Basic hero banner component
+
+   Use hero-carousel instead for image-based heroes.
+   This function is kept for backwards compatibility."
   [hero-data]
   [:section {:class (str "relative py-16 "
                         (if (:hero/image hero-data)
@@ -80,139 +169,33 @@
               :class "border-2 border-white text-white px-8 py-3 rounded-md font-semibold hover:bg-white hover:text-blue-600 transition-colors"}
           (:text cta "Join Us")])])]])
 
-(defn simple-hero
-  "Simplified hero component - backwards compatibility
-
-   DEPRECATED: Use `hero` function instead.
-   This wrapper exists for compatibility during refactoring."
-  [hero-data]
-  (hero hero-data))
-
-(defn hero-carousel
-  "Hero component with image carousel for dynamic HTMX loading
-
-   Data structure:
-   {:hero/title \"Mount Zion UCC\"
-    :hero/images [{:url \"/api/image/123\" :alt \"Church\"}]
-    :hero/content \"A progressive Christian community\"}
-
-   Renders:
-   - Title above carousel
-   - Multi-image carousel with controls
-   - Auto-rotation and manual navigation"
-  [hero-data]
-  (let [images (or (:hero/images hero-data) [])
-        content (or (:hero/content hero-data) "A progressive Christian community welcoming all people.")
-        random-index (if (seq images) (rand-int (count images)) 0)]
-    [:div {:class "bg-white min-h-screen"}
-     ;; Title above the image
-     [:div {:class "mx-auto max-w-screen-xl px-4 pt-8 text-center"}
-      [:h1 {:class "text-4xl font-extrabold sm:text-6xl text-gray-900"}
-       "Mount Zion UCC"
-       [:strong {:class "block font-extrabold text-blue-600 mt-2"} "United Church of Christ"]]]
-
-     ;; Hero image carousel section
-     (when (seq images)
-       [:div {:class "relative"}
-        ;; Image display
-        [:div {:id "hero-carousel" :class "relative min-h-screen flex items-center justify-center"}
-         (for [[idx img] (map-indexed vector images)]
-           [:div {:key idx
-                  :id (str "hero-image-" idx)
-                  :class (str "hero-slide w-full absolute inset-0 "
-                             (if (= idx random-index) "" "hidden"))
-                  :style (str "background-image: url('" (:url img) "'); "
-                             "background-size: contain; "
-                             "background-position: center; "
-                             "background-repeat: no-repeat; "
-                             "min-height: 100vh;")}])]
-
-        ;; Carousel controls
-        [:div {:class "absolute bottom-8 left-0 right-0 flex items-center justify-center gap-6 z-10"}
-         ;; Previous button
-         [:button {:onclick "changeHeroImage(-1)"
-                   :class "bg-white/80 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg transition-all"}
-          [:svg {:class "w-6 h-6" :fill "none" :stroke "currentColor" :viewBox "0 0 24 24"}
-           [:path {:stroke-linecap "round" :stroke-linejoin "round" :stroke-width "2" :d "M15 19l-7-7 7-7"}]]]
-
-         ;; Dot indicators
-         [:div {:class "flex gap-2"}
-          (for [[idx _] (map-indexed vector images)]
-            [:button {:key idx
-                      :onclick (str "showHeroImage(" idx ")")
-                      :id (str "hero-dot-" idx)
-                      :class (str "w-3 h-3 rounded-full transition-all "
-                                 (if (= idx random-index)
-                                   "bg-blue-600 scale-125"
-                                   "bg-white/60 hover:bg-white/80"))}])]
-
-         ;; Next button
-         [:button {:onclick "changeHeroImage(1)"
-                   :class "bg-white/80 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg transition-all"}
-          [:svg {:class "w-6 h-6" :fill "none" :stroke "currentColor" :viewBox "0 0 24 24"}
-           [:path {:stroke-linecap "round" :stroke-linejoin "round" :stroke-width "2" :d "M9 5l7 7-7 7"}]]]]
-
-        ;; JavaScript for carousel
-        [:script
-         (str "let currentHeroSlide = " random-index ";
-const totalHeroSlides = " (count images) ";
-
-function showHeroImage(index) {
-  // Hide all slides
-  document.querySelectorAll('.hero-slide').forEach(slide => {
-    slide.classList.add('hidden');
-  });
-
-  // Update all dots
-  document.querySelectorAll('[id^=\"hero-dot-\"]').forEach(dot => {
-    dot.classList.remove('bg-blue-600', 'scale-125');
-    dot.classList.add('bg-white/60');
-  });
-
-  // Show selected slide
-  const selectedSlide = document.getElementById('hero-image-' + index);
-  if (selectedSlide) {
-    selectedSlide.classList.remove('hidden');
-  }
-
-  // Highlight selected dot
-  const selectedDot = document.getElementById('hero-dot-' + index);
-  if (selectedDot) {
-    selectedDot.classList.remove('bg-white/60');
-    selectedDot.classList.add('bg-blue-600', 'scale-125');
-  }
-
-  currentHeroSlide = index;
-}
-
-function changeHeroImage(direction) {
-  let newIndex = currentHeroSlide + direction;
-
-  // Wrap around
-  if (newIndex < 0) {
-    newIndex = totalHeroSlides - 1;
-  } else if (newIndex >= totalHeroSlides) {
-    newIndex = 0;
-  }
-
-  showHeroImage(newIndex);
-}
-")]])]))
+(def simple-hero hero)
+(def hero-fixed hero-carousel)
 
 ;; --- REPL TESTING ---
 
 (comment
-  ;; Test basic hero
-  (hero {:hero/title "Welcome to Mount Zion UCC"
-         :hero/content "A progressive Christian community"})
+  ;; Test single image
+  (hero-carousel {:hero/images [{:id "img1"
+                                 :url "/api/image/123"
+                                 :name "Church Building"
+                                 :title "Welcome to Mount Zion"
+                                 :description "Join us for worship every Sunday"
+                                 :link "/hero/img1"}]})
 
-  ;; Test with CTAs
-  (hero {:hero/title "Join Our Community"
-         :hero/content "<p>Experience the warmth and fellowship</p>"
-         :hero/cta-primary {:text "Learn More" :href "/about"}
-         :hero/cta-secondary {:text "Visit Us" :href "/worship"}})
+  ;; Test two images
+  (hero-carousel {:hero/images [{:id "img1"
+                                 :url "/api/image/123"
+                                 :title "Sunday Worship"
+                                 :description "Join us every Sunday at 10am"}
+                                {:id "img2"
+                                 :url "/api/image/456"
+                                 :title "Community Events"
+                                 :description "Stay connected with our church family"}]})
 
-  ;; Test with background image
-  (hero {:hero/title "Welcome"
-         :hero/content "A community of faith"
-         :hero/image "/images/hero-bg.jpg"}))
+  ;; Test image card
+  (hero-image-card {:id "test-123"
+                    :url "/api/image/123"
+                    :name "Church"
+                    :title "Welcome"
+                    :description "Join us for worship"}))

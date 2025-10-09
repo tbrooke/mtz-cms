@@ -2,6 +2,7 @@
   "HTMX-powered dynamic components for Mount Zion CMS"
   (:require
    [mtz-cms.components.templates :as templates]
+   [mtz-cms.components.home-features :as home-features]
    [clojure.string :as str]))
 
 ;; --- HTMX COMPONENT CONTAINERS ---
@@ -60,7 +61,7 @@
   "HTMX-powered layout that loads components dynamically
 
    NOTE: This wraps HTMX loading containers with the standard layout structure.
-   The actual layout logic comes from ui/layouts.clj to avoid duplication."
+   Uses the new card-based feature grid for better UX."
   [page-config]
   (let [hero-node-id (get-in page-config [:components :hero :node-id])
         feature-nodes (get-in page-config [:components :features])]
@@ -69,21 +70,14 @@
      (when hero-node-id
        (htmx-hero-container hero-node-id))
 
-     ;; Features section - loads dynamically
+     ;; Features section - NEW CARD GRID LAYOUT
      (when (seq feature-nodes)
-       [:section {:class "py-12 bg-white"}
-        [:div {:class "mx-auto max-w-7xl px-6 lg:px-8"}
-         [:div {:class "mx-auto max-w-2xl lg:text-center mb-12"}
-          [:h2 {:class "text-base font-semibold leading-7 text-blue-600"} "Our Community"]
-          [:p {:class "mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"}
-           "What's Happening at Mount Zion"]]
-
-         ;; Dynamic features grid with HTMX loading
-         [:div {:class "mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none"}
-          [:dl {:class "grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3"}
-           (for [feature-node feature-nodes]
-             [:div {:key (:node-id feature-node)}
-              (htmx-feature-container (:node-id feature-node))])]]]])
+       (home-features/htmx-features-grid
+        (map-indexed
+         (fn [idx feature-node]
+           {:node-id (:node-id feature-node)
+            :slug (str "feature" (inc idx))})
+         feature-nodes)))
 
      ;; Call to action section (static, same as regular layout)
      [:section {:class "bg-blue-600"}
