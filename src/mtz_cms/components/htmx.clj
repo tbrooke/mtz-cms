@@ -98,12 +98,14 @@
                :class "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-400"}
            "Contact Us"]]]]]]
 
-     ;; Refresh button for content editors
+     ;; Refresh button for content editors - clears cache and reloads
      [:div {:class "fixed bottom-4 right-4 z-50"}
       [:button {:class "bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
-                :onclick "window.location.reload()"
-                :title "Refresh content from Alfresco"}
-       "🔄 Refresh"]]]))
+                :hx-post "/api/cache/clear"
+                :hx-target "body"
+                :hx-swap "none"
+                :title "Clear cache and refresh content from Alfresco"}
+       "🔄 Refresh Content"]]]))
 
 ;; --- HTMX INTERACTIVE FEATURES ---
 

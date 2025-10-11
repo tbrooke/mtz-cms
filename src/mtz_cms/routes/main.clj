@@ -47,6 +47,18 @@
         page-data (get result [:page/key :about])]
     (html-response (pages/about-page page-data ctx))))
 
+(defn contact-handler [request]
+  (let [ctx {}]
+    (html-response (pages/contact-page ctx))))
+
+(defn events-handler [request]
+  (let [ctx {}]
+    (html-response (pages/events-page ctx))))
+
+(defn calendar-handler [request]
+  (let [ctx {}]
+    (html-response (pages/calendar-page ctx))))
+
 (defn demo-handler [request]
   (let [ctx {}
         ;; Test Pathom
@@ -445,6 +457,12 @@
    [["/" {:get home-handler}]
 
     ["/about" {:get about-handler}]
+
+    ["/contact" {:get contact-handler}]
+
+    ;; Events routes
+    ["/events" {:get events-handler}]
+    ["/events/calendar" {:get calendar-handler}]
 
     ["/demo" {:get demo-handler}]
 

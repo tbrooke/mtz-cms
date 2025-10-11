@@ -8,6 +8,8 @@
    [mtz-cms.components.section :as section]
    [mtz-cms.components.hero :as hero]
    [mtz-cms.components.home-features :as home-features]
+   [mtz-cms.components.contact-form :as contact-form]
+   [mtz-cms.email.mailgun :as mailgun]
    [mtz-cms.validation.middleware :as validation]
    [mtz-cms.alfresco.client :as alfresco]
    [mtz-cms.cache.simple :as cache]
@@ -266,6 +268,86 @@
        :headers {"Content-Type" "text/plain"}
        :body "Image not found"})))
 
+;; --- CONTACT FORM HANDLER ---
+
+(defn contact-form-submit-handler [request]
+  "Handle contact form submission
+
+   Sends two emails via SendGrid:
+   1. Thank you email to the person who submitted the form
+   2. Notification email to church staff"
+  (try
+    (let [params (:form-params request)
+          name (get params "name")
+          email (get params "email")
+          phone (get params "phone")
+          subject (get params "subject")
+          message (get params "message")]
+
+      (log/info "📬 Contact form submitted by:" name email)
+
+      ;; Validate required fields
+      (if (and name email subject message)
+        (do
+          ;; Send thank you email to submitter
+          (let [thank-you-result (mailgun/send-thank-you-email {:name name :email email})]
+            (when-not (:success thank-you-result)
+              (log/warn "⚠️ Thank you email failed but continuing:" (:message thank-you-result))))
+
+          ;; Send notification email to admin
+          (let [admin-result (mailgun/send-admin-notification
+                              {:name name
+                               :email email
+                               :phone phone
+                               :subject subject
+                               :message message})]
+
+            (if (:success admin-result)
+              (do
+                (log/info "✅ Contact form emails sent successfully")
+                (html-fragment-response (contact-form/success-message name)))
+
+              (do
+                (log/error "❌ Admin notification failed:" (:message admin-result))
+                (html-fragment-response
+                 (contact-form/error-message
+                  "We encountered an error sending your message. Please try again or email us directly at office@mtzcg.com"))))))
+
+        ;; Missing required fields
+        (do
+          (log/warn "⚠️ Contact form submission missing required fields")
+          (html-fragment-response
+           (contact-form/error-message
+            "Please fill out all required fields.")))))
+
+    (catch Exception e
+      (log/error "❌ Error processing contact form:" (.getMessage e))
+      (html-fragment-response
+       (contact-form/error-message
+        (str "An unexpected error occurred. Please try again. Error: " (.getMessage e)))))))
+
+;; --- CACHE API HANDLER ---
+
+(defn cache-clear-handler [request]
+  "Clear the server cache and reload the page
+
+   This allows content editors to see their changes immediately
+   without waiting for the 1-hour cache expiration."
+  (log/info "🔄 Cache clear requested")
+  (cache/clear-cache!)
+  (log/info "✅ Cache cleared successfully")
+
+  ;; Return HTMX response that triggers page reload
+  {:status 200
+   :headers {"Content-Type" "text/html"
+             "HX-Refresh" "true"}  ;; HTMX will reload the page
+   :body (hiccup/html
+          [:div {:class "bg-green-50 border border-green-200 rounded-md p-4 text-green-800"}
+           [:div {:class "flex items-center"}
+            [:svg {:class "w-5 h-5 mr-2" :fill "currentColor" :viewBox "0 0 20 20"}
+             [:path {:fill-rule "evenodd" :d "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" :clip-rule "evenodd"}]]
+           [:span {:class "font-medium"} "✅ Cache cleared! Refreshing page..."]]])})
+
 ;; --- TIME API HANDLER ---
 
 (defn time-handler [request]
@@ -283,7 +365,13 @@
   "API routes for HTMX dynamic loading"
   [["/api"
     ["/time" {:get time-handler}]
-    
+
+    ["/cache"
+     ["/clear" {:post cache-clear-handler}]]
+
+    ["/contact"
+     ["/submit" {:post contact-form-submit-handler}]]
+
     ["/components"
      ["/hero/:node-id" {:get hero-component-handler}]
      ["/feature/:node-id" {:get feature-component-handler}]

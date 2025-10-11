@@ -5,7 +5,9 @@
    This file only contains page-specific content composition."
   (:require
    [mtz-cms.ui.base :as base]
-   [mtz-cms.ui.layouts :as layouts]))
+   [mtz-cms.ui.layouts :as layouts]
+   [mtz-cms.components.contact-form :as contact-form]
+   [mtz-cms.components.events :as events]))
 
 ;; --- COMPATIBILITY LAYER ---
 ;;
@@ -381,9 +383,39 @@
    ]  ; Close outer div from line 330
    ctx))
 
+;; --- CONTACT PAGE ---
+
+(defn contact-page
+  "Contact page with SendGrid-powered contact form"
+  [ctx]
+  (base-layout
+   "Contact Us - Mount Zion UCC"
+   [:div {:class "py-12"}
+    (contact-form/contact-form)]
+   ctx))
+
+;; --- EVENTS PAGES ---
+
+(defn events-page
+  "Events listing page"
+  [ctx]
+  (base-layout
+   "Events - Mount Zion UCC"
+   (events/events-list-page ctx)
+   ctx))
+
+(defn calendar-page
+  "Calendar page with week/month views"
+  [ctx]
+  (base-layout
+   "Calendar - Mount Zion UCC"
+   (events/calendar-page ctx)
+   ctx))
+
 (comment
   ;; Test pages
   (home-page {:page/title "Home" :page/content "Welcome!"})
   (demo-page {:greeting "Hello World!"
               :alfresco {:success true :message "Connected"}})
-  (dynamic-page {:page/title "Test Page" :page/content "Test content" :page/node-id "123"}))
+  (dynamic-page {:page/title "Test Page" :page/content "Test content" :page/node-id "123"})
+  (contact-page {}))

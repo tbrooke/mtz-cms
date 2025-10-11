@@ -20,7 +20,13 @@
         ;; Utilities
         org.clojure/tools.logging {:mvn/version "1.2.4"}
         camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}
-        
+
+        ;; Email (Postal - SMTP for Mailgun)
+        com.draines/postal {:mvn/version "2.0.5"}
+
+        ;; Calendar (iCal4j - RFC 5545 iCalendar parsing)
+        org.mnode.ical4j/ical4j {:mvn/version "3.2.14"}
+
         ;; Validation & Schema
         metosin/malli             {:mvn/version "0.13.0"}}
  
