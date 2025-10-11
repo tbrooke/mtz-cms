@@ -4,11 +4,16 @@
 
 Mount Zion CMS now has **full support for Alfresco calendar events** including:
 
-- ✅ **iCalendar (.ics) parsing** using iCal4j library
-- ✅ **Recurring event expansion** (RRULE support)
-- ✅ **Outlook calendar integration** via Alfresco
+- ✅ **Property-based event reading** from Alfresco `ia:calendarEvent` nodes
+- ✅ **Recurring event expansion** (RRULE support via iCal4j)
+- ✅ **Tag resolution** (tag node IDs → tag names with caching)
+- ✅ **Two display modes**: Events list (published only) and Calendar (all events)
+- ✅ **Week/Month calendar views** with responsive design
 - ✅ **REPL tools** for calendar management
-- ✅ **Admin Dashboard** for web-based configuration
+
+**Live Pages:**
+- **`/events`** - Events list showing published events only (filtered by "publish" tag)
+- **`/events/calendar`** - Calendar with week/month tabs showing ALL events
 
 ---
 
@@ -17,76 +22,73 @@ Mount Zion CMS now has **full support for Alfresco calendar events** including:
 ### Components
 
 ```
-Alfresco Calendar Events (.ics files)
+Alfresco Calendar Events (ia:calendarEvent properties)
     ↓
-iCal4j Parser (RFC 5545 compliant)
+Read properties (:ia:recurrenceRule, :ia:fromDate, etc.)
     ↓
-Calendar Service (expand recurring events)
+Resolve tag IDs to tag names (with caching)
     ↓
-Pathom Resolvers (query interface)
+Expand recurring events using iCal4j Recur
     ↓
-Web UI / REPL Tools
+Calendar Service (filter, sort, group)
+    ↓
+Web UI (events list + calendar views)
 ```
 
 ### Key Files
 
-- **`src/mtz_cms/calendar/ical.clj`** - iCal4j integration, .ics parsing, RRULE expansion
-- **`src/mtz_cms/calendar/service.clj`** - High-level calendar service with date ranges
-- **`src/mtz_cms/calendar/repl.clj`** - REPL tools for testing and management
-- **`src/mtz_cms/admin/dashboard.clj`** - Web-based admin interface
+- **`src/mtz_cms/calendar/alfresco_events.clj`** - Property-based event reading, RRULE expansion, tag resolution
+- **`src/mtz_cms/calendar/service.clj`** - High-level calendar service (delegates to alfresco_events)
+- **`src/mtz_cms/components/events.clj`** - Event list and calendar view components
+- **`src/mtz_cms/ui/pages.clj`** - Event pages (events-page, calendar-page)
+- **`src/mtz_cms/routes/main.clj`** - Routes for /events and /events/calendar
 
 ---
 
 ## Quick Start
 
-### 1. Restart REPL to Load iCal4j
+### 1. View Calendar on Website
 
-```bash
-# Stop current REPL
-# Start fresh
-clojure -M:dev
+**Published Events List:**
 ```
+http://localhost:3000/events
+```
+Shows only events tagged with "publish"
+
+**Full Calendar:**
+```
+http://localhost:3000/events/calendar
+```
+Shows ALL events in week/month views (no tag filter)
 
 ### 2. Test Calendar in REPL
 
 ```clojure
-;; Load calendar tools
-(require '[mtz-cms.calendar.repl :as cal])
+;; Load calendar service
+(require '[mtz-cms.calendar.alfresco-events :as cal])
 
-;; Show help
-(cal/help)
+(def ctx {})
 
-;; List upcoming events (next 90 days)
-(cal/list-events)
+;; Get all upcoming events (next 90 days)
+(def events (cal/get-upcoming-events ctx :days 90))
+(count events)
 
-;; List events for next 30 days
-(cal/list-events 30)
+;; Get only published events
+(def published (cal/get-upcoming-events ctx :days 90 :tag-filter "publish"))
+(count published)
 
-;; List only published events
-(cal/list-events 30 "publish")
-
-;; Show events grouped by month
-(cal/list-events-by-month)
-
-;; List all calendar nodes in Alfresco
-(cal/list-calendar-nodes)
-
-;; Test a specific recurring event
-(cal/test-recurring-event "04cf1c10-8a1c-4b91-8f1c-108a1c9b913e")
-
-;; Show calendar configuration
-(cal/show-config)
+;; View first event
+(clojure.pprint/pprint (first events))
 ```
 
-### 3. Access Admin Dashboard
+### 3. Add Events in Alfresco
 
-Visit: **http://localhost:3000/admin**
-
-Features:
-- View upcoming events
-- Configure timezone and date ranges
-- Clear cache
-- System status monitoring
+1. **Go to Alfresco Share** - http://admin.mtzcg.com/share
+2. **Navigate to Calendar** - Site → Calendar
+3. **Create Event** - Click "Add Event"
+4. **Set Recurrence** - For recurring events, set RRULE pattern
+5. **Tag as "publish"** - To show on public events list
+6. **Save** - Event automatically appears in CMS
 
 ---
 
@@ -98,34 +100,98 @@ Calendar events in Alfresco have these properties:
 
 ```clojure
 {:nodeType "ia:calendarEvent"
- :name "1758462011749-8540.ics"  ; .ics file
+ :name "1758462011749-8540.ics"
  :properties
  {:ia:fromDate "2025-09-28T18:30:00.000+0000"
   :ia:toDate "2025-09-28T19:30:00.000+0000"
   :ia:whatEvent "Liberty Commons Worship"
   :ia:descriptionEvent "Join us for Worship at Liberty Commons"
   :ia:whereEvent "Liberty Commons"
+  :ia:recurrenceRule "FREQ=WEEKLY;BYDAY=MO"  ; For recurring events
   :ia:isOutlook false  ; True if from Outlook
-  :cm:taggable ["publish"]}}  ; Tags for filtering
+  :cm:taggable ["66f4d099-b1b9-41dc-b4d0-99b1b931dc1e"]}}  ; Tag node IDs
 ```
+
+**Important Notes:**
+- `:ia:recurrenceRule` contains the RRULE string for recurring events
+- `:cm:taggable` contains tag **node IDs**, not tag names
+- Tags are automatically resolved to names (e.g., "publish") with caching
 
 ### Parsed Event Data
 
-After parsing with iCal4j:
+After processing by `alfresco-events/node-to-events`:
 
 ```clojure
-{:summary "Liberty Commons Worship"
- :description "Join us for Worship at Liberty Commons"
- :location "Liberty Commons"
- :start-local #object[java.time.LocalDateTime "2025-09-28T18:30:00"]
- :end-local #object[java.time.LocalDateTime "2025-09-28T19:30:00"]
- :occurrence-date #object[java.time.LocalDateTime "2025-09-28T18:30:00"]
- :is-recurring false
- :recurrence-rule nil  ; e.g., "FREQ=WEEKLY;BYDAY=SA"
- :node-id "04cf1c10-8a1c-4b91-8f1c-108a1c9b913e"
- :tags ["publish"]
+{:summary "Pickle Ball"
+ :description "Intermediate and experienced Pickle Ball"
+ :location "Mt Zion Son Court"
+ :start-local #object[java.time.LocalDateTime "2025-10-20T17:30:00"]
+ :end-local #object[java.time.LocalDateTime "2025-10-20T19:00:00"]
+ :occurrence-date #object[java.time.LocalDateTime "2025-10-20T17:30:00"]
+ :is-recurring "FREQ=WEEKLY;INTERVAL=1;BYDAY=MO"
+ :recurrence-rule "FREQ=WEEKLY;INTERVAL=1;BYDAY=MO"
+ :recurrence-instance false  ; true for individual occurrences of recurring event
+ :node-id "abc-123-def"
+ :tags ["publish"]  ; Resolved from tag node IDs
+ :tag-ids ["66f4d099-b1b9-41dc-b4d0-99b1b931dc1e"]
  :alfresco-properties {...}}
 ```
+
+**Recurring Event Expansion:**
+The "Pickle Ball" event above expands to 12 occurrences (every Monday for 90 days):
+- 2025-10-20 (Oct 20)
+- 2025-10-27 (Oct 27)
+- 2025-11-03 (Nov 3)
+- ... (continues weekly)
+
+---
+
+## Technical Implementation
+
+### Tag Resolution with Caching
+
+Tags in Alfresco are stored as tag node IDs (e.g., `"66f4d099-b1b9-41dc-b4d0-99b1b931dc1e"`). The system automatically resolves these to tag names:
+
+```clojure
+;; In alfresco_events.clj
+(def tag-name-cache (atom {}))
+
+(defn resolve-tag-name [ctx tag-id]
+  (if-let [cached (@tag-name-cache tag-id)]
+    cached
+    (let [result (alfresco/get-node ctx tag-id)
+          tag-name (get-in result [:data :entry :name])]
+      (swap! tag-name-cache assoc tag-id tag-name)
+      tag-name)))
+```
+
+**Benefits:**
+- First lookup hits Alfresco API
+- Subsequent lookups use cache
+- Dramatically reduces API calls
+
+### DateTime Conversion (Critical Fix)
+
+iCal4j 3.x requires epoch milliseconds for DateTime constructor:
+
+```clojure
+(defn local-datetime->ical-datetime [local-dt timezone-id]
+  (-> local-dt
+      (.atZone (ZoneId/of timezone-id))
+      .toInstant
+      .toEpochMilli  ; ← Critical: must convert to long millis
+      DateTime.))
+```
+
+**Without `.toEpochMilli`:**
+- DateTime constructor fails with IllegalArgumentException
+- Recurring events expand to 0 occurrences
+- No events appear on calendar
+
+**With `.toEpochMilli`:**
+- DateTime constructed correctly
+- RRULE expansion works
+- All recurring events display properly
 
 ---
 
@@ -133,10 +199,11 @@ After parsing with iCal4j:
 
 ### How Recurring Events Work
 
-1. **Event stored in Alfresco** with RRULE (e.g., "Every Saturday at 6:30 PM")
-2. **iCal4j parses** the .ics file and RRULE
-3. **Calendar service expands** into individual occurrences within date range
-4. **Each occurrence** becomes a separate event in the result list
+1. **Event stored in Alfresco** with `:ia:recurrenceRule` (e.g., "FREQ=WEEKLY;BYDAY=MO")
+2. **Read RRULE from properties** (not from .ics file)
+3. **iCal4j Recur.getDates()** expands into individual dates
+4. **Calendar service** converts dates to LocalDateTime and creates event occurrences
+5. **Each occurrence** becomes a separate event in the result list
 
 ### Example: Weekly Recurring Event
 

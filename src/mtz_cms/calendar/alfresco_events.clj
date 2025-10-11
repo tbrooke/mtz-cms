@@ -18,6 +18,7 @@
   (:import
    [net.fortuna.ical4j.model DateTime Period Recur]
    [net.fortuna.ical4j.model.property RRule]
+   [net.fortuna.ical4j.model.parameter Value]
    [java.time ZonedDateTime LocalDateTime ZoneId]
    [java.time.format DateTimeFormatter]))
 
@@ -51,6 +52,7 @@
     (-> local-dt
         (.atZone (ZoneId/of timezone-id))
         .toInstant
+        .toEpochMilli
         DateTime.)))
 
 ;; --- RECURRING EVENT EXPANSION ---
@@ -78,11 +80,9 @@
             period-start (local-datetime->ical-datetime range-start timezone-id)
             period-end (local-datetime->ical-datetime range-end timezone-id)
 
-            ;; Create period for expansion
-            period (Period. period-start period-end)
-
-            ;; Get occurrences
-            dates (.getDates recur event-start period-start period-end)
+            ;; Get occurrences using iCal4j Recur.getDates
+            ;; Value/DATE_TIME tells iCal4j we're working with date-times (not just dates)
+            dates (.getDates recur event-start period-start period-end Value/DATE_TIME)
 
             ;; Filter to period and convert back to LocalDateTime
             duration (.between java.time.temporal.ChronoUnit/MINUTES start-date end-date)]

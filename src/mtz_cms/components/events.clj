@@ -103,24 +103,31 @@
 (defn calendar-day-cell
   "Single day cell in calendar grid"
   [date events]
-  [:div {:class "min-h-[100px] bg-white border border-gray-200 p-2"}
+  [:div {:class "min-h-[250px] bg-white border border-gray-200 p-2"}
    ;; Date number
    [:div {:class "font-semibold text-gray-700 mb-2"}
     (.getDayOfMonth date)]
 
    ;; Events for this day
-   [:div {:class "space-y-1"}
-    (for [event (take 3 events)]  ; Show max 3 events per day
+   [:div {:class "space-y-2"}
+    (for [event (take 2 events)]  ; Show max 2 events per day (with more details)
       [:div {:class "text-xs bg-blue-50 hover:bg-blue-100 rounded px-2 py-1 border-l-2 border-blue-600 cursor-pointer"}
-       [:div {:class "font-semibold text-blue-900 truncate"}
+       ;; Title and time
+       [:div {:class "font-semibold text-blue-900"}
         (format-time (:start-local event)) " " (:summary event)]
+       ;; Location
        (when (:location event)
-         [:div {:class "text-gray-600 truncate"} (:location event)])])
+         [:div {:class "text-gray-600 text-xs mt-1"}
+          "📍 " (:location event)])
+       ;; Description
+       (when (:description event)
+         [:div {:class "text-gray-700 text-xs mt-1 line-clamp-2"}
+          (:description event)])])
 
     ;; Show "X more" if there are more events
-    (when (> (count events) 3)
-      [:div {:class "text-xs text-gray-500 italic"}
-       "+ " (- (count events) 3) " more"])]])
+    (when (> (count events) 2)
+      [:div {:class "text-xs text-gray-500 italic mt-2"}
+       "+ " (- (count events) 2) " more"])]])
 
 (defn calendar-week-view
   "Calendar grid for current week"
@@ -184,10 +191,8 @@
 
       ;; Day cells with events
       (for [day all-days]
-        (let [is-current-month (and (.isAfter day first-day-of-month)
-                                   (.isBefore day last-day-of-month)
-                                   (or (= day first-day-of-month)
-                                       (= day last-day-of-month)))
+        (let [;; Check if day is in current month by comparing month values
+              is-current-month (= (.getMonth day) (.getMonth first-day-of-month))
               day-events (get events-by-day day [])]
           [:div {:class (str "min-h-[100px] border border-gray-200 p-2 "
                             (if is-current-month

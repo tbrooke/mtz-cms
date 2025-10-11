@@ -203,10 +203,29 @@
                   content (if (:success folder-children-result)
                            (let [children (get-in folder-children-result [:data :list :entries])
                                  files (filter #(get-in % [:entry :isFile]) children)
-                                 folders (filter #(get-in % [:entry :isFolder]) children)]
+                                 html-files (filter #(let [name (get-in % [:entry :name])]
+                                                      (or (.endsWith name ".html")
+                                                          (.endsWith name ".htm")))
+                                                   files)]
                              (if (empty? children)
                                (str "This " (:name node-data) " section is ready for content.")
-                               (str "Found " (count files) " files and " (count folders) " folders in " (:name node-data) " section.")))
+                               ;; If we have HTML files, read content from the first one
+                               (if (seq html-files)
+                                 (let [first-html (first html-files)
+                                       file-id (get-in first-html [:entry :id])
+                                       content-result (alfresco/get-node-content ctx file-id)]
+                                   (if (:success content-result)
+                                     (String. (:data content-result) "UTF-8")
+                                     "Unable to read HTML file content."))
+                                 ;; Otherwise, try reading the first file if available
+                                 (if (seq files)
+                                   (let [first-file (first files)
+                                         file-id (get-in first-file [:entry :id])
+                                         content-result (alfresco/get-node-content ctx file-id)]
+                                     (if (:success content-result)
+                                       (String. (:data content-result) "UTF-8")
+                                       "Unable to read file content."))
+                                   (str "Found " (count files) " files and " (count folders) " folders in " (:name node-data) " section.")))))
                            "Unable to access folder contents.")]
               {:page/title title
                :page/content content
