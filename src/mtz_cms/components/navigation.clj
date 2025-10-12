@@ -134,7 +134,7 @@
             [:a {:href "/worship" :class nav-link-class} "Worship"]
             [:a {:href "/events" :class nav-link-class} "Events"]
             [:a {:href "/activities" :class nav-link-class} "Activities"]
-            [:a {:href "/contact" :class nav-link-class} "Contact"]]))]
+            [:a {:href "/contact" :class nav-link-class} "Contact"]])))]
 
      ;; Mobile menu button (placeholder for future)
      [:div {:class "md:hidden"}
@@ -196,7 +196,7 @@
           ;; Chevron separator (except after last item)
           (when-not is-last?
             [:svg {:class (ds/classes ["w-4 h-4 mx-2"
-                                      (ds/text :text-light)])}
+                                      (ds/text :text-light)])
                    :fill "none"
                    :stroke "currentColor"
                    :viewBox "0 0 24 24"}
