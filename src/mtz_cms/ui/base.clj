@@ -68,8 +68,8 @@
        [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
        [:title title]
 
-       ;; Tailwind CSS
-       (styles/tailwind-cdn)
+       ;; Tailwind CSS (CDN for dev, compiled for production)
+       (styles/tailwind-styles)
 
        ;; HTMX for dynamic interactions
        [:script {:src "/js/htmx.min.js"}]

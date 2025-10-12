@@ -7,7 +7,11 @@
    - Building menu structure
    - Discovering submenus
 
-   This file ONLY renders the HTML.")
+   This file ONLY renders the HTML.
+
+   Styling: Uses design system for consistent, maintainable styles."
+  (:require
+   [mtz-cms.ui.design-system :as ds]))
 
 ;; --- ARCHITECTURE NOTE ---
 ;;
@@ -44,16 +48,25 @@
      :has-children? true
      :submenu [{:label \"Pickle Ball\" :path \"/activities/pickle-ball\" :node-id \"123\"}]}]
 
-   If nav-data is empty/nil, renders fallback static navigation."
+   If nav-data is empty/nil, renders fallback static navigation.
+
+   Uses design system for consistent styling."
   [nav-data]
-  [:header {:class "bg-blue-600 text-white shadow-lg"}
-   [:div {:class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}
-    [:div {:class "flex justify-between items-center py-6"}
+  [:header {:class (ds/classes [(ds/bg :bg-header)
+                                (ds/text :text-on-dark)
+                                (ds/shadow :lg)])}
+   [:div {:class (ds/container :7xl)}
+    [:div {:class (ds/classes ["flex justify-between items-center"
+                               (ds/py :lg)])}
      ;; Logo/Title
      [:div
       [:a {:href "/" :class "block"}
-       [:h1 {:class "text-2xl font-bold"} "Mount Zion UCC"]
-       [:p {:class "text-blue-100 text-sm"} "United Church of Christ"]]]
+       [:h1 {:class (ds/classes [(ds/text-size :2xl)
+                                 (ds/font-weight :bold)])}
+        "Mount Zion UCC"]
+       [:p {:class (ds/classes [(ds/text :primary-light)
+                               (ds/text-size :sm)])}
+        "United Church of Christ"]]]
 
      ;; Navigation Menu
      [:nav {:class "hidden md:flex space-x-6 items-center"}
@@ -64,7 +77,13 @@
            (if (:has-children? item)
              ;; Dropdown menu for items with submenus
              [:div {:class "relative group"}
-              [:button {:class "text-white hover:text-blue-200 transition-colors flex items-center gap-1 py-2 text-lg font-medium"}
+              [:button {:class (ds/classes [(ds/text :text-on-dark)
+                                            "hover:text-blue-200"
+                                            (ds/transition :colors)
+                                            "flex items-center gap-1"
+                                            (ds/py :sm)
+                                            (ds/text-size :lg)
+                                            (ds/font-weight :medium)])}
                (:label item)
                ;; Dropdown arrow
                [:svg {:class   "w-4 h-4"
@@ -75,31 +94,47 @@
                         :stroke-linejoin "round"
                         :stroke-width    "2"
                         :d               "M19 9l-7 7-7-7"}]]]
-              ;; Dropdown panel - Blue background matching header
-              [:div {:class "absolute left-0 mt-2 w-48 bg-blue-600 shadow-lg border border-blue-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"}
+              ;; Dropdown panel - Uses primary color
+              [:div {:class (ds/classes ["absolute left-0 mt-2 w-48"
+                                        (ds/bg :bg-header)
+                                        (ds/shadow :lg)
+                                        "border border-blue-700"
+                                        "opacity-0 invisible"
+                                        "group-hover:opacity-100 group-hover:visible"
+                                        (ds/transition :all)
+                                        (ds/duration :normal)
+                                        "z-50"])}
                (for [sub (:submenu item)]
                  [:a {:href  (:path sub)
-                      :class "block px-4 py-2 text-white hover:bg-blue-700 hover:text-blue-100 first:rounded-t-md last:rounded-b-md"}
+                      :class (ds/classes ["block"
+                                         (ds/px :md)
+                                         (ds/py :sm)
+                                         (ds/text :text-on-dark)
+                                         "hover:bg-blue-700 hover:text-blue-100"
+                                         "first:rounded-t-md last:rounded-b-md"])}
                   (:label sub)])]]
 
              ;; Regular link (no submenu)
              [:a {:href  (:path item)
-                  :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"}
+                  :class (ds/classes [(ds/text :text-on-dark)
+                                     "hover:text-blue-200"
+                                     (ds/transition :colors)
+                                     (ds/text-size :lg)
+                                     (ds/font-weight :medium)])}
               (:label item)]))
 
          ;; Fallback: static navigation
-         [[:a {:href  "/"
-               :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"} "Home"]
-          [:a {:href  "/about"
-               :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"} "About"]
-          [:a {:href  "/worship"
-               :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"} "Worship"]
-          [:a {:href  "/events"
-               :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"} "Events"]
-          [:a {:href  "/activities"
-               :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"} "Activities"]
-          [:a {:href  "/contact"
-               :class "text-white hover:text-blue-200 transition-colors text-lg font-medium"} "Contact"]]))]
+         (let [nav-link-class (ds/classes [(ds/text :text-on-dark)
+                                          "hover:text-blue-200"
+                                          (ds/transition :colors)
+                                          (ds/text-size :lg)
+                                          (ds/font-weight :medium)])]
+           [[:a {:href "/" :class nav-link-class} "Home"]
+            [:a {:href "/about" :class nav-link-class} "About"]
+            [:a {:href "/worship" :class nav-link-class} "Worship"]
+            [:a {:href "/events" :class nav-link-class} "Events"]
+            [:a {:href "/activities" :class nav-link-class} "Activities"]
+            [:a {:href "/contact" :class nav-link-class} "Contact"]]))]
 
      ;; Mobile menu button (placeholder for future)
      [:div {:class "md:hidden"}
@@ -109,13 +144,23 @@
 (defn site-footer
   "Renders site footer.
 
-   Simple footer with copyright and branding."
+   Simple footer with copyright and branding.
+   Uses design system for consistent styling."
   []
-  [:footer {:class "bg-gray-50 border-t border-gray-200 mt-12"}
-   [:div {:class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"}
-    [:div {:class "text-center text-gray-600"}
-     [:p {:class "text-sm"} "© 2025 Mount Zion United Church of Christ"]
-     [:p {:class "text-xs text-gray-500 mt-2"} "Powered by Mount Zion CMS"]]]])
+  [:footer {:class (ds/classes [(ds/bg :bg-page)
+                                "border-t"
+                                (ds/border-color :border-default)
+                                (ds/mt :3xl)])}
+   [:div {:class (ds/classes [(ds/container :7xl)
+                              (ds/py :xl)])}
+    [:div {:class (ds/classes ["text-center"
+                               (ds/text :text-secondary)])}
+     [:p {:class (ds/text-size :sm)}
+      "© 2025 Mount Zion United Church of Christ"]
+     [:p {:class (ds/classes [(ds/text-size :xs)
+                             (ds/text :text-muted)
+                             (ds/mt :sm)])}
+      "Powered by Mount Zion CMS"]]]])
 
 (defn breadcrumbs
   "Renders breadcrumb navigation.
@@ -125,24 +170,33 @@
     {:label \"About\" :path \"/about\"}
     {:label \"Our Story\" :path \"/about/story\"}]
 
-   Last item is not clickable (current page)."
+   Last item is not clickable (current page).
+   Uses design system for consistent styling."
   [crumbs]
   (when (seq crumbs)
-    [:nav {:class "flex items-center space-x-2 text-sm text-gray-600 mb-4"}
+    [:nav {:class (ds/classes ["flex items-center space-x-2"
+                               (ds/text-size :sm)
+                               (ds/text :text-secondary)
+                               (ds/mb :md)])}
      (for [[idx crumb] (map-indexed vector crumbs)]
        (let [is-last? (= idx (dec (count crumbs)))]
          [:span {:key idx :class "flex items-center"}
           (if is-last?
             ;; Current page - not clickable
-            [:span {:class "text-gray-900 font-medium"} (:label crumb)]
+            [:span {:class (ds/classes [(ds/text :text-primary)
+                                       (ds/font-weight :medium)])}
+             (:label crumb)]
             ;; Link to parent page
             [:a {:href (:path crumb)
-                 :class "text-blue-600 hover:text-blue-800 hover:underline"}
+                 :class (ds/classes [(ds/text :primary)
+                                    (ds/hover-text :primary-dark)
+                                    "hover:underline"])}
              (:label crumb)])
 
           ;; Chevron separator (except after last item)
           (when-not is-last?
-            [:svg {:class "w-4 h-4 mx-2 text-gray-400"
+            [:svg {:class (ds/classes ["w-4 h-4 mx-2"
+                                      (ds/text :text-light)])}
                    :fill "none"
                    :stroke "currentColor"
                    :viewBox "0 0 24 24"}

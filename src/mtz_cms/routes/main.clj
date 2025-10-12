@@ -12,6 +12,7 @@
    [mtz-cms.components.sunday-worship :as worship]
    [mtz-cms.routes.api :as api]
    [mtz-cms.validation.dashboard :as dashboard]
+   [mtz-cms.admin.style-guide :as style-guide]
    [mtz-cms.cache.simple :as cache]
    [mtz-cms.content.static-loader :as static]
    [clj-http.client]
@@ -449,6 +450,17 @@
         {:status 500
          :body "Media streaming error"}))))
 
+;; --- ADMIN HANDLERS ---
+
+(defn style-guide-handler [request]
+  "Display the living style guide with all design system components"
+  (log/info "📘 Style guide requested")
+  (html-response
+   (base/base-page
+    "Style Guide - Mount Zion CMS"
+    (style-guide/style-guide-page)
+    {})))
+
 ;; --- ROUTES ---
 
 (def all-routes
@@ -467,6 +479,9 @@
     ["/demo" {:get demo-handler}]
 
     ["/pages" {:get pages-list-handler}]
+
+    ;; Admin routes
+    ["/admin/style-guide" {:get style-guide-handler}]
 
     ;; Blog routes
     ["/blog" {:get blog-list-handler}]

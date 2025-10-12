@@ -1,0 +1,21 @@
+{
+  "name": "mtz-cms",
+  "version": "1.0.0",
+  "description": "Mount Zion CMS - Tailwind CSS Build Configuration",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/css/main.css -o ./resources/public/css/styles.css --minify",
+    "watch:css": "tailwindcss -i ./src/css/main.css -o ./resources/public/css/styles.css --watch",
+    "dev:css": "npm run watch:css"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0"
+  },
+  "keywords": [
+    "tailwind",
+    "cms",
+    "church"
+  ],
+  "author": "Mount Zion UCC",
+  "license": "MIT"
+}

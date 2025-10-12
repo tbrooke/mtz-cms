@@ -5,9 +5,11 @@
    - One component per file for clarity
    - Pure presentation - accepts data, returns Hiccup
    - No Alfresco calls, no business logic
-   - Multiple card variants for different use cases"
+   - Multiple card variants for different use cases
+   - Uses design system for consistent styling"
   (:require
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [mtz-cms.ui.design-system :as ds]))
 
 ;; --- UTILITY FUNCTIONS ---
 

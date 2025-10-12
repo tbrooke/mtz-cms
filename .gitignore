@@ -25,3 +25,10 @@ target/
 # OS
 .DS_Store
 Thumbs.db
+
+# Node/NPM
+node_modules/
+package-lock.json
+
+# Compiled CSS
+resources/public/css/styles.css
