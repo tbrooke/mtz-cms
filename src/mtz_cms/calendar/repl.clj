@@ -9,6 +9,7 @@
   (:require
    [mtz-cms.calendar.service :as cal]
    [mtz-cms.calendar.ical :as ical]
+   [mtz-cms.calendar.alfresco-events :as alfresco-events]
    [mtz-cms.alfresco.client :as alfresco]
    [mtz-cms.config.core :as config]
    [clojure.string :as str]
@@ -131,7 +132,7 @@
   "List all calendar event nodes in Alfresco"
   []
   (let [ctx {}
-        nodes (cal/fetch-calendar-nodes ctx)]
+        nodes (alfresco-events/fetch-calendar-nodes ctx)]
     (if (empty? nodes)
       (println "No calendar events found in Alfresco")
       (do
