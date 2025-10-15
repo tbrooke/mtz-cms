@@ -62,15 +62,19 @@ The Mount Zion CMS design system provides:
 ### Key Functions
 
 ```clojure
-;; Colors
-(ds/text :primary)          ; => "text-blue-600"
-(ds/bg :error-bg)          ; => "bg-red-50"
-(ds/hover-text :primary-dark) ; => "hover:text-blue-700"
+;; Colors (coordinated OKLCH mint palette)
+(ds/text :primary)            ; => "text-mint-primary"
+(ds/bg :primary)              ; => "bg-mint-primary"
+(ds/bg :bg-header)            ; => "bg-mint-light"
+(ds/hover-bg :primary-dark)   ; => "hover:bg-mint-dark"
+(ds/bg :error-bg)             ; => "bg-red-50"
 
 ;; Typography
-(ds/heading 1)             ; => "text-4xl font-extrabold text-gray-900"
-(ds/text-size :lg)         ; => "text-lg"
-(ds/font-weight :bold)     ; => "font-bold"
+(ds/heading 1)                ; => "text-4xl font-extrabold text-gray-900"
+(ds/text-size :lg)            ; => "text-lg"
+(ds/font-weight :bold)        ; => "font-bold"
+(ds/font-family :garamond)    ; => "font-garamond"
+(ds/font-family :menu)        ; => "font-menu"
 
 ;; Spacing
 (ds/px :lg)                ; => "px-6"
@@ -167,17 +171,19 @@ Use semantic names instead of raw colors:
 
 **Available Semantic Colors:**
 
-**Brand:**
-- `:primary` - Main brand blue
-- `:primary-light`, `:primary-lighter` - Lighter variants
-- `:primary-dark`, `:primary-darker` - Darker variants
+**Brand (OKLCH Mint Palette):**
+- `:primary` → `:mint-primary` - Main brand mint/teal (coordinated hue 166.113°)
+- `:primary-light` → `:mint-accent` - Lighter mint for highlights
+- `:primary-lighter` → `:mint-light` - Very light mint backgrounds
+- `:primary-dark` → `:mint-dark` - Darker mint for hover states
 - `:secondary` - Gray for secondary elements
+- `:secondary-warm` → `:warm-accent` - Complementary warm accent
 
 **Status:**
 - `:success` - Green for success states
 - `:error` - Red for errors
 - `:warning` - Yellow for warnings
-- `:info` - Blue for informational
+- `:info` → `:mint-primary` - Coordinated mint for informational (matches brand)
 
 **Text:**
 - `:text-primary` - Main content text (gray-900)
@@ -186,12 +192,39 @@ Use semantic names instead of raw colors:
 - `:text-on-dark` - Text on dark backgrounds (white)
 
 **Background:**
-- `:bg-page` - Page background (gray-50)
+- `:bg-page` - Page background (white)
 - `:bg-card` - Card background (white)
-- `:bg-hover` - Hover states (gray-100)
+- `:bg-hover` → `:mint-light` - Subtle mint hover (coordinated)
+- `:bg-header` → `:mint-light` - Navigation header (custom OKLCH)
 
 **Border:**
 - `:border-default` - Standard borders (gray-200)
+
+### Custom Fonts
+
+Mount Zion uses custom Google Fonts for a refined, professional look:
+
+```clojure
+;; Font families
+(ds/font-family :garamond)  ; EB Garamond - elegant serif for headings
+(ds/font-family :menu)      ; IBM Plex Sans - uppercase menu font
+(ds/font-family :ibm-plex)  ; IBM Plex Sans - clean sans-serif
+;; Source Serif 4 is the default body font (applied globally)
+
+;; Example usage
+[:h1 {:class (ds/classes [(ds/heading 1)
+                          (ds/font-family :garamond)])}
+ "Elegant Heading"]
+
+[:nav {:class (ds/font-family :menu)}
+ "HOME • ABOUT • SERVICES"]
+```
+
+**Font Guidelines:**
+- **EB Garamond**: Use for elegant headings and decorative text
+- **IBM Plex Sans (Menu)**: Navigation and menu items (auto-uppercase)
+- **IBM Plex Sans**: UI elements and modern headings
+- **Source Serif 4**: Body text (default, no function call needed)
 
 ### Typography Scale
 
@@ -249,10 +282,11 @@ Use semantic names instead of raw colors:
 
 ```clojure
 ;; Basic variants
-(ds/button :primary)
-(ds/button :secondary)
-(ds/button :danger)
-(ds/button :link)
+(ds/button :primary)    ; Mint primary color
+(ds/button :secondary)  ; White with mint border
+(ds/button :warm)       ; Warm complementary accent
+(ds/button :danger)     ; Red for destructive actions
+(ds/button :link)       ; Text-only link style
 
 ;; With options
 (ds/button :primary {:size :sm})

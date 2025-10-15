@@ -179,21 +179,30 @@
 
 ;; Dynamic page content resolver that uses the folder discovery directly
 (defresolver dynamic-page-content
-  "Get content for any discovered page by slug"
+  "Get content for any discovered page by slug - searches recursively"
   [ctx {:page/keys [slug]}]
   {::pco/input [:page/slug]
    ::pco/output [:page/title :page/content :page/node-id :page/exists]}
   (if-let [website-node-id (config/get-node-id :website)]
-    (let [children-result (alfresco/get-node-children ctx website-node-id)]
-      (if (:success children-result)
-        (let [folders (filter #(get-in % [:entry :isFolder]) 
-                             (get-in children-result [:data :list :entries]))
-              matching-folder (first (filter (fn [folder-entry]
-                                              (let [folder-name (get-in folder-entry [:entry :name])
-                                                    folder-slug (str/lower-case 
-                                                                (str/replace folder-name #" " "-"))]
-                                                (= folder-slug slug)))
-                                            folders))]
+    (let [;; Helper to recursively search for folder by slug
+          search-folder (fn search-folder [parent-id]
+                         (when-let [children-result (alfresco/get-node-children ctx parent-id)]
+                           (when (:success children-result)
+                             (let [entries (get-in children-result [:data :list :entries])
+                                   folders (filter #(get-in % [:entry :isFolder]) entries)]
+                               ;; Check direct children first
+                               (if-let [match (first (filter (fn [folder-entry]
+                                                              (let [folder-name (get-in folder-entry [:entry :name])
+                                                                    folder-slug (str/lower-case
+                                                                                (str/replace folder-name #" " "-"))]
+                                                                (= folder-slug slug)))
+                                                            folders))]
+                                 match
+                                 ;; Recursively search subfolders
+                                 (some (fn [folder]
+                                        (search-folder (get-in folder [:entry :id])))
+                                      folders))))))
+          matching-folder (search-folder website-node-id)]
           (if matching-folder
             (let [node-data (:entry matching-folder)
                   node-id (:id node-data)
@@ -203,6 +212,7 @@
                   content (if (:success folder-children-result)
                            (let [children (get-in folder-children-result [:data :list :entries])
                                  files (filter #(get-in % [:entry :isFile]) children)
+                                 folders (filter #(get-in % [:entry :isFolder]) children)
                                  html-files (filter #(let [name (get-in % [:entry :name])]
                                                       (or (.endsWith name ".html")
                                                           (.endsWith name ".htm")))
@@ -235,10 +245,6 @@
              :page/content "Page not found"
              :page/node-id nil
              :page/exists false}))
-        {:page/title (str "Error - " slug)
-         :page/content "Unable to access website folder"
-         :page/node-id nil
-         :page/exists false}))
     {:page/title (str "Configuration Error - " slug)
      :page/content "Website node not configured"
      :page/node-id nil

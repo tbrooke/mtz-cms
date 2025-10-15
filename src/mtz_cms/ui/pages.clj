@@ -7,7 +7,20 @@
    [mtz-cms.ui.base :as base]
    [mtz-cms.ui.layouts :as layouts]
    [mtz-cms.components.contact-form :as contact-form]
-   [mtz-cms.components.events :as events]))
+   [mtz-cms.components.events :as events]
+   [hiccup.compiler :as compiler]))
+
+;; --- RAW HTML HELPER ---
+
+(deftype RawHtml [html]
+  hiccup.compiler/HtmlRenderer
+  (render-html [_] html))
+
+(defn raw-html
+  "Wraps HTML string so Hiccup won't escape it.
+   Use this for HTML content from Alfresco that should be rendered as-is."
+  [html-string]
+  (RawHtml. html-string))
 
 ;; --- COMPATIBILITY LAYER ---
 ;;
@@ -39,7 +52,8 @@
      (when page-data
        [:div {:class "bg-white rounded-lg shadow-sm p-6 mb-8"}
         [:h2 {:class "text-2xl font-semibold text-gray-900 mb-4"} (:page/title page-data)]
-        [:div {:class "prose max-w-none"} (:page/content page-data)]])
+        [:div {:class "prose max-w-none"}
+         (raw-html (or (:page/content page-data) ""))]])
      
      ;; Quick Links
      [:div {:class "bg-white rounded-lg shadow-sm p-6"}
@@ -66,7 +80,7 @@
 
      (if page-data
        [:div {:class "page-content"}
-        [:div (:page/content page-data)]]
+        [:div (raw-html (or (:page/content page-data) ""))]]
        [:div {:class "placeholder"}
         [:p "Our story of faith, community, and service."]])
 
@@ -184,7 +198,8 @@
 
      [:div {:class "bg-white rounded-lg shadow-sm p-6 mb-8"}
       [:div {:class "prose max-w-none"}
-       (:page/content page-data)]]
+       ;; Render HTML content from Alfresco
+       (raw-html (or (:page/content page-data) ""))]]
 
      [:div {:class "bg-blue-50 rounded-lg p-4"}
       [:p {:class "text-sm text-blue-600"}

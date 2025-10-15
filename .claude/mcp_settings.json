@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp@latest"]
+    },
+    "clojure-mcp": {
+      "command": "clojure",
+      "args": ["-X:mcp", ":port", "7888"]
+    }
+  }
+}

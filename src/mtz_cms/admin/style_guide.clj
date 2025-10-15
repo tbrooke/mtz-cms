@@ -119,13 +119,33 @@
                             (ds/mb :lg)])}
      "Semantic color tokens organized by purpose. Use these instead of raw Tailwind colors for consistency."]
 
+    ;; Custom OKLCH Mint Palette
+    (subsection
+     "Custom OKLCH Mint Palette"
+     [:div
+      [:p {:class (ds/classes [(ds/text :text-secondary)
+                              (ds/mb :md)
+                              (ds/text-size :sm)])}
+       "Custom coordinated mint/teal colors using OKLCH color space for consistent hue (166.113°) with varying lightness and chroma."]
+      [:div {:class "grid grid-cols-1 md:grid-cols-4 gap-6"}
+       (color-swatch "Mint Light" :mint-light "Backgrounds, header, subtle accents")
+       (color-swatch "Mint Accent" :mint-accent "Highlights, hover backgrounds")
+       (color-swatch "Mint Primary" :mint-primary "Buttons, links, primary actions")
+       (color-swatch "Mint Dark" :mint-dark "Hover states, active elements")]])
+
     ;; Brand Colors
     (subsection
-     "Brand Colors"
-     [:div {:class "grid grid-cols-1 md:grid-cols-3 gap-6"}
-      (color-swatch "Primary" :primary "Buttons, links, primary actions")
-      (color-swatch "Primary Light" :primary-light "Hover states, highlights")
-      (color-swatch "Primary Dark" :primary-dark "Active states, emphasis")])
+     "Brand Colors (Semantic Mappings)"
+     [:div
+      [:p {:class (ds/classes [(ds/text :text-secondary)
+                              (ds/mb :md)
+                              (ds/text-size :sm)])}
+       "These semantic names map to the OKLCH mint palette above. Use these for consistency."]
+      [:div {:class "grid grid-cols-1 md:grid-cols-4 gap-6"}
+       (color-swatch "Primary" :primary "→ Mint Primary")
+       (color-swatch "Primary Light" :primary-light "→ Mint Accent")
+       (color-swatch "Primary Dark" :primary-dark "→ Mint Dark")
+       (color-swatch "Warm Accent" :secondary-warm "Complementary warm tone")]])
 
     ;; Status Colors
     (subsection
@@ -152,16 +172,21 @@
       (color-swatch "Page Background" :bg-page "Main page background")
       (color-swatch "Card Background" :bg-card "Cards, panels")
       (color-swatch "Hover Background" :bg-hover "Interactive hover states")
-      (color-swatch "Header Background" :bg-header "Navigation header")])
+      (color-swatch "Header Background (Mint)" :bg-header "Navigation header - custom OKLCH mint color")])
 
     ;; Usage example
     [:div {:class (ds/mt :xl)}
      [:h4 {:class (ds/heading 4)} "Usage Example"]
      (code-example
-      ";; Using semantic colors
-(ds/text :primary)        ; => \"text-blue-600\"
-(ds/bg :error-bg)         ; => \"bg-red-50\"
-(ds/hover-text :primary-dark) ; => \"hover:text-blue-700\"")]]))
+      ";; Using semantic colors (now mapped to mint OKLCH palette)
+(ds/text :primary)            ; => \"text-mint-primary\"
+(ds/bg :primary)              ; => \"bg-mint-primary\"
+(ds/bg :bg-header)            ; => \"bg-mint-light\"
+(ds/hover-bg :primary-dark)   ; => \"hover:bg-mint-dark\"
+
+;; Status colors remain unchanged
+(ds/bg :error-bg)             ; => \"bg-red-50\"
+(ds/text :success)            ; => \"text-green-700\"")]]))
 
 ;; =============================================================================
 ;; TYPOGRAPHY SECTION
@@ -210,14 +235,56 @@
                                  (ds/text :text-muted)])}
           (str "(font-weight " weight-key ")")]])])
 
+    ;; Font Families
+    (subsection
+     "Font Families"
+     [:div {:class "space-y-6"}
+      ;; EB Garamond
+      [:div
+       [:h4 {:class (str (ds/font-family :garamond) " " (ds/text-size :3xl))}
+        "EB Garamond - Elegant Serif"]
+       [:p {:class (ds/classes [(ds/text-size :sm) (ds/text :text-muted)])}
+        "(font-family :garamond) - Use for elegant headings and decorative text"]
+       [:p {:class (str (ds/font-family :garamond) " " (ds/text-size :base) " " (ds/mt :sm))}
+        "The quick brown fox jumps over the lazy dog. ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890"]]
+
+      ;; IBM Plex Sans Menu
+      [:div
+       [:h4 {:class (str (ds/font-family :menu) " " (ds/text-size :lg))}
+        "Navigation Menu Font"]
+       [:p {:class (ds/classes [(ds/text-size :sm) (ds/text :text-muted)])}
+        "(font-family :menu) - IBM Plex Sans with uppercase styling for navigation"]
+       [:p {:class (str (ds/font-family :menu) " " (ds/mt :sm))}
+        "Home • About • Services • Contact"]]
+
+      ;; IBM Plex Sans
+      [:div
+       [:h4 {:class (str (ds/font-family :ibm-plex) " " (ds/text-size :2xl))}
+        "IBM Plex Sans - Clean Sans-Serif"]
+       [:p {:class (ds/classes [(ds/text-size :sm) (ds/text :text-muted)])}
+        "(font-family :ibm-plex) - Use for UI elements and clean headings"]
+       [:p {:class (str (ds/font-family :ibm-plex) " " (ds/text-size :base) " " (ds/mt :sm))}
+        "The quick brown fox jumps over the lazy dog. ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890"]]
+
+      ;; Source Serif 4
+      [:div
+       [:h4 {:class (str "font-serif " (ds/text-size :2xl))}
+        "Source Serif 4 - Body Text (Default)"]
+       [:p {:class (ds/classes [(ds/text-size :sm) (ds/text :text-muted)])}
+        "Default body font - Readable serif for long-form content"]
+       [:p {:class (str "font-serif " (ds/text-size :base) " " (ds/mt :sm))}
+        "The quick brown fox jumps over the lazy dog. This is the default body font used throughout the site for optimal readability in long-form content."]]])
+
     ;; Usage example
     [:div {:class (ds/mt :xl)}
-     [:h4 {:class (ds/heading 4)} "Usage Example"]
+     [:h4 {:class (ds/heading 4)} "Usage Examples"]
      (code-example
       ";; Typography utilities
-(ds/heading 1)         ; => \"text-4xl font-extrabold text-gray-900\"
-(ds/text-size :lg)     ; => \"text-lg\"
-(ds/font-weight :bold) ; => \"font-bold\"")]]))
+(ds/heading 1)            ; => \"text-4xl font-extrabold text-gray-900\"
+(ds/text-size :lg)        ; => \"text-lg\"
+(ds/font-weight :bold)    ; => \"font-bold\"
+(ds/font-family :garamond) ; => \"font-garamond\"
+(ds/font-family :menu)    ; => \"font-menu\"")]]))
 
 ;; =============================================================================
 ;; SPACING SECTION
@@ -280,6 +347,12 @@
        [:button {:class (ds/button :secondary)}
         "Secondary Button"]
        "(ds/button :secondary)")
+
+      ;; Warm Accent
+      (example-box
+       [:button {:class (ds/button :warm)}
+        "Warm Accent Button"]
+       "(ds/button :warm)")
 
       ;; Danger
       (example-box
@@ -632,9 +705,11 @@
     [:div {:class (ds/container :7xl)}
      [:h1 {:class (ds/classes [(ds/text-size :6xl)
                               (ds/font-weight :extrabold)
+                              (ds/font-family :garamond)
                               (ds/mb :md)])}
       "Mount Zion CMS"]
-     [:p {:class (ds/text-size :xl)}
+     [:p {:class (ds/classes [(ds/text-size :xl)
+                             (ds/font-family :ibm-plex)])}
       "Design System & Living Style Guide"]]]
 
    ;; Introduction

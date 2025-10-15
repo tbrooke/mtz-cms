@@ -45,7 +45,7 @@
       [:div {:class "h-80 bg-gradient-to-br from-blue-50 to-blue-100 overflow-hidden flex-shrink-0"}
        [:img {:src (:url image)
               :alt (or (:alt image) (:feature/title feature-data))
-              :class "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"}]])
+              :class "w-full h-full object-cover"}]])
 
     ;; Content section - flexible to fill remaining space
     [:div {:class "p-6 flex flex-col flex-grow"}

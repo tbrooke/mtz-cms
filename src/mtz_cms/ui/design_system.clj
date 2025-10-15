@@ -3,8 +3,9 @@
 
    Central source of truth for all design tokens and styling patterns.
    This namespace provides:
-   - Color palette (semantic and raw)
+   - Color palette (semantic and raw, including custom OKLCH colors)
    - Typography scale and utilities
+   - Custom font families (EB Garamond, IBM Plex Sans, Source Serif 4)
    - Spacing scale
    - Border radius values
    - Shadow utilities
@@ -23,6 +24,13 @@
    ;; Use semantic colors
    (ds/text :primary)        ; => \"text-blue-600\"
    (ds/bg :primary)          ; => \"bg-blue-600\"
+   (ds/bg :bg-header)        ; => \"bg-mint-light\" (custom OKLCH)
+
+   ;; Use custom fonts
+   (ds/font-family :garamond) ; => \"font-garamond\"
+   (ds/font-family :menu)     ; => \"font-menu\"
+
+   ;; Build buttons and components
    (ds/button :primary)      ; => \"px-6 py-3 bg-blue-600...\"
 
    ;; Build custom component classes
@@ -70,7 +78,15 @@
 
    :white     "white"
    :black     "black"
-   :transparent "transparent"})
+   :transparent "transparent"
+
+   ;; Custom OKLCH colors (defined in ui/styles.clj custom CSS)
+   ;; Coordinated mint/teal palette based on hue 166.113
+   :mint-light    "mint-light"    ; Very light mint background
+   :mint-primary  "mint-primary"  ; Medium mint for buttons/links
+   :mint-dark     "mint-dark"     ; Dark mint for hover states
+   :mint-accent   "mint-accent"   ; Light mint for highlights
+   :warm-accent   "warm-accent"}) ; Warm complementary accent
 
 (def semantic-colors
   "Semantic color mapping for consistent brand application.
@@ -82,16 +98,17 @@
    - :text-* - Text colors
    - :bg-* - Background colors
    - :border-* - Border colors"
-  {;; Brand colors
-   :primary           :blue-600
-   :primary-light     :blue-100
-   :primary-lighter   :blue-50
-   :primary-dark      :blue-700
-   :primary-darker    :blue-800
+  {;; Brand colors - using coordinated mint OKLCH palette
+   :primary           :mint-primary   ; Main brand color for buttons/links
+   :primary-light     :mint-accent    ; Lighter for highlights
+   :primary-lighter   :mint-light     ; Very light for backgrounds
+   :primary-dark      :mint-dark      ; Darker for hover states
+   :primary-darker    :mint-dark      ; Darkest for active states
 
    :secondary         :gray-600
    :secondary-light   :gray-200
    :secondary-lighter :gray-50
+   :secondary-warm    :warm-accent    ; Warm complementary accent
 
    ;; Status colors
    :success           :green-700
@@ -109,9 +126,9 @@
    :warning-bg        :yellow-50
    :warning-dark      :yellow-800
 
-   :info              :blue-600
-   :info-light        :blue-200
-   :info-bg           :blue-50
+   :info              :mint-primary  ; Use mint for info (coordinated theme)
+   :info-light        :mint-accent   ; Light mint for info highlights
+   :info-bg           :mint-light    ; Very light mint for info backgrounds
 
    ;; Text colors
    :text-primary      :gray-900
@@ -119,13 +136,13 @@
    :text-muted        :gray-500
    :text-light        :gray-400
    :text-on-primary   :white
-   :text-on-dark      :white
+   :text-on-dark      :black
 
    ;; Background colors
-   :bg-page           :gray-50
+   :bg-page           :white
    :bg-card           :white
-   :bg-hover          :gray-100
-   :bg-header         :blue-600
+   :bg-hover          :mint-light    ; Subtle mint hover (coordinated)
+   :bg-header         :mint-light
 
    ;; Border colors
    :border-default    :gray-200
@@ -218,6 +235,23 @@
    :semibold  "font-semibold"
    :bold      "font-bold"
    :extrabold "font-extrabold"})
+
+(def font-families
+  "Custom font family utilities.
+   These map to fonts defined in ui/styles.clj"
+  {:garamond  "font-garamond"    ; EB Garamond - elegant serif for headings
+   :menu      "font-menu"        ; IBM Plex Sans - uppercase menu font
+   :ibm-plex  "font-ibm-plex"    ; IBM Plex Sans - clean sans-serif
+   :serif     "font-serif"})     ; Source Serif 4 (default body)
+
+(defn font-family
+  "Get custom font family class.
+
+   Examples:
+     (font-family :garamond)  ; => \"font-garamond\"
+     (font-family :menu)      ; => \"font-menu\""
+  [family]
+  (get font-families family "font-serif"))
 
 (defn text-size
   "Get typography size class.
@@ -500,8 +534,10 @@
                                (hover-bg :primary-dark) (rounded :md)])
            :secondary (classes [(bg :white) (text :primary)
                                (border) (border-color :primary)
-                               "hover:bg-blue-50" (rounded :md)])
-           :danger    (classes [(bg :error-strong) (text :text-on-dark)
+                               (hover-bg :primary-lighter) (rounded :md)])
+           :warm      (classes [(bg :secondary-warm) (text :text-on-primary)
+                               "hover:bg-opacity-90" (rounded :md)])
+           :danger    (classes [(bg :error-strong) (text :text-on-primary)
                                "hover:bg-red-700" (rounded :md)])
            :link      (classes [(text :primary) (hover-text :primary-dark)
                                (font-weight :medium)])
@@ -647,6 +683,8 @@
   (heading 1)              ; => "text-4xl font-extrabold text-gray-900"
   (text-size :3xl)         ; => "text-3xl"
   (font-weight :bold)      ; => "font-bold"
+  (font-family :garamond)  ; => "font-garamond"
+  (font-family :menu)      ; => "font-menu"
 
   ;; Test spacing
   (px :lg)                 ; => "px-6"

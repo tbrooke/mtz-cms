@@ -68,6 +68,9 @@
        [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
        [:title title]
 
+       ;; Google Fonts
+       (styles/google-fonts)
+
        ;; Tailwind CSS (CDN for dev, compiled for production)
        (styles/tailwind-styles)
 
@@ -78,7 +81,7 @@
        (styles/custom-styles)]
 
       ;; BODY - Header, Main, Footer
-      [:body {:class "h-full bg-gray-50"}
+      [:body {:class "h-full bg-white"}
        ;; Header with navigation
        (nav/site-header nav)
 

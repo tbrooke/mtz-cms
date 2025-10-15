@@ -110,8 +110,11 @@
                  (let [node (:entry item)
                        node-id (:id node)
                        label (aspect/get-menu-label node)
-                       ;; Use slug if static page, otherwise node-id
-                       path-segment (get static-slugs node-id node-id)]
+                       ;; Use slug if static page, otherwise convert name to slug
+                       path-segment (get static-slugs node-id
+                                        (-> (:name node)
+                                            str/lower-case
+                                            (str/replace #"\s+" "-")))]
                    {:label label
                     :path (str "/page/" path-segment)
                     :node-id node-id

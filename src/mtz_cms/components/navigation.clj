@@ -52,94 +52,119 @@
 
    Uses design system for consistent styling."
   [nav-data]
-  [:header {:class (ds/classes [(ds/bg :bg-header)
-                                (ds/text :text-on-dark)
-                                (ds/shadow :lg)])}
-   [:div {:class (ds/container :7xl)}
-    [:div {:class (ds/classes ["flex justify-between items-center"
-                               (ds/py :lg)])}
-     ;; Logo/Title
-     [:div
-      [:a {:href "/" :class "block"}
-       [:h1 {:class (ds/classes [(ds/text-size :2xl)
-                                 (ds/font-weight :bold)])}
-        "Mount Zion UCC"]
-       [:p {:class (ds/classes [(ds/text :primary-light)
-                               (ds/text-size :sm)])}
-        "United Church of Christ"]]]
+  (let [;; Filter out Contact from navigation
+        filtered-nav (remove #(= (:key %) :contact) nav-data)
+        ;; Split navigation items in half
+        mid-point (quot (count filtered-nav) 2)
+        left-nav (take mid-point filtered-nav)
+        right-nav (drop mid-point filtered-nav)
 
-     ;; Navigation Menu
-     [:nav {:class "hidden md:flex space-x-6 items-center"}
-      (concat
-       (if (seq nav-data)
-         ;; Dynamic navigation from data
-         (for [item nav-data]
-           (if (:has-children? item)
-             ;; Dropdown menu for items with submenus
-             [:div {:class "relative group"}
-              [:button {:class (ds/classes [(ds/text :text-on-dark)
-                                            "hover:text-blue-200"
-                                            (ds/transition :colors)
-                                            "flex items-center gap-1"
-                                            (ds/py :sm)
-                                            (ds/text-size :lg)
-                                            (ds/font-weight :medium)])}
-               (:label item)
-               ;; Dropdown arrow
-               [:svg {:class   "w-4 h-4"
-                      :fill    "none"
-                      :stroke  "currentColor"
-                      :viewBox "0 0 24 24"}
-                [:path {:stroke-linecap  "round"
-                        :stroke-linejoin "round"
-                        :stroke-width    "2"
-                        :d               "M19 9l-7 7-7-7"}]]]
-              ;; Dropdown panel - Uses primary color
-              [:div {:class (ds/classes ["absolute left-0 mt-2 w-48"
-                                        (ds/bg :bg-header)
-                                        (ds/shadow :lg)
-                                        "border border-blue-700"
-                                        "opacity-0 invisible"
-                                        "group-hover:opacity-100 group-hover:visible"
-                                        (ds/transition :all)
-                                        (ds/duration :normal)
-                                        "z-50"])}
-               (for [sub (:submenu item)]
-                 [:a {:href  (:path sub)
-                      :class (ds/classes ["block"
-                                         (ds/px :md)
-                                         (ds/py :sm)
-                                         (ds/text :text-on-dark)
-                                         "hover:bg-blue-700 hover:text-blue-100"
-                                         "first:rounded-t-md last:rounded-b-md"])}
-                  (:label sub)])]]
+        ;; Helper to render nav item
+        render-nav-item (fn [item]
+                         (if (:has-children? item)
+                           ;; Dropdown menu for items with submenus
+                           [:div {:class "relative group"}
+                            [:button {:class (ds/classes [(ds/text :text-on-dark)
+                                                          "hover:text-gray-600"
+                                                          (ds/transition :colors)
+                                                          "flex items-center gap-1"
+                                                          (ds/py :sm)
+                                                          (ds/text-size :lg)
+                                                          "font-menu"])}
+                             (:label item)
+                             ;; Dropdown arrow
+                             [:svg {:class   "w-4 h-4"
+                                    :fill    "none"
+                                    :stroke  "currentColor"
+                                    :viewBox "0 0 24 24"}
+                              [:path {:stroke-linecap  "round"
+                                      :stroke-linejoin "round"
+                                      :stroke-width    "2"
+                                      :d               "M19 9l-7 7-7-7"}]]]
+                            ;; Dropdown panel
+                            [:div {:class (ds/classes ["absolute left-0 mt-2 w-48"
+                                                      (ds/bg :bg-header)
+                                                      (ds/shadow :lg)
+                                                      "border border-black"
+                                                      "opacity-0 invisible"
+                                                      "group-hover:opacity-100 group-hover:visible"
+                                                      (ds/transition :all)
+                                                      (ds/duration :normal)
+                                                      "z-50"])}
+                             (for [sub (:submenu item)]
+                               [:a {:href  (:path sub)
+                                    :class (ds/classes ["block"
+                                                       (ds/px :md)
+                                                       (ds/py :sm)
+                                                       (ds/text :text-on-dark)
+                                                       "hover:bg-gray-200"
+                                                       "first:rounded-t-md last:rounded-b-md"
+                                                       "font-menu"])}
+                                (:label sub)])]]
 
-             ;; Regular link (no submenu)
-             [:a {:href  (:path item)
-                  :class (ds/classes [(ds/text :text-on-dark)
-                                     "hover:text-blue-200"
-                                     (ds/transition :colors)
-                                     (ds/text-size :lg)
-                                     (ds/font-weight :medium)])}
-              (:label item)]))
+                           ;; Regular link (no submenu)
+                           [:a {:href  (:path item)
+                                :class (ds/classes [(ds/text :text-on-dark)
+                                                   "hover:text-gray-600"
+                                                   (ds/transition :colors)
+                                                   (ds/text-size :lg)
+                                                   "font-menu"])}
+                            (:label item)]))]
 
-         ;; Fallback: static navigation
-         (let [nav-link-class (ds/classes [(ds/text :text-on-dark)
-                                          "hover:text-blue-200"
-                                          (ds/transition :colors)
-                                          (ds/text-size :lg)
-                                          (ds/font-weight :medium)])]
-           [[:a {:href "/" :class nav-link-class} "Home"]
-            [:a {:href "/about" :class nav-link-class} "About"]
-            [:a {:href "/worship" :class nav-link-class} "Worship"]
-            [:a {:href "/events" :class nav-link-class} "Events"]
-            [:a {:href "/activities" :class nav-link-class} "Activities"]
-            [:a {:href "/contact" :class nav-link-class} "Contact"]])))]
+    [:header {:class (ds/classes [(ds/bg :bg-header)
+                                  (ds/text :text-on-dark)
+                                  "border-b border-black"])}
+     [:div {:class (ds/container :7xl)}
+      [:div {:class (ds/classes ["flex justify-center items-center"
+                                 (ds/py :lg)
+                                 "gap-16"])}
 
-     ;; Mobile menu button (placeholder for future)
-     [:div {:class "md:hidden"}
-      [:button {:class "text-white" :aria-label "Open menu"}
-       "☰ Menu"]]]]])
+       ;; Left Navigation
+       [:nav {:class "hidden md:flex space-x-6 items-center"}
+        (if (seq left-nav)
+          (for [item left-nav]
+            (render-nav-item item))
+          ;; Fallback static left nav
+          (let [nav-link-class (ds/classes [(ds/text :text-on-dark)
+                                           "hover:text-gray-600"
+                                           (ds/transition :colors)
+                                           (ds/text-size :lg)
+                                           "font-menu"])]
+            (list
+             [:a {:href "/" :class nav-link-class} "Home"]
+             [:a {:href "/about" :class nav-link-class} "About"]
+             [:a {:href "/worship" :class nav-link-class} "Worship"]
+             [:a {:href "/events" :class nav-link-class} "Events"])))]
+
+       ;; Center Logo/Title
+       [:div {:class "flex-shrink-0 px-8"}
+        [:a {:href "/" :class "block text-center"}
+         [:h1 {:class (ds/classes [(ds/text-size :4xl)
+                                   (ds/font-weight :bold)
+                                   "font-garamond"])}
+          "MT ZION UCC"]]]
+
+       ;; Right Navigation
+       [:nav {:class "hidden md:flex space-x-6 items-center"}
+        (if (seq right-nav)
+          (for [item right-nav]
+            (render-nav-item item))
+          ;; Fallback static right nav
+          (let [nav-link-class (ds/classes [(ds/text :text-on-dark)
+                                           "hover:text-gray-600"
+                                           (ds/transition :colors)
+                                           (ds/text-size :lg)
+                                           "font-menu"])]
+            (list
+             [:a {:href "/activities" :class nav-link-class} "Activities"]
+             [:a {:href "/news" :class nav-link-class} "News"]
+             [:a {:href "/outreach" :class nav-link-class} "Outreach"]
+             [:a {:href "/preschool" :class nav-link-class} "Preschool"])))]
+
+       ;; Mobile menu button (placeholder for future)
+       [:div {:class "md:hidden"}
+        [:button {:class "text-white" :aria-label "Open menu"}
+         "☰ Menu"]]]]]))
 
 (defn site-footer
   "Renders site footer.

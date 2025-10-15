@@ -49,7 +49,7 @@
            :style "padding-bottom: 56.25%;"} ;; 16:9 aspect ratio
      [:img {:src (:url image-data)
             :alt (:title image-data (:name image-data))
-            :class "absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"}]]]
+            :class "absolute inset-0 w-full h-full object-cover"}]]]
 
    ;; Content below image
    [:div {:class "mt-4 text-center"}
@@ -94,11 +94,10 @@
   (let [images (or (:hero/images hero-data) [])
         image-count (count images)]
     [:div {:class "bg-white py-8"}
-     ;; Site title at top
+     ;; Welcome message at top
      [:div {:class "mx-auto max-w-screen-xl px-4 pb-8 text-center"}
-      [:h1 {:class "text-4xl font-extrabold sm:text-6xl text-gray-900"}
-       "Mount Zion UCC"
-       [:strong {:class "block font-extrabold text-blue-600 mt-2"} "United Church of Christ"]]]
+      [:p {:class "text-xl sm:text-2xl text-gray-800 max-w-4xl mx-auto leading-relaxed"}
+       "We are a family oriented church located in China Grove. If you're looking for a place to call home, please come join us one Sunday morning or at one of our community events. Maybe you'll find that Mount Zion is the family you've been looking for."]]
 
      ;; Hero images section - ONLY 1 or 2 images
      (when (seq images)
