@@ -91,11 +91,11 @@
 
    /* Mint backgrounds - very light */
    .bg-mint-light {
-     background-color: oklch(97.9% 0.021 166.113);
+     background-color: oklch(98.4% 0.014 180.72);
    }
 
    .text-mint-light {
-     color: oklch(97.9% 0.021 166.113);
+     color: oklch(98.4% 0.014 180.72);
    }
 
    /* Mint primary - medium saturation for buttons/links */

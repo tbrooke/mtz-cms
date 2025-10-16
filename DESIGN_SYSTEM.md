@@ -172,9 +172,9 @@ Use semantic names instead of raw colors:
 **Available Semantic Colors:**
 
 **Brand (OKLCH Mint Palette):**
-- `:primary` → `:mint-primary` - Main brand mint/teal (coordinated hue 166.113°)
-- `:primary-light` → `:mint-accent` - Lighter mint for highlights
-- `:primary-lighter` → `:mint-light` - Very light mint backgrounds
+- `:primary` → `:mint-primary` - Main brand mint/teal (hue 166.113°)
+- `:primary-light` → `:mint-accent` - Lighter mint for highlights (hue 166.113°)
+- `:primary-lighter` → `:mint-light` - Very light cyan backgrounds (hue 180.72°)
 - `:primary-dark` → `:mint-dark` - Darker mint for hover states
 - `:secondary` - Gray for secondary elements
 - `:secondary-warm` → `:warm-accent` - Complementary warm accent

@@ -126,7 +126,7 @@
       [:p {:class (ds/classes [(ds/text :text-secondary)
                               (ds/mb :md)
                               (ds/text-size :sm)])}
-       "Custom coordinated mint/teal colors using OKLCH color space for consistent hue (166.113°) with varying lightness and chroma."]
+       "Custom OKLCH mint/teal palette. Mint Light uses hue 180.72° (cyan) for the header/background. Other mint colors use hue 166.113° (teal) for buttons and accents."]
       [:div {:class "grid grid-cols-1 md:grid-cols-4 gap-6"}
        (color-swatch "Mint Light" :mint-light "Backgrounds, header, subtle accents")
        (color-swatch "Mint Accent" :mint-accent "Highlights, hover backgrounds")

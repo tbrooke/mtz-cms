@@ -45,7 +45,7 @@
    ;; 16:9 Image container
    [:a {:href (:link image-data (str "/hero/" (:id image-data)))
         :class "block"}
-    [:div {:class "relative w-full overflow-hidden rounded-lg shadow-lg group-hover:shadow-xl transition-shadow"
+    [:div {:class "relative w-full overflow-hidden rounded-lg"
            :style "padding-bottom: 56.25%;"} ;; 16:9 aspect ratio
      [:img {:src (:url image-data)
             :alt (:title image-data (:name image-data))

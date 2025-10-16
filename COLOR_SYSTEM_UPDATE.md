@@ -8,21 +8,21 @@ The Mount Zion CMS design system has been updated to use a fully coordinated col
 
 ## New OKLCH Color Palette
 
-All colors use the same hue (166.113°) with varying lightness and chroma for perfect coordination:
+Custom OKLCH colors with two complementary hues for visual interest:
 
 ### Custom OKLCH Colors (defined in `ui/styles.clj`)
 
 ```css
-/* Mint Light - Very subtle background */
-oklch(97.9% 0.021 166.113)  /* Extremely light, low saturation */
+/* Mint Light - Very subtle background (CYAN HUE) */
+oklch(98.4% 0.014 180.72)   /* Extremely light, very low saturation, cyan hue */
 
-/* Mint Accent - Light highlights */
+/* Mint Accent - Light highlights (TEAL HUE) */
 oklch(88% 0.06 166.113)     /* Light, subtle saturation */
 
-/* Mint Primary - Main brand color */
+/* Mint Primary - Main brand color (TEAL HUE) */
 oklch(65% 0.12 166.113)     /* Medium lightness, good saturation */
 
-/* Mint Dark - Hover states */
+/* Mint Dark - Hover states (TEAL HUE) */
 oklch(55% 0.10 166.113)     /* Darker, slightly lower saturation */
 
 /* Warm Accent - Complementary */
@@ -31,7 +31,8 @@ oklch(75% 0.10 40)          /* Warm orange/peach tone */
 
 **Why OKLCH?**
 - Perceptually uniform (looks consistent across the palette)
-- Same hue (166.113°) ensures perfect color harmony
+- Mint Light uses cyan hue (180.72°) for subtle, airy header/backgrounds
+- Other mint colors use teal hue (166.113°) for buttons and accents
 - Varying lightness creates natural hierarchy
 - Better than RGB/HSL for color coordination
 

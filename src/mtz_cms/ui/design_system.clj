@@ -81,8 +81,8 @@
    :transparent "transparent"
 
    ;; Custom OKLCH colors (defined in ui/styles.clj custom CSS)
-   ;; Coordinated mint/teal palette based on hue 166.113
-   :mint-light    "mint-light"    ; Very light mint background
+   ;; Mint-light uses cyan hue 180.72°, others use teal hue 166.113°
+   :mint-light    "mint-light"    ; Very light cyan background (180.72°)
    :mint-primary  "mint-primary"  ; Medium mint for buttons/links
    :mint-dark     "mint-dark"     ; Dark mint for hover states
    :mint-accent   "mint-accent"   ; Light mint for highlights

@@ -167,19 +167,49 @@
          "☰ Menu"]]]]]))
 
 (defn site-footer
-  "Renders site footer.
+  "Renders site footer with Join Our Community call-to-action.
 
-   Simple footer with copyright and branding.
-   Uses design system for consistent styling."
+   Includes community invitation and action buttons.
+   Uses design system for consistent styling with light teal background."
   []
-  [:footer {:class (ds/classes [(ds/bg :bg-page)
+  [:footer {:class (ds/classes [(ds/bg :bg-header)  ; Light teal background
                                 "border-t"
                                 (ds/border-color :border-default)
                                 (ds/mt :3xl)])}
    [:div {:class (ds/classes [(ds/container :7xl)
-                              (ds/py :xl)])}
-    [:div {:class (ds/classes ["text-center"
+                              (ds/py :3xl)])}
+
+    ;; Join Our Community section
+    [:div {:class "lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center mb-8"}
+     [:div
+      [:h2 {:class (ds/classes [(ds/text-size :3xl)
+                                (ds/font-weight :bold)
+                                "tracking-tight"
+                                (ds/text :text-primary)
+                                "sm:text-4xl"])}
+       "Join Our Community"]
+      [:p {:class (ds/classes [(ds/mt :md)
+                               "max-w-3xl"
+                               (ds/text-size :lg)
                                (ds/text :text-secondary)])}
+       "Experience the warmth and fellowship of Mount Zion UCC. All are welcome in our progressive Christian community."]]
+     [:div {:class "mt-8 lg:mt-0"}
+      [:div {:class "inline-flex rounded-md shadow"}
+       [:a {:href "/worship"
+            :class (ds/button :primary)}
+        "Plan Your Visit"]]
+      [:div {:class "ml-3 inline-flex"}
+       [:a {:href "/contact"
+            :class (ds/button :secondary)}
+        "Contact Us"]]]]
+
+    ;; Copyright section
+    [:div {:class (ds/classes ["text-center"
+                               (ds/text :text-secondary)
+                               (ds/mt :2xl)
+                               "border-t"
+                               (ds/border-color :border-default)
+                               "pt-8"])}
      [:p {:class (ds/text-size :sm)}
       "© 2025 Mount Zion United Church of Christ"]
      [:p {:class (ds/classes [(ds/text-size :xs)

@@ -79,25 +79,6 @@
             :slug (str "feature" (inc idx))})
          feature-nodes)))
 
-     ;; Call to action section (static, same as regular layout)
-     [:section {:class "bg-blue-600"}
-      [:div {:class "mx-auto max-w-7xl py-12 px-6 lg:px-8 lg:py-24"}
-       [:div {:class "lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center"}
-        [:div
-         [:h2 {:class "text-3xl font-bold tracking-tight text-white sm:text-4xl"}
-          "Join Our Community"]
-         [:p {:class "mt-3 max-w-3xl text-lg text-blue-100"}
-          "Experience the warmth and fellowship of Mount Zion UCC. All are welcome in our progressive Christian community."]]
-        [:div {:class "mt-8 lg:mt-0"}
-         [:div {:class "inline-flex rounded-md shadow"}
-          [:a {:href "/worship"
-               :class "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50"}
-           "Plan Your Visit"]]
-         [:div {:class "ml-3 inline-flex"}
-          [:a {:href "/contact"
-               :class "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-400"}
-           "Contact Us"]]]]]]
-
      ;; Refresh button for content editors - clears cache and reloads
      [:div {:class "fixed bottom-4 right-4 z-50"}
       [:button {:class "bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
@@ -161,8 +142,9 @@
     :home {:layout :hero-features-layout
            :components {:hero {:node-id "39985c5c-201a-42f6-985c-5c201a62f6d8"} ; Hero folder
                         :features [{:node-id "264ab06c-984e-4f64-8ab0-6c984eaf6440"} ; Feature 1
-                                   {:node-id "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89"} ; Feature 2
-                                   {:node-id "6737d1b1-5465-4625-b7d1-b15465b62530"}]}} ; Feature 3
+                                   {:node-id "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89"}]}} ; Feature 2
+                                   ;; Feature 3 disabled - uncomment to re-enable
+                                   ;; {:node-id "6737d1b1-5465-4625-b7d1-b15465b62530"}
     ;; Default configuration
     {:layout :simple-content-layout
      :components {}}))
