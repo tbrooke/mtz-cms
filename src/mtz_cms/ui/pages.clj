@@ -16,11 +16,53 @@
   hiccup.compiler/HtmlRenderer
   (render-html [_] html))
 
+(defn strip-html-wrapper
+  "Strips HTML document wrapper tags and inline styles from content.
+
+   Removes:
+   - <!DOCTYPE html>
+   - <html>, <head>, <style>, <body> tags
+   - Inline style attributes from all elements
+   - Returns just the body content for styling with design system
+
+   Example:
+   Input: '<!DOCTYPE html><html><head><style>...</style></head><body><h1>Title</h1></body></html>'
+   Output: '<h1>Title</h1>'"
+  [html-string]
+  (if (clojure.string/blank? html-string)
+    ""
+    (-> html-string
+        ;; Remove DOCTYPE
+        (clojure.string/replace #"(?i)<!DOCTYPE[^>]*>" "")
+        ;; Remove opening html tag
+        (clojure.string/replace #"(?i)<html[^>]*>" "")
+        ;; Remove closing html tag
+        (clojure.string/replace #"(?i)</html>" "")
+        ;; Remove entire head section (including styles)
+        (clojure.string/replace #"(?is)<head[^>]*>.*?</head>" "")
+        ;; Remove opening body tag
+        (clojure.string/replace #"(?i)<body[^>]*>" "")
+        ;; Remove closing body tag
+        (clojure.string/replace #"(?i)</body>" "")
+        ;; Remove inline style attributes from all elements
+        (clojure.string/replace #"(?i)\s+style=\"[^\"]*\"" "")
+        (clojure.string/replace #"(?i)\s+style='[^']*'" "")
+        ;; Trim whitespace
+        clojure.string/trim)))
+
 (defn raw-html
   "Wraps HTML string so Hiccup won't escape it.
    Use this for HTML content from Alfresco that should be rendered as-is."
   [html-string]
   (RawHtml. html-string))
+
+(defn clean-html
+  "Cleans HTML content by stripping wrapper tags and inline styles,
+   then wraps it for safe rendering.
+
+   Use this for Alfresco content to ensure design system styles apply."
+  [html-string]
+  (raw-html (strip-html-wrapper html-string)))
 
 ;; --- COMPATIBILITY LAYER ---
 ;;
@@ -53,7 +95,7 @@
        [:div {:class "bg-white rounded-lg shadow-sm p-6 mb-8"}
         [:h2 {:class "text-2xl font-semibold text-gray-900 mb-4"} (:page/title page-data)]
         [:div {:class "prose max-w-none"}
-         (raw-html (or (:page/content page-data) ""))]])
+         (clean-html (or (:page/content page-data) ""))]])
      
      ;; Quick Links
      [:div {:class "bg-white rounded-lg shadow-sm p-6"}
@@ -80,7 +122,7 @@
 
      (if page-data
        [:div {:class "page-content"}
-        [:div (raw-html (or (:page/content page-data) ""))]]
+        [:div (clean-html (or (:page/content page-data) ""))]]
        [:div {:class "placeholder"}
         [:p "Our story of faith, community, and service."]])
 
@@ -198,8 +240,9 @@
 
      [:div {:class "bg-white rounded-lg shadow-sm p-6 mb-8"}
       [:div {:class "prose max-w-none"}
-       ;; Render HTML content from Alfresco
-       (raw-html (or (:page/content page-data) ""))]]
+       ;; Render HTML content from Alfresco with cleaned markup
+       ;; This strips inline styles to allow design system to apply
+       (clean-html (or (:page/content page-data) ""))]]
 
      [:div {:class "bg-blue-50 rounded-lg p-4"}
       [:p {:class "text-sm text-blue-600"}

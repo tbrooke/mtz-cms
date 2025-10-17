@@ -1,7 +1,8 @@
 (ns mtz-cms.components.blog
   "Blog components for Pastor Jim Reflects blog section"
   (:require
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [mtz-cms.ui.pages :as pages]))
 
 ;; --- BLOG LIST ITEM ---
 
@@ -149,10 +150,10 @@
             tag])])]]
 
     ;; Blog content
-    [:article {:class "prose prose-lg max-w-none mt-8"}
-     ;; Content is raw HTML - in Hiccup 1.x, we use [:raw "..."]
+    [:article {:class "prose max-w-none mt-8"}
+     ;; Content is raw HTML from Alfresco
      (when-let [content (:blog/content post)]
-       [:raw content])]
+       (pages/raw-html content))]
 
     ;; Back to blog link
     [:div {:class "mt-12 pt-8 border-t border-gray-200"}

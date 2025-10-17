@@ -17,15 +17,21 @@
 
 (defn loading-spinner
   "Loading spinner with message.
-   
+
    Displays an animated spinner with 'Loading...' text.
    Uses Tailwind's animate-spin utility.
-   
+
    Returns: Hiccup vector"
   []
-  [:div {:class "flex items-center justify-center py-4"}
-   [:div {:class "animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"}]
-   [:span {:class "ml-2 text-gray-600"} "Loading..."]])
+  [:div {:class (ds/classes ["flex items-center justify-center"
+                            (ds/py :md)])}
+   [:div {:class (ds/classes ["animate-spin"
+                             (ds/rounded :full)
+                             "h-8 w-8 border-b-2"
+                             "border-blue-600"])}]
+   [:span {:class (ds/classes ["ml-2"
+                              (ds/text :text-secondary)])}
+    "Loading..."]])
 
 ;; --- MESSAGE COMPONENTS ---
 
@@ -67,6 +73,44 @@
              :clip-rule "evenodd"}]]
     [:span message]]])
 
+(defn info-message
+  "Info message display component.
+
+   Args:
+     message - String info message to display
+
+   Example:
+     (info-message \"Processing your request...\")
+
+   Returns: Hiccup vector with blue info styling (using design system)"
+  [message]
+  [:div {:class (ds/alert :info)}
+   [:div {:class "flex"}
+    [:svg {:class "h-5 w-5 text-blue-400 mr-2" :fill "currentColor" :viewBox "0 0 20 20"}
+     [:path {:fill-rule "evenodd"
+             :d "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+             :clip-rule "evenodd"}]]
+    [:span message]]])
+
+(defn warning-message
+  "Warning message display component.
+
+   Args:
+     message - String warning message to display
+
+   Example:
+     (warning-message \"This action cannot be undone\")
+
+   Returns: Hiccup vector with yellow warning styling (using design system)"
+  [message]
+  [:div {:class (ds/alert :warning)}
+   [:div {:class "flex"}
+    [:svg {:class "h-5 w-5 text-yellow-400 mr-2" :fill "currentColor" :viewBox "0 0 20 20"}
+     [:path {:fill-rule "evenodd"
+             :d "M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+             :clip-rule "evenodd"}]]
+    [:span message]]])
+
 ;; --- BUTTON COMPONENTS ---
 
 (defn button
@@ -80,6 +124,7 @@
        :variant  - Button style variant:
                    :primary (default) - blue background
                    :secondary - white with border
+                   :warm - warm complementary accent
                    :danger - red background
                    :link - link style
        :size     - Optional size: :sm, :md (default), :lg
@@ -113,27 +158,21 @@
   (loading-spinner)
   ;; => [:div {:class "..."} ...]
 
-  ;; Test error message
+  ;; Test message components
   (error-message "Something went wrong")
-  ;; => [:div {:class "bg-red-50 ..."} ...]
-
-  ;; Test success message
   (success-message "Operation completed")
-  ;; => [:div {:class "bg-green-50 ..."} ...]
+  (info-message "Processing your request...")
+  (warning-message "This action cannot be undone")
 
   ;; Test button variants
   (button {:text "Primary Button"})
-  ;; => [:button {:class "..."} "Primary Button"]
-
   (button {:text "Secondary Button" :variant :secondary})
-  ;; => [:button {:class "..."} "Secondary Button"]
-
+  (button {:text "Warm Accent" :variant :warm})
   (button {:text "Danger Button" :variant :danger})
-  ;; => [:button {:class "..."} "Danger Button"]
+  (button {:text "Link Style" :variant :link})
 
   ;; Test button as link
   (button {:text "Learn More" :href "/about"})
-  ;; => [:a {:class "..." :href "/about"} "Learn More"]
 
   ;; Test button sizes
   (button {:text "Small" :size :sm :variant :secondary})
@@ -141,14 +180,9 @@
 
   ;; Test disabled button
   (button {:text "Can't Click" :disabled true})
-  ;; => [:button {:class "..." :disabled true} "Can't Click"]
 
   ;; Test with click handler
   (button {:text "Click Me" :on-click "alert('clicked')"})
-  ;; => [:button {:class "..." :onclick "..."} "Click Me"]
-
-  ;; Test link button
-  (button {:text "Link Style" :variant :link :href "/page"})
 
   ;; All functions return Hiccup vectors ready for rendering
   )

@@ -7,7 +7,8 @@
    - No Alfresco calls, no business logic
    - Multiple variants for different layouts"
   (:require
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [mtz-cms.ui.design-system :as ds]))
 
 ;; --- UTILITY FUNCTIONS ---
 
@@ -38,13 +39,22 @@
    - Content text (optional, HTML will be stripped)
    - Image (optional, displayed below content)"
   [feature-data]
-  [:div {:class "bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"}
+  [:div {:class (ds/classes [(ds/bg :bg-card)
+                             (ds/p :lg)
+                             (ds/rounded :lg)
+                             (ds/shadow :md)
+                             (ds/hover-shadow :lg)
+                             (ds/transition :shadow)])}
    ;; Title
-   [:h3 {:class "text-xl font-semibold mb-4 text-gray-900"}
+   [:h3 {:class (ds/classes [(ds/text-size :xl)
+                             (ds/font-weight :semibold)
+                             (ds/mb :md)
+                             (ds/text :text-primary)])}
     (or (:feature/title feature-data) "Feature")]
 
    ;; Content
-   [:div {:class "text-gray-600 mb-4"}
+   [:div {:class (ds/classes [(ds/text :text-secondary)
+                             (ds/mb :md)])}
     (or (extract-text-from-html (:feature/content feature-data))
         "Feature content goes here")]
 
@@ -52,7 +62,8 @@
    (when-let [image (:feature/image feature-data)]
      [:img {:src (str "http://localhost:8080" (:url image))
             :alt (or (:name image) (:feature/title feature-data))
-            :class "w-full h-48 object-cover rounded"}])])
+            :class (ds/classes ["w-full h-48 object-cover"
+                               (ds/rounded :md)])}])])
 
 (defn feature-with-icon
   "Feature component with icon instead of image
@@ -67,15 +78,19 @@
   [:div {:class "text-center"}
    ;; Icon
    (when-let [icon (:feature/icon feature-data)]
-     [:div {:class "text-5xl mb-4"}
+     [:div {:class (ds/classes [(ds/text-size :5xl)
+                               (ds/mb :md)])}
       icon])
 
    ;; Title
-   [:h3 {:class "text-xl font-semibold mb-3 text-gray-900"}
+   [:h3 {:class (ds/classes [(ds/text-size :xl)
+                             (ds/font-weight :semibold)
+                             (ds/mb :sm)
+                             (ds/text :text-primary)])}
     (or (:feature/title feature-data) "Feature")]
 
    ;; Content
-   [:p {:class "text-gray-600"}
+   [:p {:class (ds/text :text-secondary)}
     (or (extract-text-from-html (:feature/content feature-data))
         "Feature content goes here")]])
 
@@ -86,19 +101,28 @@
 
    Used in: About pages, detailed features"
   [feature-data]
-  [:div {:class "flex flex-col md:flex-row gap-6 bg-white p-6 rounded-lg shadow-md"}
+  [:div {:class (ds/classes ["flex flex-col md:flex-row"
+                            (ds/gap :lg)
+                            (ds/bg :bg-card)
+                            (ds/p :lg)
+                            (ds/rounded :lg)
+                            (ds/shadow :md)])}
    ;; Image (left side on desktop)
    (when-let [image (:feature/image feature-data)]
      [:div {:class "md:w-1/3"}
       [:img {:src (str "http://localhost:8080" (:url image))
              :alt (or (:name image) (:feature/title feature-data))
-             :class "w-full h-full object-cover rounded"}]])
+             :class (ds/classes ["w-full h-full object-cover"
+                                (ds/rounded :md)])}]])
 
    ;; Content (right side on desktop)
    [:div {:class "md:w-2/3"}
-    [:h3 {:class "text-2xl font-semibold mb-4 text-gray-900"}
+    [:h3 {:class (ds/classes [(ds/text-size :2xl)
+                              (ds/font-weight :semibold)
+                              (ds/mb :md)
+                              (ds/text :text-primary)])}
      (or (:feature/title feature-data) "Feature")]
-    [:div {:class "text-gray-600"}
+    [:div {:class (ds/text :text-secondary)}
      (or (extract-text-from-html (:feature/content feature-data))
          "Feature content goes here")]]])
 

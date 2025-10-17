@@ -3,9 +3,24 @@
   (:require
    [mtz-cms.components.templates :as templates]
    [mtz-cms.components.home-features :as home-features]
+   [mtz-cms.ui.design-system :as ds]
    [clojure.string :as str]))
 
 ;; --- HTMX COMPONENT CONTAINERS ---
+
+;; Hero Loading Skeleton
+(defn- hero-loading-skeleton
+  "Loading skeleton for hero component"
+  []
+  [:div {:class (ds/classes [(ds/bg :bg-page)
+                             (ds/text :text-primary)
+                             "py-32 min-h-screen flex items-center"])}
+   [:div {:class (ds/classes [(ds/container :xl)
+                              "text-center"])}
+    [:div {:class "animate-pulse"}
+     [:div {:class "h-8 bg-gray-300 rounded w-3/4 mx-auto mb-4"}]
+     [:div {:class "h-4 bg-gray-400 rounded w-1/2 mx-auto mb-8"}]
+     [:div {:class "h-10 bg-gray-500 rounded w-32 mx-auto"}]]]])
 
 (defn htmx-hero-container
   "HTMX container that dynamically loads hero content from Alfresco"
@@ -17,12 +32,20 @@
              :hx-indicator "#hero-loading"}
    ;; Loading state
    [:div {:id "hero-loading" :class "htmx-indicator"}
-    [:div {:class "bg-white text-gray-900 py-32 min-h-screen flex items-center"}
-     [:div {:class "mx-auto max-w-screen-xl px-4 text-center"}
-      [:div {:class "animate-pulse"}
-       [:div {:class "h-8 bg-gray-300 rounded w-3/4 mx-auto mb-4"}]
-       [:div {:class "h-4 bg-gray-400 rounded w-1/2 mx-auto mb-8"}]
-       [:div {:class "h-10 bg-gray-500 rounded w-32 mx-auto"}]]]]]])
+    (hero-loading-skeleton)]])
+
+;; Feature Loading Skeleton
+(defn- feature-loading-skeleton
+  "Loading skeleton for feature component"
+  []
+  [:div {:class (ds/classes [(ds/bg :bg-card)
+                             (ds/p :xl)
+                             (ds/rounded :lg)
+                             (ds/shadow :sm)])}
+   [:div {:class "animate-pulse"}
+    [:div {:class "h-6 bg-gray-300 rounded w-1/3 mb-4"}]
+    [:div {:class "h-4 bg-gray-200 rounded w-full mb-2"}]
+    [:div {:class "h-4 bg-gray-200 rounded w-2/3"}]]])
 
 (defn htmx-feature-container
   "HTMX container that dynamically loads feature content from Alfresco"
@@ -34,11 +57,20 @@
          :hx-indicator (str "#feature-loading-" node-id)}
    ;; Loading state
    [:div {:id (str "feature-loading-" node-id) :class "htmx-indicator"}
-    [:div {:class "bg-white p-8 rounded-lg shadow-sm"}
-     [:div {:class "animate-pulse"}
-      [:div {:class "h-6 bg-gray-300 rounded w-1/3 mb-4"}]
-      [:div {:class "h-4 bg-gray-200 rounded w-full mb-2"}]
-      [:div {:class "h-4 bg-gray-200 rounded w-2/3"}]]]]])
+    (feature-loading-skeleton)]])
+
+;; Card Loading Skeleton
+(defn- card-loading-skeleton
+  "Loading skeleton for card component"
+  []
+  [:div {:class (ds/classes [(ds/bg :secondary-lighter)
+                             (ds/p :lg)
+                             (ds/rounded :lg)
+                             "border-2 border-dashed"
+                             (ds/border-color :border-default)])}
+   [:div {:class "animate-pulse text-center"}
+    [:div {:class "h-32 bg-gray-200 rounded mb-4"}]
+    [:div {:class "h-4 bg-gray-300 rounded w-2/3 mx-auto"}]]])
 
 (defn htmx-card-container
   "HTMX container that dynamically loads card content from Alfresco"
@@ -50,10 +82,7 @@
          :hx-indicator (str "#card-loading-" node-id)}
    ;; Loading state
    [:div {:id (str "card-loading-" node-id) :class "htmx-indicator"}
-    [:div {:class "bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300"}
-     [:div {:class "animate-pulse text-center"}
-      [:div {:class "h-32 bg-gray-200 rounded mb-4"}]
-      [:div {:class "h-4 bg-gray-300 rounded w-2/3 mx-auto"}]]]]])
+    (card-loading-skeleton)]])
 
 ;; --- HTMX DYNAMIC LAYOUTS ---
 
@@ -81,7 +110,14 @@
 
      ;; Refresh button for content editors - clears cache and reloads
      [:div {:class "fixed bottom-4 right-4 z-50"}
-      [:button {:class "bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+      [:button {:class (ds/classes [(ds/bg :primary)
+                                    (ds/text :text-on-primary)
+                                    (ds/px :md)
+                                    (ds/py :sm)
+                                    (ds/rounded :full)
+                                    (ds/shadow :lg)
+                                    (ds/hover-bg :primary-dark)
+                                    (ds/transition :colors)])
                 :hx-post "/api/cache/clear"
                 :hx-target "body"
                 :hx-swap "none"
@@ -96,8 +132,15 @@
   [:div {:class "relative group"}
    [:div {:class "content"} content]
    ;; Edit overlay (only visible to editors)
-   [:div {:class "absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity"}
-    [:button {:class "bg-gray-800 text-white px-2 py-1 rounded text-xs"
+   [:div {:class (ds/classes ["absolute top-0 right-0"
+                              "opacity-0 group-hover:opacity-100"
+                              (ds/transition :opacity)])}
+    [:button {:class (ds/classes [(ds/bg :secondary)
+                                  (ds/text :text-on-primary)
+                                  (ds/px :sm)
+                                  "py-1"
+                                  (ds/rounded :md)
+                                  (ds/text-size :xs)])
               :hx-get (str "/api/edit/" node-id)
               :hx-target "closest .content"
               :hx-swap "innerHTML"}
@@ -116,9 +159,20 @@
 (defn htmx-component-selector
   "HTMX interface for selecting component types"
   [node-id current-type]
-  [:div {:class "component-selector bg-gray-100 p-4 rounded-lg mb-4"}
-   [:h4 {:class "font-semibold text-gray-900 mb-2"} "Component Type"]
-   [:select {:class "w-full p-2 border border-gray-300 rounded"
+  [:div {:class (ds/classes ["component-selector"
+                             (ds/bg :secondary-lighter)
+                             (ds/p :md)
+                             (ds/rounded :lg)
+                             (ds/mb :md)])}
+   [:h4 {:class (ds/classes [(ds/font-weight :semibold)
+                             (ds/text :text-primary)
+                             (ds/mb :sm)])}
+    "Component Type"]
+   [:select {:class (ds/classes ["w-full"
+                                 (ds/p :sm)
+                                 (ds/border)
+                                 (ds/border-color :border-default)
+                                 (ds/rounded :md)])
              :hx-get "/api/components/preview"
              :hx-target "#component-preview"
              :hx-include "[name='node-id']"
@@ -130,7 +184,13 @@
     [:option {:value "feature-card" :selected (= current-type "feature-card")} "Feature Card"]
     [:option {:value "card" :selected (= current-type "card")} "Simple Card"]]
    [:input {:type "hidden" :name "node-id" :value node-id}]
-   [:div {:id "component-preview" :class "mt-4 border-2 border-dashed border-gray-300 rounded p-4 min-h-32"}
+   [:div {:id "component-preview"
+          :class (ds/classes [(ds/mt :md)
+                              "border-2 border-dashed"
+                              (ds/border-color :border-default)
+                              (ds/rounded :md)
+                              (ds/p :md)
+                              "min-h-32"])}
     "Select a component type to see preview"]])
 
 ;; --- PAGE CONFIGURATION ---

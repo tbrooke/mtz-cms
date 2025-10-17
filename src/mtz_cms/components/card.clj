@@ -24,6 +24,72 @@
         (str/replace #"\s+" " ")         ; Normalize whitespace
         str/trim)))
 
+;; --- CARD HELPER COMPONENTS ---
+
+(defn- card-image
+  "Card image section"
+  [image item-data]
+  [:div {:class "h-48 bg-gray-200"}
+   [:img {:src (str "http://localhost:8080" (:url image))
+          :alt (or (:name image) (:title item-data))
+          :class "w-full h-full object-cover"}]])
+
+(defn- card-title
+  "Card title element"
+  [item-data]
+  [:h3 {:class (ds/classes [(ds/text-size :lg)
+                            (ds/font-weight :semibold)
+                            (ds/text :text-primary)
+                            (ds/mb :sm)])}
+   (or (:title item-data) (:name item-data) "Untitled")])
+
+(defn- card-description
+  "Card description with HTML stripping and truncation"
+  [item-data]
+  [:p {:class (ds/classes [(ds/text :text-secondary)
+                          (ds/mb :md)
+                          "line-clamp-3"])}
+   (or (extract-text-from-html (:description item-data))
+       (extract-text-from-html (:content item-data))
+       "No description available")])
+
+(defn- card-metadata
+  "Card metadata section (date, category)"
+  [item-data]
+  (when (or (:date item-data) (:category item-data))
+    [:div {:class (ds/classes ["flex items-center"
+                              (ds/text-size :sm)
+                              (ds/text :text-secondary)
+                              (ds/mb :md)])}
+     (when (:date item-data)
+       [:span {:class "mr-4"} (:date item-data)])
+     (when (:category item-data)
+       [:span {:class (ds/classes [(ds/px :sm)
+                                  "py-1"
+                                  "bg-blue-100"
+                                  "text-blue-700"
+                                  (ds/rounded :full)
+                                  (ds/text-size :xs)])}
+        (:category item-data)])]))
+
+(defn- card-link
+  "Card call-to-action link with arrow"
+  [link]
+  [:a {:href link
+       :class (ds/classes ["inline-flex items-center"
+                          (ds/text :primary)
+                          (ds/hover-text :primary-dark)
+                          (ds/font-weight :medium)])}
+   [:span "Learn more"]
+   [:svg {:class "ml-2 w-4 h-4"
+          :fill "none"
+          :stroke "currentColor"
+          :viewBox "0 0 24 24"}
+    [:path {:stroke-linecap "round"
+            :stroke-linejoin "round"
+            :stroke-width "2"
+            :d "M9 5l7 7-7 7"}]]])
+
 ;; --- CARD COMPONENTS ---
 
 (defn card
@@ -47,48 +113,25 @@
 
    Used in: Event listings, ministry cards, news grids"
   [item-data]
-  [:div {:class "bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"}
+  [:div {:class (ds/classes [(ds/bg :bg-card)
+                             (ds/rounded :lg)
+                             (ds/shadow :md)
+                             "overflow-hidden"
+                             (ds/hover-shadow :lg)
+                             (ds/transition :shadow)])}
    ;; Image section (if available)
    (when-let [image (:image item-data)]
-     [:div {:class "h-48 bg-gray-200"}
-      [:img {:src (str "http://localhost:8080" (:url image))
-             :alt (or (:name image) (:title item-data))
-             :class "w-full h-full object-cover"}]])
+     (card-image image item-data))
 
    ;; Content section
-   [:div {:class "p-6"}
-    ;; Title
-    [:h3 {:class "text-lg font-semibold text-gray-900 mb-2"}
-     (or (:title item-data) (:name item-data) "Untitled")]
-
-    ;; Description or content (truncated)
-    [:p {:class "text-gray-600 mb-4 line-clamp-3"}
-     (or (extract-text-from-html (:description item-data))
-         (extract-text-from-html (:content item-data))
-         "No description available")]
-
-    ;; Optional metadata (date, category, etc.)
-    (when (or (:date item-data) (:category item-data))
-      [:div {:class "flex items-center text-sm text-gray-500 mb-4"}
-       (when (:date item-data)
-         [:span {:class "mr-4"} (:date item-data)])
-       (when (:category item-data)
-         [:span {:class "px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs"}
-          (:category item-data)])])
+   [:div {:class (ds/p :lg)}
+    (card-title item-data)
+    (card-description item-data)
+    (card-metadata item-data)
 
     ;; Call to action link
     (when (:link item-data)
-      [:a {:href (:link item-data)
-           :class "inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"}
-       [:span "Learn more"]
-       [:svg {:class "ml-2 w-4 h-4"
-              :fill "none"
-              :stroke "currentColor"
-              :viewBox "0 0 24 24"}
-        [:path {:stroke-linecap "round"
-                :stroke-linejoin "round"
-                :stroke-width "2"
-                :d "M9 5l7 7-7 7"}]]])]])
+      (card-link (:link item-data)))]])
 
 (defn simple-card
   "Simplified card without image - text only
@@ -100,18 +143,27 @@
 
    Used in: Simple listings, text-heavy content"
   [item-data]
-  [:div {:class "bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:border-blue-300 transition-colors"}
-   [:h3 {:class "text-lg font-semibold text-gray-900 mb-2"}
-    (or (:title item-data) (:name item-data) "Untitled")]
+  [:div {:class (ds/classes [(ds/bg :bg-card)
+                             (ds/rounded :lg)
+                             (ds/shadow :sm)
+                             (ds/border)
+                             (ds/border-color :border-default)
+                             (ds/p :lg)
+                             "hover:border-blue-300"
+                             (ds/transition :colors)])}
+   (card-title item-data)
 
-   [:p {:class "text-gray-600 mb-4"}
+   [:p {:class (ds/classes [(ds/text :text-secondary)
+                           (ds/mb :md)])}
     (or (extract-text-from-html (:description item-data))
         (extract-text-from-html (:content item-data))
         "No description available")]
 
    (when (:link item-data)
      [:a {:href (:link item-data)
-          :class "text-blue-600 hover:text-blue-800 font-medium"}
+          :class (ds/classes [(ds/text :primary)
+                             (ds/hover-text :primary-dark)
+                             (ds/font-weight :medium)])}
       "Learn more →"])])
 
 (defn icon-card
@@ -125,18 +177,29 @@
 
    Used in: Service highlights, feature cards"
   [item-data]
-  [:div {:class "bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow"}
+  [:div {:class (ds/classes [(ds/bg :bg-card)
+                             (ds/rounded :lg)
+                             (ds/shadow :md)
+                             (ds/p :lg)
+                             "text-center"
+                             (ds/hover-shadow :lg)
+                             (ds/transition :shadow)])}
    ;; Icon
    (when-let [icon (:icon item-data)]
-     [:div {:class "text-5xl mb-4"}
+     [:div {:class (ds/classes [(ds/text-size :5xl)
+                               (ds/mb :md)])}
       icon])
 
    ;; Title
-   [:h3 {:class "text-lg font-semibold text-gray-900 mb-2"}
+   [:h3 {:class (ds/classes [(ds/text-size :lg)
+                             (ds/font-weight :semibold)
+                             (ds/text :text-primary)
+                             (ds/mb :sm)])}
     (or (:title item-data) (:name item-data) "Untitled")]
 
    ;; Description
-   [:p {:class "text-gray-600 mb-4"}
+   [:p {:class (ds/classes [(ds/text :text-secondary)
+                           (ds/mb :md)])}
     (or (extract-text-from-html (:description item-data))
         (extract-text-from-html (:content item-data))
         "No description available")]
@@ -144,7 +207,9 @@
    ;; Link
    (when (:link item-data)
      [:a {:href (:link item-data)
-          :class "text-blue-600 hover:text-blue-800 font-medium"}
+          :class (ds/classes [(ds/text :primary)
+                             (ds/hover-text :primary-dark)
+                             (ds/font-weight :medium)])}
       "Learn more →"])])
 
 (defn feature-card

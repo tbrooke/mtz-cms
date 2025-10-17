@@ -139,10 +139,10 @@
    :text-on-dark      :black
 
    ;; Background colors
-   :bg-page           :white
-   :bg-card           :white
+   :bg-page           :white         ; Pure white (#ffffff) - base page background
+   :bg-card           :white         ; Pure white (#ffffff) - card backgrounds
    :bg-hover          :mint-light    ; Subtle mint hover (coordinated)
-   :bg-header         :mint-light
+   :bg-header         :mint-light    ; Light mint header background
 
    ;; Border colors
    :border-default    :gray-200

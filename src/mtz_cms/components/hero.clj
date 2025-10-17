@@ -7,7 +7,8 @@
    - No Alfresco calls, no business logic
    - Fixed layout (no carousel) - displays 1 or 2 images in 16:9 format"
   (:require
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [mtz-cms.ui.design-system :as ds]))
 
 ;; --- UTILITY FUNCTIONS ---
 
@@ -45,28 +46,78 @@
    ;; 16:9 Image container
    [:a {:href (:link image-data (str "/hero/" (:id image-data)))
         :class "block"}
-    [:div {:class "relative w-full overflow-hidden rounded-lg"
+    [:div {:class (ds/classes ["relative w-full overflow-hidden"
+                               (ds/rounded :lg)])
            :style "padding-bottom: 56.25%;"} ;; 16:9 aspect ratio
      [:img {:src (:url image-data)
             :alt (:title image-data (:name image-data))
             :class "absolute inset-0 w-full h-full object-cover"}]]]
 
    ;; Content below image
-   [:div {:class "mt-4 text-center"}
+   [:div {:class (ds/classes [(ds/mt :md) "text-center"])}
     ;; Title (H2) - from cm:title property, not filename
-    [:h2 {:class "text-2xl font-bold text-gray-900 mb-2"}
+    [:h2 {:class (ds/classes [(ds/text-size :2xl)
+                              (ds/font-weight :bold)
+                              (ds/text :text-primary)
+                              (ds/mb :sm)])}
      (or (:title image-data) "Untitled")]
 
     ;; Description - from cm:description property
     (when-let [desc (:description image-data)]
       (when (not (empty? desc))
-        [:p {:class "text-gray-600 mb-3"}
+        [:p {:class (ds/classes [(ds/text :text-secondary)
+                                (ds/mb :sm)])}
          desc]))
 
     ;; "Click for more" link
     [:a {:href (:link image-data (str "/hero/" (:id image-data)))
-         :class "inline-block text-blue-600 hover:text-blue-800 text-sm font-medium"}
+         :class (ds/classes ["inline-block"
+                            (ds/text :primary)
+                            (ds/hover-text :primary-dark)
+                            (ds/text-size :sm)
+                            (ds/font-weight :medium)])}
      "...click for more →"]]])
+
+;; --- HELPER LAYOUT FUNCTIONS ---
+
+(defn- hero-welcome-message
+  "Welcome message displayed at top of hero section"
+  []
+  [:div {:class (ds/classes [(ds/container :7xl)
+                             "pb-8"
+                             "text-center"])}
+   [:p {:class (ds/classes [(ds/text-size :xl)
+                            "sm:text-2xl"
+                            (ds/text :text-primary)
+                            "max-w-4xl mx-auto leading-relaxed"])}
+    "We are a family oriented church located in China Grove. If you're looking for a place to call home, please come join us one Sunday morning or at one of our community events. Maybe you'll find that Mount Zion is the family you've been looking for."]])
+
+(defn- hero-single-image-layout
+  "Layout for single hero image - full width"
+  [image]
+  [:div {:class "max-w-6xl mx-auto"}
+   (hero-image-card image)])
+
+(defn- hero-two-image-layout
+  "Layout for two hero images - side by side"
+  [images]
+  [:div {:class (ds/classes ["grid grid-cols-1 md:grid-cols-2"
+                             (ds/gap :xl)])}
+   (for [[idx img] (map-indexed vector images)]
+     [:div {:key (or (:id img) idx)}
+      (hero-image-card img)])])
+
+(defn- hero-error-message
+  "Error message when too many images in hero"
+  [image-count]
+  [:div {:class (ds/classes ["max-w-4xl mx-auto"
+                             (ds/alert :warning)
+                             "text-center"])}
+   [:p {:class (ds/font-weight :semibold)}
+    "⚠️ Warning: Hero component has " image-count " images"]
+   [:p {:class (ds/classes [(ds/text-size :sm)
+                           (ds/mt :sm)])}
+    "Only 1 or 2 images are allowed. Please remove extra images from the Hero folder in Alfresco."]])
 
 ;; --- MAIN HERO COMPONENT ---
 
@@ -93,35 +144,18 @@
   [hero-data]
   (let [images (or (:hero/images hero-data) [])
         image-count (count images)]
-    [:div {:class "bg-white py-8"}
+    [:div {:class (ds/classes [(ds/bg :bg-page)
+                               (ds/py :xl)])}
      ;; Welcome message at top
-     [:div {:class "mx-auto max-w-screen-xl px-4 pb-8 text-center"}
-      [:p {:class "text-xl sm:text-2xl text-gray-800 max-w-4xl mx-auto leading-relaxed"}
-       "We are a family oriented church located in China Grove. If you're looking for a place to call home, please come join us one Sunday morning or at one of our community events. Maybe you'll find that Mount Zion is the family you've been looking for."]]
+     (hero-welcome-message)
 
      ;; Hero images section - ONLY 1 or 2 images
      (when (seq images)
-       [:div {:class "mx-auto max-w-screen-xl px-4"}
+       [:div {:class (ds/container :7xl)}
         (cond
-          ;; Single image - large full width display (max-w-6xl = 1152px)
-          (= image-count 1)
-          [:div {:class "max-w-6xl mx-auto"}
-           (hero-image-card (first images))]
-
-          ;; Two images - side by side
-          (= image-count 2)
-          [:div {:class "grid grid-cols-1 md:grid-cols-2 gap-8"}
-           (for [[idx img] (map-indexed vector images)]
-             [:div {:key (or (:id img) idx)}
-              (hero-image-card img)])]
-
-          ;; More than 2 images - ERROR (should be caught by schema)
-          :else
-          [:div {:class "max-w-4xl mx-auto bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 text-center"}
-           [:p {:class "text-yellow-800 font-semibold"}
-            "⚠️ Warning: Hero component has " image-count " images"]
-           [:p {:class "text-yellow-700 text-sm mt-2"}
-            "Only 1 or 2 images are allowed. Please remove extra images from the Hero folder in Alfresco."]])])]))
+          (= image-count 1) (hero-single-image-layout (first images))
+          (= image-count 2) (hero-two-image-layout images)
+          :else (hero-error-message image-count))])]))
 
 ;; --- BACKWARDS COMPATIBILITY ---
 

@@ -61,7 +61,7 @@
                    (log/error e "Failed to build navigation")
                    nil)))]
 
-     [:html {:class "h-full"}
+     [:html {:class "h-full bg-white"}
       ;; HEAD - Meta tags, CSS, Scripts
       [:head
        [:meta {:charset "utf-8"}]

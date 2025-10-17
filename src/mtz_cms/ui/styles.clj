@@ -199,6 +199,135 @@
    .htmx-request.htmx-indicator {
      opacity: 1;
    }
+
+   /* Prose Styling - Custom typography for content areas */
+   /* Tailwind CDN doesn't include @tailwindcss/typography, so we define it */
+
+   .prose {
+     color: #374151; /* gray-700 */
+     max-width: 65ch;
+   }
+
+   .prose p,
+   .prose div {
+     margin-top: 1.25em;
+     margin-bottom: 1.25em;
+     font-size: 1.125rem; /* 18px - larger, more readable */
+     line-height: 1.75; /* 28px */
+   }
+
+   /* Remove excessive margins between consecutive divs */
+   .prose div + div {
+     margin-top: 0;
+   }
+
+   .prose h1 {
+     color: #111827; /* gray-900 */
+     font-weight: 800;
+     font-size: 2.25em;
+     margin-top: 0;
+     margin-bottom: 0.8888889em;
+     line-height: 1.1111111;
+   }
+
+   .prose h2 {
+     color: #111827; /* gray-900 */
+     font-weight: 700;
+     font-size: 1.5em;
+     margin-top: 2em;
+     margin-bottom: 1em;
+     line-height: 1.3333333;
+   }
+
+   .prose h3 {
+     color: #111827; /* gray-900 */
+     font-weight: 600;
+     font-size: 1.25em;
+     margin-top: 1.6em;
+     margin-bottom: 0.6em;
+     line-height: 1.6;
+   }
+
+   .prose ul, .prose ol {
+     margin-top: 1.25em;
+     margin-bottom: 1.25em;
+     padding-left: 1.625em;
+   }
+
+   .prose li {
+     margin-top: 0.5em;
+     margin-bottom: 0.5em;
+     font-size: 1.125rem; /* 18px */
+     line-height: 1.75;
+   }
+
+   .prose strong {
+     color: #111827;
+     font-weight: 600;
+   }
+
+   .prose a {
+     color: oklch(65% 0.12 166.113); /* mint-primary */
+     text-decoration: underline;
+     font-weight: 500;
+   }
+
+   .prose a:hover {
+     color: oklch(55% 0.10 166.113); /* mint-dark */
+   }
+
+   /* Alfresco Content Styles - for static pages with custom classes */
+
+   /* Schedule container */
+   .schedule {
+     background-color: oklch(98.4% 0.014 180.72); /* bg-mint-light */
+     border-left: 4px solid oklch(65% 0.12 166.113); /* border-mint-primary */
+     padding: 1rem;
+     margin: 1.25rem 0;
+     border-radius: 0.375rem;
+   }
+
+   .schedule h2 {
+     font-size: 1.5rem;
+     font-weight: 700;
+     margin-top: 0.5rem;
+     margin-bottom: 1rem;
+   }
+
+   /* Individual day blocks */
+   .day {
+     margin: 0.625rem 0;
+     padding: 0.75rem;
+     background-color: white;
+     border-radius: 0.375rem;
+     border: 1px solid #e5e7eb; /* gray-200 */
+   }
+
+   .day h3 {
+     font-size: 1.25rem;
+     font-weight: 600;
+     margin-bottom: 0.5rem;
+   }
+
+   .day p {
+     font-size: 1.125rem; /* 18px */
+     line-height: 1.75;
+     margin: 0.5rem 0;
+   }
+
+   /* Time information */
+   .time {
+     font-weight: 600;
+     color: oklch(55% 0.10 166.113); /* text-mint-dark */
+     margin: 0.5rem 0;
+   }
+
+   /* Level/skill information */
+   .level {
+     font-style: italic;
+     color: #6b7280; /* gray-500 */
+     margin: 0.5rem 0;
+   }
    "])
 
 ;; --- REPL TESTING ---

@@ -1,7 +1,8 @@
 (ns mtz-cms.components.home-features
   "Homepage feature cards - clickable cards that link to detail pages"
   (:require
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [mtz-cms.ui.design-system :as ds]))
 
 ;; --- UTILITY FUNCTIONS ---
 
@@ -37,7 +38,16 @@
   [feature-data]
   [:a {:href (:feature/link feature-data)
        :class "block group"}
-   [:div {:class "bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border-2 border-transparent group-hover:border-blue-500 flex flex-col"
+   [:div {:class (ds/classes [(ds/bg :bg-card)
+                              (ds/rounded :lg)
+                              (ds/shadow :md)
+                              "overflow-hidden"
+                              (ds/hover-shadow :xl)
+                              (ds/transition :all)
+                              (ds/duration :normal)
+                              "border-2 border-transparent"
+                              "group-hover:border-blue-500"
+                              "flex flex-col"])
           :style "height: 1200px;"}  ;; Tall card with prominent image display
 
     ;; Image section (if available) - takes up majority of card for full graphic visibility
@@ -49,20 +59,33 @@
               :class "w-full h-full object-cover"}]])
 
     ;; Content section - flexible to fill remaining space
-    [:div {:class "p-6 flex flex-col flex-grow"}
+    [:div {:class (ds/classes [(ds/p :lg) "flex flex-col flex-grow"])}
      ;; Title
-     [:h3 {:class "text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors"}
+     [:h3 {:class (ds/classes [(ds/text-size :xl)
+                               (ds/font-weight :bold)
+                               (ds/text :text-primary)
+                               (ds/mb :sm)
+                               "group-hover:text-blue-600"
+                               (ds/transition :colors)])}
       (or (:feature/title feature-data) "Untitled Feature")]
 
      ;; Description - takes up available space
-     [:p {:class "text-gray-600 mb-4 flex-grow"}
+     [:p {:class (ds/classes [(ds/text :text-secondary)
+                             (ds/mb :md)
+                             "flex-grow"])}
       (or (:feature/description feature-data)
           "Click to learn more about this feature.")]
 
      ;; Read more indicator - stays at bottom
-     [:div {:class "flex items-center text-blue-600 font-medium text-sm mt-auto"}
+     [:div {:class (ds/classes ["flex items-center"
+                               (ds/text :primary)
+                               (ds/font-weight :medium)
+                               (ds/text-size :sm)
+                               "mt-auto"])}
       [:span "Learn more"]
-      [:svg {:class "ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+      [:svg {:class (ds/classes ["ml-2 w-4 h-4"
+                                "group-hover:translate-x-1"
+                                (ds/transition :transform)])
              :fill "none"
              :stroke "currentColor"
              :viewBox "0 0 24 24"}
@@ -74,10 +97,17 @@
 (defn placeholder-feature-card
   "Placeholder card for empty/loading features - tall format to match feature cards"
   [feature-id]
-  [:div {:class "bg-white rounded-lg shadow-md overflow-hidden border-2 border-dashed border-gray-300 flex flex-col items-center justify-center"
+  [:div {:class (ds/classes [(ds/bg :bg-card)
+                             (ds/rounded :lg)
+                             (ds/shadow :md)
+                             "overflow-hidden"
+                             "border-2 border-dashed"
+                             (ds/border-color :border-default)
+                             "flex flex-col items-center justify-center"])
          :style "height: 1200px;"}  ;; Match tall card height
-   [:div {:class "p-6 text-center"}
-    [:div {:class "text-gray-400 mb-4"}
+   [:div {:class (ds/classes [(ds/p :lg) "text-center"])}
+    [:div {:class (ds/classes [(ds/text :text-muted)
+                              (ds/mb :md)])}
      [:svg {:class "w-16 h-16 mx-auto"
             :fill "none"
             :stroke "currentColor"
@@ -86,9 +116,13 @@
               :stroke-linejoin "round"
               :stroke-width "2"
               :d "M12 6v6m0 0v6m0-6h6m-6 0H6"}]]]
-    [:h3 {:class "text-lg font-semibold text-gray-500 mb-2"}
+    [:h3 {:class (ds/classes [(ds/text-size :lg)
+                              (ds/font-weight :semibold)
+                              (ds/text :text-secondary)
+                              (ds/mb :sm)])}
      "Feature Coming Soon"]
-    [:p {:class "text-sm text-gray-400"}
+    [:p {:class (ds/classes [(ds/text-size :sm)
+                            (ds/text :text-muted)])}
      "This feature will be added soon."]]])
 
 ;; --- FEATURE GRID LAYOUT ---
@@ -110,16 +144,36 @@
 (defn- two-feature-layout
   "Layout for two features - side by side"
   [features]
-  [:div {:class "grid grid-cols-1 md:grid-cols-2 gap-8"}
+  [:div {:class (ds/classes ["grid grid-cols-1 md:grid-cols-2"
+                             (ds/gap :xl)])}
    (for [feature features]
      (render-feature feature))])
 
 (defn- multi-feature-layout
   "Layout for 3+ features - three columns with natural wrapping"
   [features]
-  [:div {:class "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"}
+  [:div {:class (ds/classes ["grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                             (ds/gap :xl)])}
    (for [feature features]
      (render-feature feature))])
+
+(defn- features-section-header
+  "Header for features section"
+  []
+  [:div {:class (ds/classes ["mx-auto max-w-2xl text-center"
+                            (ds/mb :3xl)])}
+   [:h2 {:class (ds/classes [(ds/text-size :base)
+                             (ds/font-weight :semibold)
+                             "leading-7"
+                             (ds/text :primary)])}
+    "Discover Mount Zion"]
+   [:p {:class (ds/classes [(ds/mt :sm)
+                           (ds/text-size :3xl)
+                           (ds/font-weight :bold)
+                           "tracking-tight"
+                           (ds/text :text-primary)
+                           "sm:text-4xl"])}
+    "What's Happening at Our Church"]])
 
 (defn features-grid
   "Grid of feature cards with dynamic layout based on count
@@ -131,15 +185,12 @@
    Matches Hero component behavior where layout adapts to content count."
   [features]
   (let [feature-count (count features)]
-    [:section {:class "py-16 bg-white"}
-     [:div {:class "mx-auto max-w-7xl px-6 lg:px-8"}
+    [:section {:class (ds/classes [(ds/py :4xl)
+                                   (ds/bg :bg-page)])}
+     [:div {:class (ds/classes [(ds/container :7xl)])}
 
       ;; Section header
-      [:div {:class "mx-auto max-w-2xl text-center mb-12"}
-       [:h2 {:class "text-base font-semibold leading-7 text-blue-600"}
-        "Discover Mount Zion"]
-       [:p {:class "mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"}
-        "What's Happening at Our Church"]]
+      (features-section-header)
 
       ;; Features display - dynamic based on count
       (cond
@@ -159,11 +210,14 @@
          :hx-trigger "load"
          :hx-swap "innerHTML"}
    ;; Loading state - tall card format
-   [:div {:class "bg-white rounded-lg shadow-md overflow-hidden animate-pulse flex flex-col"
+   [:div {:class (ds/classes [(ds/bg :bg-card)
+                              (ds/rounded :lg)
+                              (ds/shadow :md)
+                              "overflow-hidden animate-pulse flex flex-col"])
           :style "height: 1200px;"}
     [:div {:class "bg-gray-200 flex-shrink-0"
            :style "height: 900px;"}]
-    [:div {:class "p-6 flex flex-col flex-grow"}
+    [:div {:class (ds/classes [(ds/p :lg) "flex flex-col flex-grow"])}
      [:div {:class "h-6 bg-gray-300 rounded w-3/4 mb-3"}]
      [:div {:class "h-4 bg-gray-200 rounded w-full mb-2"}]
      [:div {:class "h-4 bg-gray-200 rounded w-5/6 mb-2"}]
@@ -180,7 +234,8 @@
 (defn- htmx-two-feature-layout
   "HTMX layout for two features - side by side"
   [configs]
-  [:div {:class "grid grid-cols-1 md:grid-cols-2 gap-8"}
+  [:div {:class (ds/classes ["grid grid-cols-1 md:grid-cols-2"
+                             (ds/gap :xl)])}
    (for [config configs]
      [:div {:key (:node-id config)}
       (htmx-feature-card-container (:node-id config) (:slug config))])])
@@ -188,7 +243,8 @@
 (defn- htmx-multi-feature-layout
   "HTMX layout for 3+ features - three columns with natural wrapping"
   [configs]
-  [:div {:class "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"}
+  [:div {:class (ds/classes ["grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                             (ds/gap :xl)])}
    (for [config configs]
      [:div {:key (:node-id config)}
       (htmx-feature-card-container (:node-id config) (:slug config))])])
@@ -203,15 +259,12 @@
    Matches the features-grid dynamic layout behavior."
   [feature-configs]
   (let [feature-count (count feature-configs)]
-    [:section {:class "py-16 bg-white"}
-     [:div {:class "mx-auto max-w-7xl px-6 lg:px-8"}
+    [:section {:class (ds/classes [(ds/py :4xl)
+                                   (ds/bg :bg-page)])}
+     [:div {:class (ds/classes [(ds/container :7xl)])}
 
       ;; Section header
-      [:div {:class "mx-auto max-w-2xl text-center mb-12"}
-       [:h2 {:class "text-base font-semibold leading-7 text-blue-600"}
-        "Discover Mount Zion"]
-       [:p {:class "mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"}
-        "What's Happening at Our Church"]]
+      (features-section-header)
 
       ;; Features display - dynamic based on count
       (cond
