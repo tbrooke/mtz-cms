@@ -87,7 +87,7 @@
      :blog/author (:author post-data)
      :blog/tags tags
      :blog/thumbnail (when thumbnail-id
-                      (str "/api/image/" thumbnail-id))}))
+                      (str "/proxy/image/" thumbnail-id "/imgpreview"))}))
 
 (defn extract-blog-post-from-alfresco
   "Extract blog post data from Alfresco node entry

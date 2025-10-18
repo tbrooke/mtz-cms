@@ -84,7 +84,7 @@
                        (let [img (first image-files)]
                          {:id (get-in img [:entry :id])
                           :name (get-in img [:entry :name])
-                          :url (str "/api/image/" (get-in img [:entry :id]))}))
+                          :url (str "/proxy/image/" (get-in img [:entry :id]) "/imgpreview")}))
                ;; Return images with metadata (hero uses this)
                ;; NOTE: Hero component only supports 1-2 images, limit and warn if more
                :images (when (seq image-files)
@@ -99,7 +99,7 @@
                                                    (get-in img-node-result [:data :entry :properties]))]
                                     {:id img-id
                                      :name (get-in img [:entry :name])
-                                     :url (str "/api/image/" img-id)
+                                     :url (str "/proxy/image/" img-id "/imgpreview")
                                      :title (get img-props :cm:title)
                                      :description (get img-props :cm:description)
                                      :link (str "/hero/" img-id)}))

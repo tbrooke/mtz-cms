@@ -248,25 +248,8 @@
     (json-response result)))
 
 ;; --- IMAGE PROXY HANDLER ---
-
-(defn image-proxy-handler [request]
-  "Proxy images from Alfresco with authentication and caching.
-   Images are cached for 24 hours (86400 seconds) since they rarely change."
-  (let [node-id (get-in request [:path-params :node-id])
-        ctx {}
-        ;; Cache images for 24 hours - they rarely change
-        result (cache/cached
-                (keyword "image" node-id)
-                86400  ;; 24 hours in seconds
-                #(alfresco/get-node-content ctx node-id))]
-    (if (:success result)
-      {:status 200
-       :headers {"Content-Type" "image/png"
-                 "Cache-Control" "public, max-age=86400"}  ;; Tell browser to cache too
-       :body (:data result)}
-      {:status 404
-       :headers {"Content-Type" "text/plain"}
-       :body "Image not found"})))
+;; NOTE: Deprecated - Use /proxy/image/:node-id/:rendition instead
+;; Kept for backward compatibility, redirects to main proxy handler
 
 ;; --- CONTACT FORM HANDLER ---
 
@@ -390,4 +373,6 @@
 
     ["/pathom" {:post pathom-query-handler}]
 
-    ["/image/:node-id" {:get image-proxy-handler}]]])
+    ;; Image proxy deprecated - use /proxy/image/:node-id/:rendition instead
+    ;; ["/image/:node-id" {:get image-proxy-handler}]
+    ]])

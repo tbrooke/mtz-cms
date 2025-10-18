@@ -71,7 +71,8 @@
     {:pdf/id (:id pdf-node)
      :pdf/name (:name pdf-node)
      :pdf/url (str "/api/pdf/" (:id pdf-node))
-     :pdf/thumbnail (str "/api/image/" (:id pdf-node))}))
+     ;; For PDFs, image-proxy-handler automatically uses thumbnail renditions
+     :pdf/thumbnail (str "/proxy/image/" (:id pdf-node))}))
 
 (defn video-to-map
   "Convert video node to our data structure"

@@ -125,23 +125,37 @@
     (html-response (pages/pages-list-page {:pages pages :navigation navigation}))))
 
 (defn image-proxy-handler [request]
-  "Proxy images from Alfresco by node ID with caching"
+  "Proxy images from Alfresco by node ID with optional rendition support
+
+   Routes:
+   - /proxy/image/:node-id          → Original full-size image
+   - /proxy/image/:node-id/imgpreview → 960px width rendition (recommended)
+   - /proxy/image/:node-id/doclib   → 100px thumbnail
+   - /proxy/image/:node-id/avatar   → 64px square avatar"
   (let [ctx {}
-        node-id (get-in request [:path-params :node-id])]
-    (log/debug "Proxying image for node:" node-id)
+        node-id (get-in request [:path-params :node-id])
+        rendition (get-in request [:path-params :rendition])]
+    (log/debug "Proxying image for node:" node-id "rendition:" (or rendition "original"))
     (try
       ;; First check if it's a PDF
       (let [node-info (alfresco/get-node ctx node-id)
             mime-type (get-in node-info [:data :entry :content :mimeType])
-            is-pdf? (= mime-type "application/pdf")]
+            is-pdf? (= mime-type "application/pdf")
+            cache-key (keyword "image" (str node-id "-" (or rendition "original")))]
 
         ;; Cache images for 24 hours
         (let [result (cache/cached
-                      (keyword "image" node-id)
+                      cache-key
                       86400  ;; 24 hours
-                      (if is-pdf?
-                        #(alfresco/get-pdf-thumbnail ctx node-id)
-                        #(alfresco/get-node-content ctx node-id)))]
+                      (cond
+                        ;; PDFs use special thumbnail handling
+                        is-pdf? #(alfresco/get-pdf-thumbnail ctx node-id)
+
+                        ;; Images with rendition request
+                        rendition #(alfresco/get-image-rendition ctx node-id rendition)
+
+                        ;; Images without rendition (original)
+                        :else #(alfresco/get-node-content ctx node-id)))]
           (if (:success result)
             {:status 200
              :headers {"Content-Type" (if is-pdf? "image/png" (or mime-type "image/jpeg"))
@@ -302,7 +316,7 @@
                         :hero/title (or (:cm:title props) (:name node-data) "Untitled")
                         :hero/description (:cm:description props)
                         :hero/content (:cm:content props)  ; Optional additional content
-                        :hero/image {:url (str "/api/image/" image-id)
+                        :hero/image {:url (str "/proxy/image/" image-id "/imgpreview")
                                     :alt (or (:cm:title props) (:name node-data))}}]
 
           (log/info "✅ Hero image found:" (:hero/title hero-data))
@@ -501,6 +515,8 @@
     ["/api/media/:node-id" {:get media-handler}]
 
     ;; Image proxy - must come before dynamic page handler
+    ;; Order matters: specific route (with rendition) before general route
+    ["/proxy/image/:node-id/:rendition" {:get image-proxy-handler}]
     ["/proxy/image/:node-id" {:get image-proxy-handler}]
 
     ;; Dynamic page handler - catches any page slug

@@ -21,20 +21,31 @@
 ;; --- FEATURE CARD COMPONENT ---
 
 (defn- feature-card-image-only
-  "Render feature card with only an image (graphic-only mode)
-
-   Just displays the image - not clickable since viewing the image is the content.
-   Image sizes naturally based on its aspect ratio (no fixed height)."
+  "Render feature card with only an image (graphic-only mode)"
   [feature-data]
   (let [image (:feature/image feature-data)]
-    ;; No link wrapper - just display the image (not clickable)
-    [:div {:class (ds/classes [(ds/rounded :lg)
-                               (ds/shadow :md)
-                               "overflow-hidden"])}
-     ;; Image - sizes naturally
-     [:img {:src (:url image)
-            :alt (or (:alt image) (:feature/title feature-data) "Feature image")
-            :class "w-full h-auto"}]]))
+    [:a {:href (:feature/link feature-data)
+         :class "block group"}
+     [:div {:class (ds/classes [(ds/rounded :lg)
+                                (ds/shadow :md)
+                                "overflow-hidden"
+                                (ds/hover-shadow :xl)
+                                (ds/transition :all)
+                                (ds/duration :normal)
+                                "border-2 border-transparent"
+                                "group-hover:border-blue-500"
+                                "relative"])
+            :style "height: 1200px;"}
+      ;; Full-height image
+      [:img {:src (:url image)
+             :alt (or (:alt image) (:feature/title feature-data) "Feature image")
+             :class "w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"}]
+
+      ;; Optional overlay with title (if title exists)
+      (when (:feature/title feature-data)
+        [:div {:class "absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6"}
+         [:h3 {:class "text-white text-2xl font-bold"}
+          (:feature/title feature-data)]])]]))
 
 (defn- feature-card-text-only
   "Render feature card with only text (no image)"
@@ -91,9 +102,7 @@
                :d "M9 5l7 7-7 7"}]]]]]])
 
 (defn- feature-card-image-and-text
-  "Render feature card with both image and text (standard mode)
-
-   Clickable card that links to feature detail page."
+  "Render feature card with both image and text (standard mode)"
   [feature-data]
   (let [image (:feature/image feature-data)]
     [:a {:href (:feature/link feature-data)
@@ -107,42 +116,54 @@
                                 (ds/duration :normal)
                                 "border-2 border-transparent"
                                 "group-hover:border-blue-500"
-                                "flex flex-col"])}
+                                "flex flex-col"])
+            :style "height: 1200px;"}
 
-      ;; Image section - contains image naturally
-      [:div {:class "bg-gradient-to-br from-blue-50 to-blue-100 overflow-hidden flex-shrink-0 flex items-center justify-center"}
+      ;; Image section - takes up majority of card
+      [:div {:class "bg-gradient-to-br from-blue-50 to-blue-100 overflow-hidden flex-shrink-0 flex items-center justify-center"
+             :style "height: 900px;"}
        [:img {:src (:url image)
               :alt (or (:alt image) (:feature/title feature-data))
-              :class "w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"}]]
+              :class "w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"}]]
 
-      ;; Content section - description from image node (cm:description) as teaser
-      (when-let [image-description (:description image)]
-        [:div {:class (ds/classes [(ds/p :lg) "flex flex-col"])}
-         ;; Description from image node (cm:description) - teaser for full article
-         [:p {:class (ds/classes [(ds/text :text-secondary)
-                                 (ds/mb :md)
-                                 (ds/text-size :base)])}
-          image-description]
+      ;; Content section - flexible to fill remaining space
+      [:div {:class (ds/classes [(ds/p :lg) "flex flex-col flex-grow"])}
+       ;; Title
+       [:h3 {:class (ds/classes [(ds/text-size :xl)
+                                 (ds/font-weight :bold)
+                                 (ds/text :text-primary)
+                                 (ds/mb :sm)
+                                 "group-hover:text-blue-600"
+                                 (ds/transition :colors)])}
+        (or (:feature/title feature-data) "Untitled Feature")]
 
-         ;; Read more indicator
-         [:div {:class (ds/classes ["flex items-center"
-                                   (ds/text :primary)
-                                   (ds/font-weight :medium)
-                                   (ds/text-size :sm)])}
-          [:span "Read full article"]
-          [:svg {:class (ds/classes ["ml-2 w-4 h-4"
-                                    "group-hover:translate-x-1"
-                                    (ds/transition :transform)])
-                 :fill "none"
-                 :stroke "currentColor"
-                 :viewBox "0 0 24 24"}
-           [:path {:stroke-linecap "round"
-                   :stroke-linejoin "round"
-                   :stroke-width "2"
-                   :d "M9 5l7 7-7 7"}]]]])]]))
+       ;; Description - takes up available space
+       [:p {:class (ds/classes [(ds/text :text-secondary)
+                               (ds/mb :md)
+                               "flex-grow"])}
+        (or (:feature/description feature-data)
+            "Click to learn more about this feature.")]
+
+       ;; Read more indicator - stays at bottom
+       [:div {:class (ds/classes ["flex items-center"
+                                 (ds/text :primary)
+                                 (ds/font-weight :medium)
+                                 (ds/text-size :sm)
+                                 "mt-auto"])}
+        [:span "Learn more"]
+        [:svg {:class (ds/classes ["ml-2 w-4 h-4"
+                                  "group-hover:translate-x-1"
+                                  (ds/transition :transform)])
+               :fill "none"
+               :stroke "currentColor"
+               :viewBox "0 0 24 24"}
+         [:path {:stroke-linecap "round"
+                 :stroke-linejoin "round"
+                 :stroke-width "2"
+                 :d "M9 5l7 7-7 7"}]]]]]]))
 
 (defn placeholder-feature-card
-  "Placeholder card for empty/loading features"
+  "Placeholder card for empty/loading features - tall format to match feature cards"
   [feature-id]
   [:div {:class (ds/classes [(ds/bg :bg-card)
                              (ds/rounded :lg)
@@ -150,26 +171,27 @@
                              "overflow-hidden"
                              "border-2 border-dashed"
                              (ds/border-color :border-default)
-                             "flex flex-col items-center justify-center"
-                             (ds/p :3xl)])}
-   [:div {:class (ds/classes [(ds/text :text-muted)
+                             "flex flex-col items-center justify-center"])
+         :style "height: 1200px;"}  ;; Match tall card height
+   [:div {:class (ds/classes [(ds/p :lg) "text-center"])}
+    [:div {:class (ds/classes [(ds/text :text-muted)
                               (ds/mb :md)])}
-    [:svg {:class "w-16 h-16 mx-auto"
-           :fill "none"
-           :stroke "currentColor"
-           :viewBox "0 0 24 24"}
-     [:path {:stroke-linecap "round"
-             :stroke-linejoin "round"
-             :stroke-width "2"
-             :d "M12 6v6m0 0v6m0-6h6m-6 0H6"}]]]
-   [:h3 {:class (ds/classes [(ds/text-size :lg)
-                             (ds/font-weight :semibold)
-                             (ds/text :text-secondary)
-                             (ds/mb :sm)])}
-    "Feature Coming Soon"]
-   [:p {:class (ds/classes [(ds/text-size :sm)
-                           (ds/text :text-muted)])}
-    "This feature will be added soon."]])
+     [:svg {:class "w-16 h-16 mx-auto"
+            :fill "none"
+            :stroke "currentColor"
+            :viewBox "0 0 24 24"}
+      [:path {:stroke-linecap "round"
+              :stroke-linejoin "round"
+              :stroke-width "2"
+              :d "M12 6v6m0 0v6m0-6h6m-6 0H6"}]]]
+    [:h3 {:class (ds/classes [(ds/text-size :lg)
+                              (ds/font-weight :semibold)
+                              (ds/text :text-secondary)
+                              (ds/mb :sm)])}
+     "Feature Coming Soon"]
+    [:p {:class (ds/classes [(ds/text-size :sm)
+                            (ds/text :text-muted)])}
+     "This feature will be added soon."]]])
 
 (defn feature-card
   "Single feature card for homepage - intelligently renders based on content type
@@ -178,30 +200,28 @@
    {:feature/id \"feature1\"
     :feature/title \"Welcome to Mount Zion\"
     :feature/description \"Join us for worship...\"
-    :feature/image {:url \"/proxy/image/123/imgpreview\" :alt \"Image\"}  ; optional
+    :feature/image {:url \"/proxy/image/123\" :alt \"Image\"}  ; optional
     :feature/link \"/features/feature1\"}
 
    Rendering logic:
-   - Image only (no HTML node): Just image, NOT clickable, sizes naturally
-   - Image + HTML (has HTML node): Image with description from image node, clickable to full article
-   - HTML only (no image): Text-focused card, clickable to article
+   - Image only: Full-height image card (1200px)
+   - Text only: Text-focused card with gradient background
+   - Both: Image (900px) + text (300px) standard layout
    - Neither: Falls back to placeholder"
   [feature-data]
   (let [has-image (and (:feature/image feature-data)
                        (:url (:feature/image feature-data)))
-        ;; Check for HTML content (from cm:content HTML node), NOT image description
-        ;; This determines if there's a full article to link to
-        has-html-content (and (:feature/content feature-data)
-                              (not (clojure.string/blank? (:feature/content feature-data))))]
+        has-text (or (:feature/title feature-data)
+                     (:feature/description feature-data))]
     (cond
-      ;; Both image and HTML content - show image + description teaser, clickable to article
-      (and has-image has-html-content) (feature-card-image-and-text feature-data)
+      ;; Both image and text
+      (and has-image has-text) (feature-card-image-and-text feature-data)
 
-      ;; Image only (no HTML article) - just show image, NOT clickable
+      ;; Image only
       has-image (feature-card-image-only feature-data)
 
-      ;; HTML content only (no image) - text card, clickable
-      has-html-content (feature-card-text-only feature-data)
+      ;; Text only
+      has-text (feature-card-text-only feature-data)
 
       ;; Neither - show placeholder
       :else (placeholder-feature-card (:feature/id feature-data)))))
@@ -290,15 +310,20 @@
          :hx-get (str "/api/features/card/" node-id)
          :hx-trigger "load"
          :hx-swap "innerHTML"}
-   ;; Loading state
+   ;; Loading state - tall card format
    [:div {:class (ds/classes [(ds/bg :bg-card)
                               (ds/rounded :lg)
                               (ds/shadow :md)
-                              "overflow-hidden animate-pulse flex flex-col"
-                              (ds/p :lg)])}
-    [:div {:class "h-6 bg-gray-300 rounded w-3/4 mb-3"}]
-    [:div {:class "h-4 bg-gray-200 rounded w-full mb-2"}]
-    [:div {:class "h-4 bg-gray-200 rounded w-5/6 mb-2"}]]])
+                              "overflow-hidden animate-pulse flex flex-col"])
+          :style "height: 1200px;"}
+    [:div {:class "bg-gray-200 flex-shrink-0"
+           :style "height: 900px;"}]
+    [:div {:class (ds/classes [(ds/p :lg) "flex flex-col flex-grow"])}
+     [:div {:class "h-6 bg-gray-300 rounded w-3/4 mb-3"}]
+     [:div {:class "h-4 bg-gray-200 rounded w-full mb-2"}]
+     [:div {:class "h-4 bg-gray-200 rounded w-5/6 mb-2"}]
+     [:div {:class "h-4 bg-gray-200 rounded w-2/3 mb-4"}]
+     [:div {:class "h-4 bg-gray-200 rounded w-1/3 mt-auto"}]]]])
 
 (defn- htmx-single-feature-layout
   "HTMX layout for a single feature - full width centered"

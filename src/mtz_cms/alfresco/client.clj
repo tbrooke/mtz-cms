@@ -122,6 +122,51 @@
         {:success false
          :error (.getMessage e)}))))
 
+(defn get-image-rendition
+  "Get a specific rendition for an image node
+
+   Rendition options:
+   - imgpreview: 960px width (ideal for Hero/Feature/Blog images)
+   - doclib: 100x100px thumbnail
+   - medium: 100x100px thumbnail
+   - avatar: 64x64px square
+   - nil or \"original\": Returns full-size original image
+
+   Falls back to original content if rendition not available."
+  [ctx node-id rendition-name]
+  (let [{:keys [base-url username password]} (get-config ctx)
+        api-base (str base-url "/alfresco/api/-default-/public/alfresco/versions/1")]
+
+    (if (or (nil? rendition-name) (= rendition-name "original"))
+      ;; Return original content
+      (do
+        (log/debug "Fetching original content for node:" node-id)
+        (get-node-content ctx node-id))
+
+      ;; Try to get the requested rendition
+      (let [full-url (str api-base "/nodes/" node-id "/renditions/" rendition-name "/content")]
+        (log/debug "Fetching rendition" rendition-name "for node:" node-id)
+
+        (try
+          (let [response (http/get full-url
+                                   {:basic-auth [username password]
+                                    :throw-exceptions false
+                                    :as :byte-array})]
+
+            (if (< (:status response) 400)
+              (do
+                (log/info "✅ Found rendition" rendition-name "for node:" node-id)
+                {:success true
+                 :status (:status response)
+                 :data (:body response)})
+              (do
+                (log/warn "Rendition" rendition-name "not available, falling back to original content")
+                (get-node-content ctx node-id))))
+
+          (catch Exception e
+            (log/warn "Error fetching rendition" rendition-name ", falling back to original:" (.getMessage e))
+            (get-node-content ctx node-id)))))))
+
 (defn get-pdf-thumbnail
   "Get thumbnail rendition for a PDF node
 
