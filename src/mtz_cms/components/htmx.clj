@@ -4,6 +4,8 @@
    [mtz-cms.components.templates :as templates]
    [mtz-cms.components.home-features :as home-features]
    [mtz-cms.ui.design-system :as ds]
+   [mtz-cms.alfresco.client :as alfresco]
+   [clojure.tools.logging :as log]
    [clojure.string :as str]))
 
 ;; --- HTMX COMPONENT CONTAINERS ---
@@ -193,18 +195,73 @@
                               "min-h-32"])}
     "Select a component type to see preview"]])
 
+;; --- DYNAMIC FEATURE DISCOVERY ---
+
+(def home-page-node-id "9faac48b-6c77-4266-aac4-8b6c7752668a")
+(def hero-node-id "39985c5c-201a-42f6-985c-5c201a62f6d8")
+
+(defn discover-home-features
+  "Dynamically discover all feature folders in the Home Page directory.
+
+   Returns all children of Home Page except the Hero folder.
+   This allows features to be added/removed in Alfresco without code changes."
+  [ctx]
+  (try
+    (let [children-result (alfresco/get-node-children ctx home-page-node-id)]
+      (if (:success children-result)
+        (let [all-children (get-in children-result [:data :list :entries])
+              ;; Filter out Hero folder and keep only folders (not files)
+              feature-folders (->> all-children
+                                   (filter (fn [entry]
+                                             (let [node-id (get-in entry [:entry :id])
+                                                   is-folder (get-in entry [:entry :isFolder])]
+                                               (and is-folder
+                                                    (not= node-id hero-node-id)))))
+                                   ;; Sort by name to maintain consistent order (Feature 1, Feature 2, Feature 3)
+                                   (sort-by (fn [entry] (get-in entry [:entry :name])))
+                                   (map-indexed (fn [idx entry]
+                                                  {:node-id (get-in entry [:entry :id])
+                                                   :name (get-in entry [:entry :name])
+                                                   :slug (str "feature" (inc idx))})))]
+          (log/info "📦 Discovered" (count feature-folders) "home page features:"
+                    (str/join ", " (map :name feature-folders)))
+          feature-folders)
+        (do
+          (log/error "❌ Failed to discover home features:" (:error children-result))
+          [])))
+    (catch Exception e
+      (log/error "❌ Error discovering home features:" (.getMessage e))
+      [])))
+
+(defn get-feature-node-id-by-slug
+  "Look up a feature node-id by its slug (e.g., 'feature1', 'feature2').
+
+   Dynamically discovers features and returns the matching node-id, or nil if not found."
+  [ctx slug]
+  (let [features (discover-home-features ctx)
+        feature (first (filter #(= (:slug %) slug) features))]
+    (:node-id feature)))
+
 ;; --- PAGE CONFIGURATION ---
 
 (defn get-page-component-config
-  "Get component configuration for a page (future: from Alfresco aspects)"
-  [page-key]
+  "Get component configuration for a page.
+
+   For the home page, dynamically discovers all features from Alfresco.
+   This means adding/removing Feature folders in Alfresco will automatically
+   update the homepage without code changes."
+  [page-key ctx]
   (case page-key
-    :home {:layout :hero-features-layout
-           :components {:hero {:node-id "39985c5c-201a-42f6-985c-5c201a62f6d8"} ; Hero folder
-                        :features [{:node-id "264ab06c-984e-4f64-8ab0-6c984eaf6440"} ; Feature 1
-                                   {:node-id "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89"}]}} ; Feature 2
-                                   ;; Feature 3 disabled - uncomment to re-enable
-                                   ;; {:node-id "6737d1b1-5465-4625-b7d1-b15465b62530"}
+    :home (let [features (discover-home-features ctx)]
+            {:layout :hero-features-layout
+             :components {:hero {:node-id hero-node-id}
+                          ;; Try dynamic discovery, fall back to hardcoded if it fails
+                          :features (if (seq features)
+                                      features
+                                      ;; Fallback to hardcoded features (includes all 3)
+                                      [{:node-id "264ab06c-984e-4f64-8ab0-6c984eaf6440" :slug "feature1"}
+                                       {:node-id "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89" :slug "feature2"}
+                                       {:node-id "6737d1b1-5465-4625-b7d1-b15465b62530" :slug "feature3"}])}})
     ;; Default configuration
     {:layout :simple-content-layout
      :components {}}))

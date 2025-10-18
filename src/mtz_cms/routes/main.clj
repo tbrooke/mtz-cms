@@ -35,7 +35,7 @@
 (defn home-handler [request]
   "Home page with HTMX dynamic components"
   (let [ctx {}  ; Alfresco client uses default-config
-        page-config (htmx/get-page-component-config :home)]
+        page-config (htmx/get-page-component-config :home ctx)]
     (html-response
      (pages/base-layout
       "Mount Zion UCC - Home"
@@ -326,11 +326,8 @@
 
     (log/info "🎯 Feature detail requested:" slug)
 
-    ;; Map slug to node-id (feature1, feature2, feature3)
-    (let [feature-mapping {"feature1" "264ab06c-984e-4f64-8ab0-6c984eaf6440"
-                           "feature2" "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89"
-                           "feature3" "6737d1b1-5465-4625-b7d1-b15465b62530"}
-          node-id (get feature-mapping slug)]
+    ;; Dynamically look up node-id from slug
+    (let [node-id (htmx/get-feature-node-id-by-slug ctx slug)]
 
       (if node-id
         ;; Fetch feature content from Alfresco

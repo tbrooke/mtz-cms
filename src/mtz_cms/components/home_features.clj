@@ -20,21 +20,35 @@
 
 ;; --- FEATURE CARD COMPONENT ---
 
-(defn feature-card
-  "Single feature card for homepage
+(defn- feature-card-image-only
+  "Render feature card with only an image (graphic-only mode)"
+  [feature-data]
+  (let [image (:feature/image feature-data)]
+    [:a {:href (:feature/link feature-data)
+         :class "block group"}
+     [:div {:class (ds/classes [(ds/rounded :lg)
+                                (ds/shadow :md)
+                                "overflow-hidden"
+                                (ds/hover-shadow :xl)
+                                (ds/transition :all)
+                                (ds/duration :normal)
+                                "border-2 border-transparent"
+                                "group-hover:border-blue-500"
+                                "relative"])
+            :style "height: 1200px;"}
+      ;; Full-height image
+      [:img {:src (:url image)
+             :alt (or (:alt image) (:feature/title feature-data) "Feature image")
+             :class "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"}]
 
-   Data structure:
-   {:feature/id \"feature1\"
-    :feature/title \"Welcome to Mount Zion\"
-    :feature/description \"Join us for worship...\"
-    :feature/image {:url \"/proxy/image/123\" :alt \"Image\"}  ; optional
-    :feature/link \"/features/feature1\"}
+      ;; Optional overlay with title (if title exists)
+      (when (:feature/title feature-data)
+        [:div {:class "absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6"}
+         [:h3 {:class "text-white text-2xl font-bold"}
+          (:feature/title feature-data)]])]]))
 
-   Renders a tall card (height = 2x width) with:
-   - Optional image at top (takes up more space in tall card)
-   - Title
-   - Description
-   - Entire card is clickable"
+(defn- feature-card-text-only
+  "Render feature card with only text (no image)"
   [feature-data]
   [:a {:href (:feature/link feature-data)
        :class "block group"}
@@ -47,43 +61,36 @@
                               (ds/duration :normal)
                               "border-2 border-transparent"
                               "group-hover:border-blue-500"
-                              "flex flex-col"])
-          :style "height: 1200px;"}  ;; Tall card with prominent image display
+                              "flex flex-col"
+                              "bg-gradient-to-br from-blue-50 via-white to-blue-50"])
+          :style "height: 1200px;"}
 
-    ;; Image section (if available) - takes up majority of card for full graphic visibility
-    (when-let [image (:feature/image feature-data)]
-      [:div {:class "bg-gradient-to-br from-blue-50 to-blue-100 overflow-hidden flex-shrink-0"
-             :style "height: 900px;"}
-       [:img {:src (:url image)
-              :alt (or (:alt image) (:feature/title feature-data))
-              :class "w-full h-full object-cover"}]])
-
-    ;; Content section - flexible to fill remaining space
-    [:div {:class (ds/classes [(ds/p :lg) "flex flex-col flex-grow"])}
+    [:div {:class (ds/classes [(ds/p :2xl) "flex flex-col h-full justify-center"])}
      ;; Title
-     [:h3 {:class (ds/classes [(ds/text-size :xl)
+     [:h3 {:class (ds/classes [(ds/text-size :3xl)
                                (ds/font-weight :bold)
                                (ds/text :text-primary)
-                               (ds/mb :sm)
+                               (ds/mb :lg)
                                "group-hover:text-blue-600"
                                (ds/transition :colors)])}
       (or (:feature/title feature-data) "Untitled Feature")]
 
-     ;; Description - takes up available space
+     ;; Description - larger text for text-only cards
      [:p {:class (ds/classes [(ds/text :text-secondary)
-                             (ds/mb :md)
-                             "flex-grow"])}
+                             (ds/text-size :lg)
+                             (ds/mb :xl)
+                             "leading-relaxed"])}
       (or (:feature/description feature-data)
           "Click to learn more about this feature.")]
 
-     ;; Read more indicator - stays at bottom
+     ;; Read more indicator
      [:div {:class (ds/classes ["flex items-center"
                                (ds/text :primary)
                                (ds/font-weight :medium)
-                               (ds/text-size :sm)
+                               (ds/text-size :base)
                                "mt-auto"])}
       [:span "Learn more"]
-      [:svg {:class (ds/classes ["ml-2 w-4 h-4"
+      [:svg {:class (ds/classes ["ml-2 w-5 h-5"
                                 "group-hover:translate-x-1"
                                 (ds/transition :transform)])
              :fill "none"
@@ -93,6 +100,67 @@
                :stroke-linejoin "round"
                :stroke-width "2"
                :d "M9 5l7 7-7 7"}]]]]]])
+
+(defn- feature-card-image-and-text
+  "Render feature card with both image and text (standard mode)"
+  [feature-data]
+  (let [image (:feature/image feature-data)]
+    [:a {:href (:feature/link feature-data)
+         :class "block group"}
+     [:div {:class (ds/classes [(ds/bg :bg-card)
+                                (ds/rounded :lg)
+                                (ds/shadow :md)
+                                "overflow-hidden"
+                                (ds/hover-shadow :xl)
+                                (ds/transition :all)
+                                (ds/duration :normal)
+                                "border-2 border-transparent"
+                                "group-hover:border-blue-500"
+                                "flex flex-col"])
+            :style "height: 1200px;"}
+
+      ;; Image section - takes up majority of card
+      [:div {:class "bg-gradient-to-br from-blue-50 to-blue-100 overflow-hidden flex-shrink-0"
+             :style "height: 900px;"}
+       [:img {:src (:url image)
+              :alt (or (:alt image) (:feature/title feature-data))
+              :class "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"}]]
+
+      ;; Content section - flexible to fill remaining space
+      [:div {:class (ds/classes [(ds/p :lg) "flex flex-col flex-grow"])}
+       ;; Title
+       [:h3 {:class (ds/classes [(ds/text-size :xl)
+                                 (ds/font-weight :bold)
+                                 (ds/text :text-primary)
+                                 (ds/mb :sm)
+                                 "group-hover:text-blue-600"
+                                 (ds/transition :colors)])}
+        (or (:feature/title feature-data) "Untitled Feature")]
+
+       ;; Description - takes up available space
+       [:p {:class (ds/classes [(ds/text :text-secondary)
+                               (ds/mb :md)
+                               "flex-grow"])}
+        (or (:feature/description feature-data)
+            "Click to learn more about this feature.")]
+
+       ;; Read more indicator - stays at bottom
+       [:div {:class (ds/classes ["flex items-center"
+                                 (ds/text :primary)
+                                 (ds/font-weight :medium)
+                                 (ds/text-size :sm)
+                                 "mt-auto"])}
+        [:span "Learn more"]
+        [:svg {:class (ds/classes ["ml-2 w-4 h-4"
+                                  "group-hover:translate-x-1"
+                                  (ds/transition :transform)])
+               :fill "none"
+               :stroke "currentColor"
+               :viewBox "0 0 24 24"}
+         [:path {:stroke-linecap "round"
+                 :stroke-linejoin "round"
+                 :stroke-width "2"
+                 :d "M9 5l7 7-7 7"}]]]]]]))
 
 (defn placeholder-feature-card
   "Placeholder card for empty/loading features - tall format to match feature cards"
@@ -124,6 +192,39 @@
     [:p {:class (ds/classes [(ds/text-size :sm)
                             (ds/text :text-muted)])}
      "This feature will be added soon."]]])
+
+(defn feature-card
+  "Single feature card for homepage - intelligently renders based on content type
+
+   Data structure:
+   {:feature/id \"feature1\"
+    :feature/title \"Welcome to Mount Zion\"
+    :feature/description \"Join us for worship...\"
+    :feature/image {:url \"/proxy/image/123\" :alt \"Image\"}  ; optional
+    :feature/link \"/features/feature1\"}
+
+   Rendering logic:
+   - Image only: Full-height image card (1200px)
+   - Text only: Text-focused card with gradient background
+   - Both: Image (900px) + text (300px) standard layout
+   - Neither: Falls back to placeholder"
+  [feature-data]
+  (let [has-image (and (:feature/image feature-data)
+                       (:url (:feature/image feature-data)))
+        has-text (or (:feature/title feature-data)
+                     (:feature/description feature-data))]
+    (cond
+      ;; Both image and text
+      (and has-image has-text) (feature-card-image-and-text feature-data)
+
+      ;; Image only
+      has-image (feature-card-image-only feature-data)
+
+      ;; Text only
+      has-text (feature-card-text-only feature-data)
+
+      ;; Neither - show placeholder
+      :else (placeholder-feature-card (:feature/id feature-data)))))
 
 ;; --- FEATURE GRID LAYOUT ---
 
