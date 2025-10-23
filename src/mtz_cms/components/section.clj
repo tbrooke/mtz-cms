@@ -47,7 +47,7 @@
        ;; Body content (HTML rendered safely)
        [:div {:class (ds/classes [(ds/mt :md)
                                  (ds/text :text-secondary)
-                                 "prose max-w-none"])}
+                                 "prose prose-2xl max-w-none"])}
         [:div {:dangerouslySetInnerHTML {:__html (or body "")}}]]]]
 
      ;; Image column (only show if image exists)
@@ -84,7 +84,7 @@
 
      ;; Body content (HTML rendered safely)
      [:div {:class (ds/classes [(ds/text :text-secondary)
-                               "prose prose-lg max-w-none"])}
+                               "prose prose-2xl max-w-none"])}
       [:div {:dangerouslySetInnerHTML {:__html (or body "")}}]]]]])
 
 (defn section-with-background
@@ -117,7 +117,7 @@
 
      ;; Body content
      [:div {:class (ds/classes [(ds/text :text-secondary)
-                               "prose prose-lg max-w-none mx-auto"])}
+                               "prose prose-2xl max-w-none mx-auto"])}
       [:div {:dangerouslySetInnerHTML {:__html (or body "")}}]]]]])
 
 ;; --- SMART RENDERER ---

@@ -94,7 +94,7 @@
      (when page-data
        [:div {:class "bg-white rounded-lg shadow-sm p-6 mb-8"}
         [:h2 {:class "text-2xl font-semibold text-gray-900 mb-4"} (:page/title page-data)]
-        [:div {:class "prose max-w-none"}
+        [:div {:class "prose prose-2xl max-w-none"}
          (clean-html (or (:page/content page-data) ""))]])
      
      ;; Quick Links
@@ -239,7 +239,7 @@
       (:page/title page-data)]
 
      [:div {:class "bg-white rounded-lg shadow-sm p-6 mb-8"}
-      [:div {:class "prose max-w-none"}
+      [:div {:class "prose prose-2xl max-w-none"}
        ;; Render HTML content from Alfresco with cleaned markup
        ;; This strips inline styles to allow design system to apply
        (clean-html (or (:page/content page-data) ""))]]
@@ -346,7 +346,7 @@
        (or (:feature/title feature-data) "Untitled Feature")]
 
       ;; Feature content (full HTML)
-      [:div {:class "prose prose-lg max-w-none mb-8"}
+      [:div {:class "prose prose-2xl max-w-none mb-8"}
        (if (:feature/content feature-data)
          [:div {:dangerouslySetInnerHTML {:__html (:feature/content feature-data)}}]
          [:p {:class "text-gray-500 italic"} "No content available for this feature."])]
@@ -422,7 +422,7 @@
 
       ;; Additional content (if provided)
       (when (:hero/content hero-data)
-        [:div {:class "prose prose-lg max-w-none mb-8 border-t border-gray-200 pt-8"}
+        [:div {:class "prose prose-2xl max-w-none mb-8 border-t border-gray-200 pt-8"}
          [:div {:dangerouslySetInnerHTML {:__html (:hero/content hero-data)}}]])
 
       ;; Back to home button

@@ -212,8 +212,8 @@
    .prose div {
      margin-top: 1.25em;
      margin-bottom: 1.25em;
-     font-size: 1.125rem; /* 18px - larger, more readable */
-     line-height: 1.75; /* 28px */
+     font-size: 1.5rem; /* 24px - larger, more readable */
+     line-height: 1.75; /* increased from 18px */
    }
 
    /* Remove excessive margins between consecutive divs */
@@ -257,7 +257,7 @@
    .prose li {
      margin-top: 0.5em;
      margin-bottom: 0.5em;
-     font-size: 1.125rem; /* 18px */
+     font-size: 1.5rem; /* 24px - matches paragraph size */
      line-height: 1.75;
    }
 

@@ -74,7 +74,7 @@
    [:div {:class "lg:grid lg:grid-cols-3 lg:gap-8"}
     ;; Main content
     [:div {:class "lg:col-span-2"}
-     [:div {:class "prose prose-lg max-w-none"}
+     [:div {:class "prose prose-2xl max-w-none"}
       (:page/content page-data)]]
 
     ;; Sidebar

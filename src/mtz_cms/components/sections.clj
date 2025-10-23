@@ -25,7 +25,7 @@
         {:class "text-2xl font-semibold text-gray-900 sm:text-3xl"}
         (or subtitle "Section Title")]
        [:div
-        {:class "mt-4 text-gray-700 prose max-w-none"}
+        {:class "mt-4 text-gray-700 prose prose-2xl max-w-none"}
         ;; body is already processed HTML
         [:div {:dangerouslySetInnerHTML {:__html (or body "")}}]]]]
 
@@ -50,7 +50,7 @@
       {:class "text-2xl font-semibold text-gray-900 sm:text-3xl mb-6"}
       (or subtitle "Section Title")]
      [:div
-      {:class "text-gray-700 prose prose-lg max-w-none"}
+      {:class "text-gray-700 prose prose-2xl max-w-none"}
       [:div {:dangerouslySetInnerHTML {:__html (or body "")}}]]]]])
 
 (defn render-section

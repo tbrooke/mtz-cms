@@ -92,7 +92,7 @@
           title]
 
          ;; Dynamic content area
-         [:div {:class "mt-6 text-lg leading-8 text-gray-600 prose"
+         [:div {:class "mt-6 text-lg leading-8 text-gray-600 prose prose-2xl"
                 :hx-get (str "/api/components/feature/" node-id "/content")
                 :hx-trigger "every 60s" ; Refresh content periodically
                 :hx-swap "innerHTML"}

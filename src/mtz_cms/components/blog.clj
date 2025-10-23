@@ -24,7 +24,7 @@
     :blog/author \"Tom Brooke\"
     :blog/thumbnail \"/api/image/...\" or nil}"
   [post]
-  (let [thumbnail-url (or (:blog/thumbnail post) "/images/blog-default.svg")
+  (let [thumbnail-url (or (:blog/thumbnail post) "/images/pastor-jim.jpg")
         post-url (str "/blog/" (:blog/slug post))
         published-date (:blog/published-at post)
         ;; Format date - for now keep ISO, can enhance later
@@ -42,16 +42,17 @@
        [:div {:class "flex-shrink-0"}
         [:img {:src thumbnail-url
                :alt (:blog/title post)
-               :class "w-32 h-32 object-cover rounded-lg"}]]
+               :class "w-32 h-32 object-cover rounded-lg"
+               :onerror "this.onerror=null; this.src='/images/pastor-jim.jpg';"}]]
 
        ;; Content on right
        [:div {:class "flex-1 min-w-0"}
         ;; Title
-        [:h3 {:class "text-xl font-semibold text-gray-900 mb-2"}
+        [:h3 {:class "text-3xl font-semibold text-gray-900 mb-2"}
          (:blog/title post)]
 
         ;; Date and Author
-        [:div {:class "flex items-center text-sm text-gray-500 mb-3"}
+        [:div {:class "flex items-center text-xl text-gray-500 mb-3"}
          (when formatted-date
            [:time {:datetime (:blog/published-at post)
                    :class ""}
@@ -63,7 +64,7 @@
 
         ;; Excerpt
         (when (:blog/excerpt post)
-          [:p {:class "text-gray-600 line-clamp-3"}
+          [:p {:class "text-xl text-gray-600 line-clamp-3"}
            (:blog/excerpt post)])]]]]))
 
 ;; --- BLOG LIST PAGE ---
@@ -76,9 +77,9 @@
   [:div {:class "bg-white min-h-screen"}
    ;; Page header
    [:div {:class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-b border-gray-200"}
-    [:h1 {:class "text-4xl font-bold text-gray-900 mb-2"}
+    [:h1 {:class "text-5xl font-bold text-gray-900 mb-2"}
      "Pastor Jim Reflects"]
-    [:p {:class "text-lg text-gray-600"}
+    [:p {:class "text-2xl text-gray-600"}
      "Thoughts and reflections from Pastor Jim"]]
 
    ;; Blog list
@@ -90,7 +91,7 @@
 
       ;; Empty state
       [:div {:class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center"}
-       [:p {:class "text-gray-500"}
+       [:p {:class "text-xl text-gray-500"}
         "No blog posts yet. Check back soon!"]])]
 
    ;; Bottom border
@@ -117,12 +118,13 @@
    [:div {:class "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8"}
     [:div {:class "flex gap-8 mb-8"}
 
-     ;; Image on top left
-     (when (:blog/thumbnail post)
+     ;; Image on top left - always show with Pastor Jim as fallback
+     (let [thumbnail-url (or (:blog/thumbnail post) "/images/pastor-jim.jpg")]
        [:div {:class "flex-shrink-0"}
-        [:img {:src (:blog/thumbnail post)
+        [:img {:src thumbnail-url
                :alt (:blog/title post)
-               :class "w-48 h-48 object-cover rounded-lg"}]])
+               :class "w-48 h-48 object-cover rounded-lg"
+               :onerror "this.onerror=null; this.src='/images/pastor-jim.jpg';"}]])
 
      ;; Title and metadata on right
      [:div {:class "flex-1 min-w-0"}
@@ -150,7 +152,7 @@
             tag])])]]
 
     ;; Blog content
-    [:article {:class "prose max-w-none mt-8"}
+    [:article {:class "prose prose-2xl max-w-none mt-8"}
      ;; Content is raw HTML from Alfresco
      (when-let [content (:blog/content post)]
        (pages/raw-html content))]
@@ -176,4 +178,4 @@
   [post]
   (or (:blog/thumbnail post)
       (extract-first-image-from-content (:blog/content post))
-      "/images/blog-default.svg"))
+      "/images/pastor-jim.jpg"))
