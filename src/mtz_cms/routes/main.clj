@@ -60,6 +60,10 @@
   (let [ctx {}]
     (html-response (pages/calendar-page ctx))))
 
+(defn privacy-handler [request]
+  (let [ctx {}]
+    (html-response (pages/privacy-page ctx))))
+
 (defn demo-handler [request]
   (let [ctx {}
         ;; Test Pathom
@@ -486,6 +490,8 @@
     ;; Events routes
     ["/events" {:get events-handler}]
     ["/events/calendar" {:get calendar-handler}]
+
+    ["/privacy" {:get privacy-handler}]
 
     ["/demo" {:get demo-handler}]
 

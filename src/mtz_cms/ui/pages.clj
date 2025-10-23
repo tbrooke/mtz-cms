@@ -470,6 +470,72 @@
    (events/calendar-page ctx)
    ctx))
 
+(defn privacy-page
+  "Privacy Policy page"
+  [ctx]
+  (base-layout
+   "Privacy Policy - Mount Zion UCC"
+   [:div {:class "max-w-4xl mx-auto px-6 py-12"}
+    [:h1 {:class "text-4xl font-bold text-gray-900 mb-8"} "Privacy Policy"]
+
+    [:div {:class "prose prose-lg max-w-none"}
+     [:p {:class "text-gray-600 mb-6"}
+      "Last updated: January 2025"]
+
+     [:h2 {:class "text-2xl font-bold text-gray-900 mt-8 mb-4"} "Information We Collect"]
+     [:p {:class "text-gray-700 mb-4"}
+      "Mount Zion United Church of Christ collects information that you provide directly to us when you:"]
+     [:ul {:class "list-disc pl-6 mb-6 text-gray-700"}
+      [:li "Contact us through our website forms"]
+      [:li "Subscribe to our newsletter or communications"]
+      [:li "Register for events or activities"]
+      [:li "Make donations or participate in church activities"]]
+
+     [:h2 {:class "text-2xl font-bold text-gray-900 mt-8 mb-4"} "How We Use Your Information"]
+     [:p {:class "text-gray-700 mb-4"}
+      "We use the information we collect to:"]
+     [:ul {:class "list-disc pl-6 mb-6 text-gray-700"}
+      [:li "Respond to your inquiries and communicate with you"]
+      [:li "Send you information about church events and activities"]
+      [:li "Process donations and event registrations"]
+      [:li "Improve our website and services"]]
+
+     [:h2 {:class "text-2xl font-bold text-gray-900 mt-8 mb-4"} "Information Sharing"]
+     [:p {:class "text-gray-700 mb-6"}
+      "We do not sell, trade, or rent your personal information to third parties. We may share information with trusted service providers who assist us in operating our website and conducting church activities, provided they agree to keep this information confidential."]
+
+     [:h2 {:class "text-2xl font-bold text-gray-900 mt-8 mb-4"} "Cookies and Tracking"]
+     [:p {:class "text-gray-700 mb-6"}
+      "Our website may use cookies to enhance your browsing experience. You can choose to disable cookies through your browser settings, though some features of our website may not function properly."]
+
+     [:h2 {:class "text-2xl font-bold text-gray-900 mt-8 mb-4"} "Data Security"]
+     [:p {:class "text-gray-700 mb-6"}
+      "We implement appropriate security measures to protect your personal information. However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security."]
+
+     [:h2 {:class "text-2xl font-bold text-gray-900 mt-8 mb-4"} "Children's Privacy"]
+     [:p {:class "text-gray-700 mb-6"}
+      "Our website is not directed to children under 13. We do not knowingly collect personal information from children under 13. If you believe we have collected information from a child under 13, please contact us."]
+
+     [:h2 {:class "text-2xl font-bold text-gray-900 mt-8 mb-4"} "Your Rights"]
+     [:p {:class "text-gray-700 mb-6"}
+      "You have the right to access, correct, or delete your personal information. To exercise these rights, please contact us using the information below."]
+
+     [:h2 {:class "text-2xl font-bold text-gray-900 mt-8 mb-4"} "Changes to This Policy"]
+     [:p {:class "text-gray-700 mb-6"}
+      "We may update this privacy policy from time to time. We will notify you of any changes by posting the new privacy policy on this page with an updated \"Last updated\" date."]
+
+     [:h2 {:class "text-2xl font-bold text-gray-900 mt-8 mb-4"} "Contact Us"]
+     [:p {:class "text-gray-700 mb-4"}
+      "If you have questions about this privacy policy, please contact us:"]
+     [:address {:class "not-italic text-gray-700 mb-6"}
+      [:div {:class "mb-2"} "Mount Zion United Church of Christ"]
+      [:div {:class "mb-2"} "1415 S Main St"]
+      [:div {:class "mb-2"} "China Grove, NC 28023"]
+      [:div
+       "Phone: "
+       [:a {:href "tel:+17048571169" :class "text-blue-600 hover:underline"} "(704) 857-1169"]]]]]
+   ctx))
+
 (comment
   ;; Test pages
   (home-page {:page/title "Home" :page/content "Welcome!"})

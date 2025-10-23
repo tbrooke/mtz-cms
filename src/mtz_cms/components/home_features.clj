@@ -243,17 +243,17 @@
   []
   [:div {:class (ds/classes ["mx-auto max-w-2xl text-center"
                             (ds/mb :3xl)])}
-   [:h2 {:class (ds/classes [(ds/text-size :base)
+   [:h2 {:class (ds/classes [(ds/text-size :2xl)
                              (ds/font-weight :semibold)
                              "leading-7"
                              (ds/text :primary)])}
     "Discover Mount Zion"]
    [:p {:class (ds/classes [(ds/mt :sm)
-                           (ds/text-size :3xl)
+                           (ds/text-size :5xl)
                            (ds/font-weight :bold)
                            "tracking-tight"
                            (ds/text :text-primary)
-                           "sm:text-4xl"])}
+                           "sm:text-6xl"])}
     "What's Happening at Our Church"]])
 
 (defn features-grid

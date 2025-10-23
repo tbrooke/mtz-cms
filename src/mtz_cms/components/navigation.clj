@@ -167,55 +167,93 @@
          "☰ Menu"]]]]]))
 
 (defn site-footer
-  "Renders site footer with Join Our Community call-to-action.
+  "Renders compact site footer with Join Our Community, church info, and links.
 
-   Includes community invitation and action buttons.
+   Includes:
+   - Community invitation with action buttons
+   - Church address and phone
+   - Privacy policy link
+   - Copyright information
    Uses design system for consistent styling with light teal background."
   []
-  [:footer {:class (ds/classes [(ds/bg :bg-header)  ; Light teal background
+  [:footer {:class (ds/classes [(ds/bg :bg-header)
                                 "border-t"
                                 (ds/border-color :border-default)
                                 (ds/mt :3xl)])}
    [:div {:class (ds/classes [(ds/container :7xl)
-                              (ds/py :3xl)])}
+                              (ds/py :2xl)])}
 
-    ;; Join Our Community section
-    [:div {:class "lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center mb-8"}
-     [:div
-      [:h2 {:class (ds/classes [(ds/text-size :3xl)
+    ;; Single compact footer layout
+    [:div {:class "grid grid-cols-1 md:grid-cols-3 gap-8 items-center"}
+
+     ;; Left: Join Our Community with buttons
+     [:div {:class "text-center md:text-left"}
+      [:h3 {:class (ds/classes [(ds/text-size :xl)
                                 (ds/font-weight :bold)
-                                "tracking-tight"
-                                (ds/text :text-primary)
-                                "sm:text-4xl"])}
+                                (ds/text :text-primary)])}
        "Join Our Community"]
-      [:p {:class (ds/classes [(ds/mt :md)
-                               "max-w-3xl"
-                               (ds/text-size :lg)
+      [:p {:class (ds/classes [(ds/mt :xs)
+                               (ds/text-size :sm)
                                (ds/text :text-secondary)])}
-       "Experience the warmth and fellowship of Mount Zion UCC. All are welcome in our progressive Christian community."]]
-     [:div {:class "mt-8 lg:mt-0"}
-      [:div {:class "inline-flex rounded-md shadow"}
+       "All are welcome!"]
+      [:div {:class "mt-4 flex flex-wrap gap-2 justify-center md:justify-start"}
        [:a {:href "/worship"
-            :class (ds/button :primary)}
-        "Plan Your Visit"]]
-      [:div {:class "ml-3 inline-flex"}
+            :class (ds/classes ["inline-flex items-center justify-center"
+                               "px-4 py-2"
+                               "text-sm font-medium rounded-md"
+                               "bg-blue-600 text-white"
+                               "hover:bg-blue-700"
+                               (ds/transition :colors)])}
+        "Plan Your Visit"]
        [:a {:href "/contact"
-            :class (ds/button :secondary)}
-        "Contact Us"]]]]
+            :class (ds/classes ["inline-flex items-center justify-center"
+                               "px-4 py-2"
+                               "text-sm font-medium rounded-md"
+                               "border border-blue-600"
+                               (ds/text :text-primary)
+                               "hover:bg-blue-50"
+                               (ds/transition :colors)])}
+        "Contact Us"]]]
 
-    ;; Copyright section
-    [:div {:class (ds/classes ["text-center"
-                               (ds/text :text-secondary)
-                               (ds/mt :2xl)
-                               "border-t"
-                               (ds/border-color :border-default)
-                               "pt-8"])}
-     [:p {:class (ds/text-size :sm)}
-      "© 2025 Mount Zion United Church of Christ"]
-     [:p {:class (ds/classes [(ds/text-size :xs)
-                             (ds/text :text-muted)
-                             (ds/mt :sm)])}
-      "Powered by Mount Zion CMS"]]]])
+     ;; Center: Church contact info
+     [:div {:class "text-center"}
+      [:h3 {:class (ds/classes [(ds/text-size :lg)
+                                (ds/font-weight :bold)
+                                (ds/text :text-primary)])}
+       "Mount Zion UCC"]
+      [:address {:class (ds/classes ["not-italic"
+                                     (ds/mt :xs)
+                                     (ds/text-size :sm)
+                                     (ds/text :text-secondary)])}
+       [:a {:href "https://www.google.com/maps/search/?api=1&query=1415+S+Main+St+China+Grove+NC+28023"
+            :target "_blank"
+            :rel "noopener noreferrer"
+            :class (ds/classes [(ds/text :text-primary)
+                               "hover:underline"
+                               "block"])}
+        [:div "1415 S Main St"]
+        [:div "China Grove, NC 28023"]]
+       [:div {:class (ds/mt :xs)}
+        [:a {:href "tel:+17048571169"
+             :class (ds/classes [(ds/text :text-primary)
+                                "hover:underline"])}
+         "(704) 857-1169"]]]]
+
+     ;; Right: Copyright and links
+     [:div {:class "text-center md:text-right"}
+      [:p {:class (ds/classes [(ds/text-size :sm)
+                               (ds/text :text-secondary)])}
+       "© 2025 Mount Zion UCC"]
+      [:div {:class (ds/classes [(ds/mt :xs)
+                                 (ds/text-size :xs)])}
+       [:a {:href "/privacy"
+            :class (ds/classes [(ds/text :text-primary)
+                               "hover:underline"])}
+        "Privacy Policy"]]
+      [:p {:class (ds/classes [(ds/text-size :xs)
+                              (ds/text :text-muted)
+                              (ds/mt :xs)])}
+       "Powered by Mount Zion CMS"]]]]])
 
 (defn breadcrumbs
   "Renders breadcrumb navigation.

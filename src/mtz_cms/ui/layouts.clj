@@ -45,24 +45,7 @@
                     :class "flex flex-col"}
               (templates/render-feature feature-data)])]]]])
 
-     ;; Call to action section
-     [:section {:class "bg-blue-600"}
-      [:div {:class "mx-auto max-w-7xl py-12 px-6 lg:px-8 lg:py-24"}
-       [:div {:class "lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center"}
-        [:div
-         [:h2 {:class "text-3xl font-bold tracking-tight text-white sm:text-4xl"}
-          "Join Our Community"]
-         [:p {:class "mt-3 max-w-3xl text-lg text-blue-100"}
-          "Experience the warmth and fellowship of Mount Zion UCC. All are welcome in our progressive Christian community."]]
-        [:div {:class "mt-8 lg:mt-0"}
-         [:div {:class "inline-flex rounded-md shadow"}
-          [:a {:href "/worship"
-               :class "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50"}
-           "Plan Your Visit"]]
-         [:div {:class "ml-3 inline-flex"}
-          [:a {:href "/contact"
-               :class "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-400"}
-           "Contact Us"]]]]]]]))
+]))
 
 (defn simple-content-layout
   "Layout: Simple content with sidebar
