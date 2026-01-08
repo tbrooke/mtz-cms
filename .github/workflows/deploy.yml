@@ -1,0 +1,55 @@
+name: Deploy to Trust Server
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H trust >> ~/.ssh/known_hosts || echo "Could not scan trust, add IP manually"
+
+      - name: Deploy to server
+        env:
+          SERVER: tmb@trust
+          APP_DIR: /home/tmb/mtz-cms
+        run: |
+          # Create app directory
+          ssh $SERVER "mkdir -p $APP_DIR"
+
+          # Sync files
+          rsync -avz --exclude='.git' \
+                     --exclude='.github' \
+                     --exclude='.cpcache' \
+                     --exclude='target' \
+                     --exclude='.DS_Store' \
+                     ./ $SERVER:$APP_DIR/
+
+          # Update nginx config
+          scp nginx-mtzcg.com.conf $SERVER:/tmp/mtzcg.com.conf
+          ssh $SERVER "echo 'tmb' | sudo -S cp /tmp/mtzcg.com.conf /etc/nginx/sites-available/mtzcg.com"
+          ssh $SERVER "echo 'tmb' | sudo -S ln -sf /etc/nginx/sites-available/mtzcg.com /etc/nginx/sites-enabled/"
+          ssh $SERVER "echo 'tmb' | sudo -S nginx -t && echo 'tmb' | sudo -S systemctl reload nginx"
+
+          # Deploy with Docker Compose
+          ssh $SERVER "cd $APP_DIR && docker compose down || true"
+          ssh $SERVER "cd $APP_DIR && docker compose build"
+          ssh $SERVER "cd $APP_DIR && docker compose up -d"
+
+          # Verify deployment
+          ssh $SERVER "docker ps | grep mtz-cms"
