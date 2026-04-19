@@ -35,30 +35,37 @@
      title - Page title (string)
      content - Page content (Hiccup vector)
      ctx - Pathom context (map, optional but recommended)
+     site-context - :church or :preschool (optional, defaults to :church)
 
    Returns:
      Complete HTML page as Hiccup vector
 
    Example:
-     (base-page \"Home\" [:div \"Welcome!\"] {})
+     (base-page \"Home\" [:div \"Welcome!\"] {} :church)
+     (base-page \"Preschool Home\" [:div \"Preschool!\"] {} :preschool)
 
    Note: Navigation is built from Alfresco and cached for 1 hour.
          If ctx is nil, falls back to static navigation."
   ([title content]
-   (base-page title content nil))
+   (base-page title content nil :church))
 
   ([title content ctx]
+   (base-page title content ctx :church))
+
+  ([title content ctx site-context]
    (let [;; Build navigation from Alfresco (cached for performance)
+         ;; Use different cache key for church vs preschool
+         cache-key (keyword "site-navigation" (name site-context))
          nav (when ctx
                (try
                  (let [result (cache/cached
-                               :site-navigation
+                               cache-key
                                3600  ;; 1 hour cache
-                               #(menu/build-navigation ctx))]
-                   (log/debug "Navigation ready:" (count result) "items")
+                               #(menu/build-navigation ctx site-context))]
+                   (log/debug "Navigation ready for" site-context ":" (count result) "items")
                    result)
                  (catch Exception e
-                   (log/error e "Failed to build navigation")
+                   (log/error e "Failed to build navigation for" site-context)
                    nil)))]
 
      [:html {:class "h-full bg-white"}
@@ -83,7 +90,7 @@
       ;; BODY - Header, Main, Footer
       [:body {:class "h-full bg-white"}
        ;; Header with navigation
-       (nav/site-header nav)
+       (nav/site-header nav site-context)
 
        ;; Main content area
        [:main {:class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"}
@@ -97,14 +104,14 @@
 (comment
   ;; Test base page
   (base-page
-    "Test Page"
-    [:div "Hello World"]
-    {})
+   "Test Page"
+   [:div "Hello World"]
+   {})
 
   ;; Test without context (should use fallback navigation)
   (base-page
-    "Test Page"
-    [:div "Hello World"])
+   "Test Page"
+   [:div "Hello World"])
 
   ;; All pages should use this function - no direct HTML rendering elsewhere
   )

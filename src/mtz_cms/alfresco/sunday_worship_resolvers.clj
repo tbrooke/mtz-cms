@@ -170,10 +170,16 @@
                                          (:worship/presentation %))
                                     services)
 
-              ;; Sort by date (newest first)
-              sorted-services (sort-by :worship/date
-                                      (fn [a b] (compare b a))
-                                      valid-services)]
+              ;; Sort by date (newest first) - parse MM-DD-YY to YY-MM-DD for correct chronological order
+              sorted-services (sort-by (fn [svc]
+                                         (let [d (:worship/date svc)
+                                               parts (str/split d #"-")]
+                                           (if (= 3 (count parts))
+                                             (let [[mm dd yy] parts]
+                                               (str yy "-" mm "-" dd))
+                                             d)))
+                                       (fn [a b] (compare b a))
+                                       valid-services)]
 
           (log/info "✅ Retrieved" (count sorted-services) "worship services")
 

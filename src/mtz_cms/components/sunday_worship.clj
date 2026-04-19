@@ -39,7 +39,7 @@
          (:worship/date-formatted service)]
 
         ;; PDF info
-        [:div {:class "space-y-2 text-sm text-gray-600"}
+        [:div {:class "space-y-2 text-base text-gray-600"}
          (when bulletin
            [:div {:class "flex items-center"}
             [:span {:class "font-medium text-gray-700 w-24"} "Bulletin:"]
@@ -52,11 +52,46 @@
 
 ;; --- SUNDAY WORSHIP LIST PAGE ---
 
+(defn- pagination-link
+  "Render a single pagination link"
+  [page label current?]
+  (if current?
+    [:span {:class "inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md"}
+     label]
+    [:a {:href (str "/worship/sunday?page=" page)
+         :class "inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"}
+     label]))
+
+(defn- pagination-controls
+  "Render pagination controls"
+  [current-page total-pages]
+  (when (> total-pages 1)
+    [:div {:class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"}
+     [:nav {:class "flex items-center justify-center gap-2"
+            :aria-label "Pagination"}
+
+      ;; Previous
+      (when (> current-page 1)
+        [:a {:href (str "/worship/sunday?page=" (dec current-page))
+             :class "inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"}
+         "\u2190 Previous"])
+
+      ;; Page numbers
+      (for [p (range 1 (inc total-pages))]
+        [:span {:key p}
+         (pagination-link p (str p) (= p current-page))])
+
+      ;; Next
+      (when (< current-page total-pages)
+        [:a {:href (str "/worship/sunday?page=" (inc current-page))
+             :class "inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"}
+         "Next \u2192"])]]))
+
 (defn sunday-worship-list-page
   "Sunday Worship list page
 
    Shows list of worship services with bulletin thumbnails"
-  [services]
+  [services current-page total-pages]
   [:div {:class "bg-white min-h-screen"}
    ;; Page header
    [:div {:class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-b border-gray-200"}
@@ -77,8 +112,8 @@
        [:p {:class "text-gray-500"}
         "No worship services available yet."]])]
 
-   ;; Bottom border
-   [:div {:class "border-b border-gray-200"}]])
+   ;; Pagination
+   (pagination-controls current-page total-pages)])
 
 ;; --- SUNDAY WORSHIP DETAIL PAGE ---
 

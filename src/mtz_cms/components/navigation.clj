@@ -48,123 +48,146 @@
      :has-children? true
      :submenu [{:label \"Pickle Ball\" :path \"/activities/pickle-ball\" :node-id \"123\"}]}]
 
+   Optionally accepts site-context (:church or :preschool) to show context switcher.
+
    If nav-data is empty/nil, renders fallback static navigation.
 
    Uses design system for consistent styling."
-  [nav-data]
-  (let [;; Filter out Contact from navigation
-        filtered-nav (remove #(= (:key %) :contact) nav-data)
-        ;; Split navigation items in half
-        mid-point (quot (count filtered-nav) 2)
-        left-nav (take mid-point filtered-nav)
-        right-nav (drop mid-point filtered-nav)
+  ([nav-data]
+   (site-header nav-data :church))
 
-        ;; Helper to render nav item
-        render-nav-item (fn [item]
-                         (if (:has-children? item)
-                           ;; Dropdown menu for items with submenus
-                           [:div {:class "relative group"}
-                            [:button {:class (ds/classes [(ds/text :text-on-dark)
-                                                          "hover:text-gray-600"
-                                                          (ds/transition :colors)
-                                                          "flex items-center gap-1"
+  ([nav-data site-context]
+   (let [;; Filter out Contact from navigation
+         filtered-nav (remove #(= (:key %) :contact) nav-data)
+         ;; Split navigation items in half
+         mid-point (quot (count filtered-nav) 2)
+         left-nav (take mid-point filtered-nav)
+         right-nav (drop mid-point filtered-nav)
+
+         ;; Context switcher links
+         context-switch-link (case site-context
+                               :preschool {:path "/" :label "← Church Site"}
+                               :church {:path "/preschool" :label "Preschool →"}
+                               {:path "/" :label "Home"})
+
+         ;; Helper to render nav item
+         render-nav-item (fn [item]
+                           (if (:has-children? item)
+                             ;; Dropdown menu for items with submenus
+                             [:div {:class "relative group"}
+                              [:button {:class (ds/classes [(ds/text :text-on-dark)
+                                                            "hover:text-gray-600"
+                                                            (ds/transition :colors)
+                                                            "flex items-center gap-1"
+                                                            (ds/py :sm)
+                                                            (ds/text-size :lg)
+                                                            "font-menu"])}
+                               (:label item)
+                               ;; Dropdown arrow
+                               [:svg {:class   "w-4 h-4"
+                                      :fill    "none"
+                                      :stroke  "currentColor"
+                                      :viewBox "0 0 24 24"}
+                                [:path {:stroke-linecap  "round"
+                                        :stroke-linejoin "round"
+                                        :stroke-width    "2"
+                                        :d               "M19 9l-7 7-7-7"}]]]
+                              ;; Dropdown panel
+                              [:div {:class (ds/classes ["absolute left-0 mt-2 w-48"
+                                                         (ds/bg :bg-header)
+                                                         (ds/shadow :lg)
+                                                         "border border-black"
+                                                         "opacity-0 invisible"
+                                                         "group-hover:opacity-100 group-hover:visible"
+                                                         (ds/transition :all)
+                                                         (ds/duration :normal)
+                                                         "z-50"])}
+                               (for [sub (:submenu item)]
+                                 [:a {:href  (:path sub)
+                                      :class (ds/classes ["block"
+                                                          (ds/px :md)
                                                           (ds/py :sm)
-                                                          (ds/text-size :lg)
+                                                          (ds/text :text-on-dark)
+                                                          "hover:bg-gray-200"
+                                                          "first:rounded-t-md last:rounded-b-md"
                                                           "font-menu"])}
-                             (:label item)
-                             ;; Dropdown arrow
-                             [:svg {:class   "w-4 h-4"
-                                    :fill    "none"
-                                    :stroke  "currentColor"
-                                    :viewBox "0 0 24 24"}
-                              [:path {:stroke-linecap  "round"
-                                      :stroke-linejoin "round"
-                                      :stroke-width    "2"
-                                      :d               "M19 9l-7 7-7-7"}]]]
-                            ;; Dropdown panel
-                            [:div {:class (ds/classes ["absolute left-0 mt-2 w-48"
-                                                      (ds/bg :bg-header)
-                                                      (ds/shadow :lg)
-                                                      "border border-black"
-                                                      "opacity-0 invisible"
-                                                      "group-hover:opacity-100 group-hover:visible"
-                                                      (ds/transition :all)
-                                                      (ds/duration :normal)
-                                                      "z-50"])}
-                             (for [sub (:submenu item)]
-                               [:a {:href  (:path sub)
-                                    :class (ds/classes ["block"
-                                                       (ds/px :md)
-                                                       (ds/py :sm)
-                                                       (ds/text :text-on-dark)
-                                                       "hover:bg-gray-200"
-                                                       "first:rounded-t-md last:rounded-b-md"
-                                                       "font-menu"])}
-                                (:label sub)])]]
+                                  (:label sub)])]]
 
-                           ;; Regular link (no submenu)
-                           [:a {:href  (:path item)
-                                :class (ds/classes [(ds/text :text-on-dark)
-                                                   "hover:text-gray-600"
-                                                   (ds/transition :colors)
-                                                   (ds/text-size :lg)
-                                                   "font-menu"])}
-                            (:label item)]))]
+                             ;; Regular link (no submenu)
+                             [:a {:href  (:path item)
+                                  :class (ds/classes [(ds/text :text-on-dark)
+                                                      "hover:text-gray-600"
+                                                      (ds/transition :colors)
+                                                      (ds/text-size :lg)
+                                                      "font-menu"])}
+                              (:label item)]))]
 
-    [:header {:class (ds/classes [(ds/bg :bg-header)
-                                  (ds/text :text-on-dark)
-                                  "border-b border-black"])}
-     [:div {:class (ds/container :7xl)}
-      [:div {:class (ds/classes ["flex justify-center items-center"
-                                 (ds/py :lg)
-                                 "gap-16"])}
+     [:header {:class (ds/classes [(ds/bg :bg-header)
+                                   (ds/text :text-on-dark)
+                                   "border-b border-black"])}
+      [:div {:class (ds/container :7xl)}
+       [:div {:class (ds/classes ["flex justify-center items-center"
+                                  (ds/py :lg)
+                                  "gap-6"])}
 
        ;; Left Navigation
-       [:nav {:class "hidden md:flex space-x-6 items-center"}
-        (if (seq left-nav)
-          (for [item left-nav]
-            (render-nav-item item))
+        [:nav {:class "hidden md:flex space-x-4 items-center"}
+         (if (seq left-nav)
+           (for [item left-nav]
+             (render-nav-item item))
           ;; Fallback static left nav
-          (let [nav-link-class (ds/classes [(ds/text :text-on-dark)
-                                           "hover:text-gray-600"
-                                           (ds/transition :colors)
-                                           (ds/text-size :lg)
-                                           "font-menu"])]
-            (list
-             [:a {:href "/" :class nav-link-class} "Home"]
-             [:a {:href "/about" :class nav-link-class} "About"]
-             [:a {:href "/worship" :class nav-link-class} "Worship"]
-             [:a {:href "/events" :class nav-link-class} "Events"])))]
+           (let [nav-link-class (ds/classes [(ds/text :text-on-dark)
+                                             "hover:text-gray-600"
+                                             (ds/transition :colors)
+                                             (ds/text-size :lg)
+                                             "font-menu"])]
+             (list
+              [:a {:href "/" :class nav-link-class} "Home"]
+              [:a {:href "/about" :class nav-link-class} "About"]
+              [:a {:href "/worship" :class nav-link-class} "Worship"]
+              [:a {:href "/events" :class nav-link-class} "Events"])))]
 
        ;; Center Logo/Title
-       [:div {:class "flex-shrink-0 px-8"}
-        [:a {:href "/" :class "block text-center"}
-         [:h1 {:class (ds/classes [(ds/text-size :4xl)
-                                   (ds/font-weight :bold)
-                                   "font-garamond"])}
-          "MT ZION UCC"]]]
+        [:div {:class "flex-shrink-0 px-4"}
+         [:div {:class "text-center"}
+          [:a {:href (if (= site-context :preschool) "/preschool" "/")
+               :class "block"}
+           [:h1 {:class (ds/classes [(ds/text-size :4xl)
+                                     (ds/font-weight :bold)
+                                     "font-garamond"])}
+            (if (= site-context :preschool)
+              "MT ZION PRESCHOOL"
+              "MT ZION UCC")]]
+          ;; Context switcher link
+          [:div {:class "mt-1"}
+           [:a {:href (:path context-switch-link)
+                :class (ds/classes ["text-sm"
+                                    (ds/text :text-on-dark)
+                                    "hover:underline"
+                                    (ds/transition :colors)])}
+            (:label context-switch-link)]]]]
 
        ;; Right Navigation
-       [:nav {:class "hidden md:flex space-x-6 items-center"}
-        (if (seq right-nav)
-          (for [item right-nav]
-            (render-nav-item item))
+        [:nav {:class "hidden md:flex space-x-4 items-center"}
+         (if (seq right-nav)
+           (for [item right-nav]
+             (render-nav-item item))
           ;; Fallback static right nav
-          (let [nav-link-class (ds/classes [(ds/text :text-on-dark)
-                                           "hover:text-gray-600"
-                                           (ds/transition :colors)
-                                           (ds/text-size :lg)
-                                           "font-menu"])]
-            (list
-             [:a {:href "/activities" :class nav-link-class} "Activities"]
-             [:a {:href "/news" :class nav-link-class} "News"]
-             [:a {:href "/outreach" :class nav-link-class} "Outreach"]
-             [:a {:href "/preschool" :class nav-link-class} "Preschool"])))]
+           (let [nav-link-class (ds/classes [(ds/text :text-on-dark)
+                                             "hover:text-gray-600"
+                                             (ds/transition :colors)
+                                             (ds/text-size :lg)
+                                             "font-menu"])]
+             (list
+              [:a {:href "/activities" :class nav-link-class} "Activities"]
+              [:a {:href "/news" :class nav-link-class} "News"]
+              [:a {:href "/outreach" :class nav-link-class} "Outreach"]
+              [:a {:href "/preschool" :class nav-link-class} "Preschool"])))]
 
        ;; Mobile menu button (placeholder for future)
-       [:div {:class "md:hidden"}
-        [:button {:class "text-white" :aria-label "Open menu"}
-         "☰ Menu"]]]]]))
+        [:div {:class "md:hidden"}
+         [:button {:class "text-white" :aria-label "Open menu"}
+          "☰ Menu"]]]]])))
 
 (defn site-footer
   "Renders compact site footer with Join Our Community, church info, and links.
@@ -199,20 +222,20 @@
       [:div {:class "mt-4 flex flex-wrap gap-2 justify-center md:justify-start"}
        [:a {:href "/worship"
             :class (ds/classes ["inline-flex items-center justify-center"
-                               "px-4 py-2"
-                               "text-sm font-medium rounded-md"
-                               "bg-blue-600 text-white"
-                               "hover:bg-blue-700"
-                               (ds/transition :colors)])}
+                                "px-4 py-2"
+                                "text-sm font-medium rounded-md"
+                                "bg-blue-600 text-white"
+                                "hover:bg-blue-700"
+                                (ds/transition :colors)])}
         "Plan Your Visit"]
        [:a {:href "/contact"
             :class (ds/classes ["inline-flex items-center justify-center"
-                               "px-4 py-2"
-                               "text-sm font-medium rounded-md"
-                               "border border-blue-600"
-                               (ds/text :text-primary)
-                               "hover:bg-blue-50"
-                               (ds/transition :colors)])}
+                                "px-4 py-2"
+                                "text-sm font-medium rounded-md"
+                                "border border-blue-600"
+                                (ds/text :text-primary)
+                                "hover:bg-blue-50"
+                                (ds/transition :colors)])}
         "Contact Us"]]]
 
      ;; Center: Church contact info
@@ -229,14 +252,14 @@
             :target "_blank"
             :rel "noopener noreferrer"
             :class (ds/classes [(ds/text :text-primary)
-                               "hover:underline"
-                               "block"])}
+                                "hover:underline"
+                                "block"])}
         [:div "1415 S Main St"]
         [:div "China Grove, NC 28023"]]
        [:div {:class (ds/mt :xs)}
         [:a {:href "tel:+17048571169"
              :class (ds/classes [(ds/text :text-primary)
-                                "hover:underline"])}
+                                 "hover:underline"])}
          "(704) 857-1169"]]]]
 
      ;; Right: Copyright and links
@@ -248,11 +271,11 @@
                                  (ds/text-size :xs)])}
        [:a {:href "/privacy"
             :class (ds/classes [(ds/text :text-primary)
-                               "hover:underline"])}
+                                "hover:underline"])}
         "Privacy Policy"]]
       [:p {:class (ds/classes [(ds/text-size :xs)
-                              (ds/text :text-muted)
-                              (ds/mt :xs)])}
+                               (ds/text :text-muted)
+                               (ds/mt :xs)])}
        "Powered by Mount Zion CMS"]]]]])
 
 (defn breadcrumbs
@@ -277,19 +300,19 @@
           (if is-last?
             ;; Current page - not clickable
             [:span {:class (ds/classes [(ds/text :text-primary)
-                                       (ds/font-weight :medium)])}
+                                        (ds/font-weight :medium)])}
              (:label crumb)]
             ;; Link to parent page
             [:a {:href (:path crumb)
                  :class (ds/classes [(ds/text :primary)
-                                    (ds/hover-text :primary-dark)
-                                    "hover:underline"])}
+                                     (ds/hover-text :primary-dark)
+                                     "hover:underline"])}
              (:label crumb)])
 
           ;; Chevron separator (except after last item)
           (when-not is-last?
             [:svg {:class (ds/classes ["w-4 h-4 mx-2"
-                                      (ds/text :text-light)])
+                                       (ds/text :text-light)])
                    :fill "none"
                    :stroke "currentColor"
                    :viewBox "0 0 24 24"}

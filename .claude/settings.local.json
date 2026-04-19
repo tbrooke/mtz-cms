@@ -3,7 +3,8 @@
     "allow": [
       "Bash(bd update:*)",
       "Bash(/Users/tombrooke/go/bin/bd create:*)",
-      "mcp__chrome-devtools__list_console_messages"
+      "mcp__chrome-devtools__list_console_messages",
+      "Bash(ssh tmb@trust:*)"
     ],
     "deny": [],
     "ask": []

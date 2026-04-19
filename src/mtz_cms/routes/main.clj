@@ -64,6 +64,57 @@
   (let [ctx {}]
     (html-response (pages/privacy-page ctx))))
 
+;; --- PRESCHOOL HANDLERS ---
+
+(defn preschool-home-handler [request]
+  "Preschool home page handler"
+  (let [ctx {}]
+    (html-response
+     (base/base-page
+      "Mount Zion Preschool - Home"
+      [:div {:class "prose prose-lg max-w-none"}
+       [:h1 {:class "text-4xl font-bold mb-6"} "Welcome to Mount Zion Preschool"]
+       [:p {:class "text-xl mb-6"}
+        "A nurturing Christian preschool program providing quality early childhood education."]
+       [:div {:class "grid md:grid-cols-2 gap-6 mt-8"}
+        [:a {:href "/preschool/about"
+             :class "bg-blue-600 text-white px-6 py-4 rounded-lg hover:bg-blue-700 transition-colors text-center"}
+         "Learn About Our Program"]
+        [:a {:href "/preschool/admissions"
+             :class "bg-green-600 text-white px-6 py-4 rounded-lg hover:bg-green-700 transition-colors text-center"}
+         "Admissions Information"]]]
+      ctx
+      :preschool))))
+
+(defn preschool-page-handler [request]
+  "Generic handler for preschool pages - uses slug to load content"
+  (let [slug (get-in request [:path-params :slug])
+        ctx {}
+        ;; Map of slug to page title
+        page-titles {"about" "About Our Preschool"
+                     "programs" "Our Programs"
+                     "registration" "Registration"
+                     "classes" "Our Classes"
+                     "events" "Preschool Events"
+                     "calendar" "Preschool Calendar"
+                     "news" "News & Updates"
+                     "contact" "Contact Preschool"
+                     "resources" "Parent Resources"}
+        page-title (get page-titles slug "Preschool")]
+
+    (html-response
+     (base/base-page
+      (str "Mount Zion Preschool - " page-title)
+      [:div {:class "prose prose-lg max-w-none"}
+       [:h1 {:class "text-4xl font-bold mb-6"} page-title]
+       [:p {:class "text-gray-600 mb-6"}
+        (str "Content for " page-title " will be loaded from Alfresco.")]
+       [:div {:class "bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6"}
+        [:p {:class "text-sm text-yellow-700"}
+         "This page is currently under development. Content will be managed through the CMS."]]]
+      ctx
+      :preschool))))
+
 (defn demo-handler [request]
   (let [ctx {}
         ;; Test Pathom
@@ -98,11 +149,11 @@
       (do
         (log/info "📄 Serving STATIC page:" slug)
         (html-response (pages/dynamic-page
-                       {:page/title (:title static-content)
-                        :page/content (:content static-content)
-                        :page/node-id (:node-id static-content)
-                        :page/exists true
-                        :page/static true} ctx)))
+                        {:page/title (:title static-content)
+                         :page/content (:content static-content)
+                         :page/node-id (:node-id static-content)
+                         :page/exists true
+                         :page/static true} ctx)))
 
       ;; Fall back to dynamic (Alfresco)
       (let [result (pathom/query ctx [{[:page/slug slug] [:page/title :page/content :page/exists]}])
@@ -244,17 +295,27 @@
 ;; --- SUNDAY WORSHIP HANDLERS ---
 
 (defn sunday-worship-list-handler [request]
-  "Display list of Sunday Worship services"
+  "Display list of Sunday Worship services with pagination"
   (let [ctx {}
         result (pathom/query ctx [:worship/list])
-        services (:worship/list result)]
+        all-services (:worship/list result)
+        per-page 10
+        page (max 1 (try (Integer/parseInt (get-in request [:query-params "page"] "1"))
+                         (catch Exception _ 1)))
+        total (count all-services)
+        total-pages (max 1 (int (Math/ceil (/ total per-page))))
+        page (min page total-pages)
+        services (->> all-services
+                      (drop (* (dec page) per-page))
+                      (take per-page))]
 
-    (log/info "📅 Sunday Worship list requested, found" (count services) "services")
+    (log/info "📅 Sunday Worship list requested, page" page "of" total-pages
+              "(" total "total services)")
 
     (html-response
      (base/base-page
       "Sunday Worship - Mount Zion UCC"
-      (worship/sunday-worship-list-page services)
+      (worship/sunday-worship-list-page services page total-pages)
       ctx))))
 
 (defn sunday-worship-detail-handler [request]
@@ -317,11 +378,11 @@
 
               ;; Build hero detail data
               hero-data {:hero/id image-id
-                        :hero/title (or (:cm:title props) (:name node-data) "Untitled")
-                        :hero/description (:cm:description props)
-                        :hero/content (:cm:content props)  ; Optional additional content
-                        :hero/image {:url (str "/proxy/image/" image-id "/imgpreview")
-                                    :alt (or (:cm:title props) (:name node-data))}}]
+                         :hero/title (or (:cm:title props) (:name node-data) "Untitled")
+                         :hero/description (:cm:description props)
+                         :hero/content (:cm:content props)  ; Optional additional content
+                         :hero/image {:url (str "/proxy/image/" image-id "/imgpreview")
+                                      :alt (or (:cm:title props) (:name node-data))}}]
 
           (log/info "✅ Hero image found:" (:hero/title hero-data))
 
@@ -406,7 +467,7 @@
         username (:username config)
         password (:password config)
         alfresco-url (str base-url "/alfresco/api/-default-/public/alfresco/versions/1/nodes/"
-                         node-id "/content")
+                          node-id "/content")
 
         ;; Get Range header from client request
         range-header (get-in request [:headers "range"])]
@@ -417,13 +478,13 @@
       ;; Get node info for MIME type and size
       (let [node-info (alfresco/get-node ctx node-id)
             mime-type (if (:success node-info)
-                       (get-in node-info [:data :entry :content :mimeType])
-                       "video/mp4")
+                        (get-in node-info [:data :entry :content :mimeType])
+                        "video/mp4")
 
             ;; Build headers for Alfresco request (include Range if present)
             alfresco-headers (if range-header
-                              {"Range" range-header}
-                              {})
+                               {"Range" range-header}
+                               {})
 
             ;; Proxy the request to Alfresco with authentication and Range header
             stream-response (clj-http.client/get alfresco-url
@@ -497,6 +558,10 @@
 
     ["/pages" {:get pages-list-handler}]
 
+    ;; Preschool routes
+    ["/preschool" {:get preschool-home-handler}]
+    ["/preschool/:slug" {:get preschool-page-handler}]
+
     ;; Admin routes
     ["/admin/style-guide" {:get style-guide-handler}]
 
@@ -535,7 +600,7 @@
 
    ;; API routes for HTMX dynamic loading
    api/api-routes
-   
+
    ;; Validation dashboard routes
    dashboard/dashboard-routes))
 

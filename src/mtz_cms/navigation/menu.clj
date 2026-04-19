@@ -73,6 +73,87 @@
     :path "/contact"
     :icon "mail"}])
 
+;; --- PRESCHOOL MENU CONFIGURATION ---
+
+(def preschool-menu
+  "Preschool-specific menu items - displays when user is in /preschool/* pages.
+   Order matters - will display in this sequence.
+   Each has a :key that will map to Alfresco preschool content.
+
+   8 items to match church menu structure."
+  [{:key :preschool-home
+    :label "Home"
+    :path "/preschool"
+    :icon "home"}
+
+   {:key :preschool-about
+    :label "About"
+    :path "/preschool/about"
+    :icon "info"}
+
+   {:key :preschool-programs
+    :label "Programs"
+    :path "/preschool/programs"
+    :icon "book"
+    :has-submenu? true
+    :static-submenu [{:label "Registration"
+                      :path "/preschool/registration"
+                      :icon "clipboard"}
+                     {:label "Classes"
+                      :path "/preschool/classes"
+                      :icon "users"}]}
+
+   {:key :preschool-events
+    :label "Events"
+    :path "/preschool/events"
+    :icon "calendar-check"}
+
+   {:key :preschool-calendar
+    :label "Calendar"
+    :path "/preschool/calendar"
+    :icon "calendar"}
+
+   {:key :preschool-news
+    :label "News"
+    :path "/preschool/news"
+    :icon "newspaper"}
+
+   {:key :preschool-contact
+    :label "Contact"
+    :path "/preschool/contact"
+    :icon "mail"}
+
+   {:key :church-site
+    :label "Mt Zion"
+    :path "/"
+    :icon "church"}])
+
+;; --- CONTEXT DETECTION ---
+
+(defn detect-site-context
+  "Detect whether we're in church or preschool context based on request path.
+
+   Returns :church or :preschool
+
+   Examples:
+   - /about → :church
+   - /worship → :church
+   - /preschool → :preschool
+   - /preschool/about → :preschool"
+  [request-path]
+  (if (or (= request-path "/preschool")
+          (clojure.string/starts-with? request-path "/preschool/"))
+    :preschool
+    :church))
+
+(defn get-menu-for-context
+  "Get the appropriate menu definition based on site context"
+  [context]
+  (case context
+    :preschool preschool-menu
+    :church top-level-menu
+    top-level-menu))  ; Default to church menu
+
 ;; --- SUBMENU DISCOVERY ---
 
 (defn get-submenu-items
@@ -94,16 +175,16 @@
     (let [static-slugs (static/build-node-id-to-slug-map)
           ;; IMPORTANT: Must include aspectNames and properties to check web:menuItem
           children-result (alfresco/get-node-children ctx parent-node-id
-                                                         {:include "aspectNames,properties"})]
+                                                      {:include "aspectNames,properties"})]
       (if (:success children-result)
         (let [children (get-in children-result [:data :list :entries])
               ;; Filter to pages with menuItem=true and published
               menu-items (filter (fn [child]
-                                  (let [node (:entry child)]
-                                    (and (aspect/is-page? node)
-                                         (aspect/is-published? node)
-                                         (aspect/should-show-in-menu? node))))
-                                children)]
+                                   (let [node (:entry child)]
+                                     (and (aspect/is-page? node)
+                                          (aspect/is-published? node)
+                                          (aspect/should-show-in-menu? node))))
+                                 children)]
 
           ;; Transform to menu structure
           (map (fn [item]
@@ -112,9 +193,9 @@
                        label (aspect/get-menu-label node)
                        ;; Use slug if static page, otherwise convert name to slug
                        path-segment (get static-slugs node-id
-                                        (-> (:name node)
-                                            str/lower-case
-                                            (str/replace #"\s+" "-")))]
+                                         (-> (:name node)
+                                             str/lower-case
+                                             (str/replace #"\s+" "-")))]
                    {:label label
                     :path (str "/page/" path-segment)
                     :node-id node-id
@@ -165,6 +246,9 @@
 (defn build-navigation
   "Build complete hierarchical navigation structure.
 
+   Accepts optional site-context parameter (:church or :preschool).
+   Defaults to :church if not specified.
+
    Returns:
    [{:key :home
      :label \"Home\"
@@ -183,15 +267,19 @@
                 :path \"/page/67890...\"
                 :node-id \"67890...\"}]}
     ...]"
-  [ctx]
-  (log/info "Building navigation menu...")
+  ([ctx]
+   (build-navigation ctx :church))
 
-  (let [menu (mapv (partial build-top-level-item ctx) top-level-menu)
-        submenu-count (reduce + (map #(count (:submenu %)) menu))]
+  ([ctx site-context]
+   (log/info "Building navigation menu for context:" site-context)
 
-    (log/info "Navigation built:" (count menu) "top-level items,"
-              submenu-count "submenu items")
-    menu))
+   (let [menu-definition (get-menu-for-context site-context)
+         menu (mapv (partial build-top-level-item ctx) menu-definition)
+         submenu-count (reduce + (map #(count (:submenu %)) menu))]
+
+     (log/info "Navigation built:" (count menu) "top-level items,"
+               submenu-count "submenu items" "for context:" site-context)
+     menu)))
 
 ;; --- MENU HELPERS ---
 
@@ -234,14 +322,14 @@
 
       ;; Check if it's a submenu item
       (let [parent (some (fn [item]
-                          (when (:submenu item)
-                            (when (some #(= (:node-id %) current-node-id)
-                                       (:submenu item))
-                              item)))
-                        nav)
+                           (when (:submenu item)
+                             (when (some #(= (:node-id %) current-node-id)
+                                         (:submenu item))
+                               item)))
+                         nav)
             child (when parent
-                   (some #(when (= (:node-id %) current-node-id) %)
-                        (:submenu parent)))]
+                    (some #(when (= (:node-id %) current-node-id) %)
+                          (:submenu parent)))]
 
         (if (and parent child)
           ;; Found as submenu item
@@ -295,4 +383,4 @@
    :items-with-children (mapv (fn [item]
                                 {:key (:key item)
                                  :submenu-count (count (:submenu item []))})
-                             (filter :has-children? nav))})
+                              (filter :has-children? nav))})
