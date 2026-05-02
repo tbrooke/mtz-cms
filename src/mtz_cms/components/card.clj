@@ -29,7 +29,7 @@
 (defn- card-image
   "Card image section"
   [image item-data]
-  [:div {:class "h-48 bg-gray-200"}
+  [:div {:class "h-48 200"}
    [:img {:src (str "http://localhost:8080" (:url image))
           :alt (or (:name image) (:title item-data))
           :class "w-full h-full object-cover"}]])

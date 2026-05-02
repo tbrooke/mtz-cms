@@ -23,6 +23,7 @@ rsync -avz --exclude='.git' \
            --exclude='target' \
            --exclude='.DS_Store' \
            --exclude='.nrepl-port' \
+           --exclude='.clj-kondo' \
            ./ $SERVER:$APP_DIR/
 
 # Step 3: Update nginx configuration
