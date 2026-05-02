@@ -15,7 +15,7 @@
    :password "admin"})
 
 (defn get-config [ctx]
-  (merge default-config 
+  (merge default-config
          (select-keys ctx [:alfresco/base-url :alfresco/username :alfresco/password])))
 
 ;; --- HTTP CLIENT ---
@@ -30,7 +30,7 @@
     (log/debug "Alfresco API request:" method full-url)
 
     (try
-      (let [response (http/request 
+      (let [response (http/request
                       (merge {:method method
                               :url full-url
                               :basic-auth [username password]
@@ -72,7 +72,7 @@
             validation (schemas/validate :alfresco/node node-data)]
         (when-not (:valid? validation)
           (log/warn "Alfresco node validation failed for" node-id
-                   ":" (:errors validation)))))
+                    ":" (:errors validation)))))
     response))
 
 (defn get-node-children
@@ -191,13 +191,13 @@
         (let [rendition-name (first names)
               full-url (str api-base "/nodes/" node-id "/renditions/" rendition-name "/content")
               response (try
-                        (http/get full-url
-                                  {:basic-auth [username password]
-                                   :throw-exceptions false
-                                   :as :byte-array})
-                        (catch Exception e
-                          (log/debug "Rendition" rendition-name "failed, trying next...")
-                          nil))]
+                         (http/get full-url
+                                   {:basic-auth [username password]
+                                    :throw-exceptions false
+                                    :as :byte-array})
+                         (catch Exception e
+                           (log/debug "Rendition" rendition-name "failed, trying next...")
+                           nil))]
 
           (if (and response (< (:status response) 400))
             (do
@@ -242,20 +242,20 @@
   (let [{:keys [base-url username password]} (get-config ctx)
         search-url (str base-url "/alfresco/api/-default-/public/search/versions/1/search")
         body {:query {:query query-string
-                     :language "afts"}
+                      :language "afts"}
               :include ["properties" "aspectNames"]  ; Include properties in results
               :paging {:maxItems (get options :maxItems 100)
-                      :skipCount (get options :skipCount 0)}}]
+                       :skipCount (get options :skipCount 0)}}]
 
     (log/debug "Alfresco Search API request:" query-string)
 
     (try
       (let [response (http/post search-url
-                               {:basic-auth [username password]
-                                :content-type :json
-                                :accept :json
-                                :body (json/write-str body)
-                                :throw-exceptions false})]
+                                {:basic-auth [username password]
+                                 :content-type :json
+                                 :accept :json
+                                 :body (json/write-str body)
+                                 :throw-exceptions false})]
 
         (if (< (:status response) 400)
           {:success true
@@ -311,7 +311,7 @@
                         children (get-in children-result [:data :list :entries])]
                     {:node (extract-node-metadata {:entry node-data})
                      :children (map #(explore-node (get-in % [:entry :id]) (inc depth))
-                                   (take 10 children))})))))]
+                                    (take 10 children))})))))]
     (let [root-result (get-root-node ctx)]
       (when (:success root-result)
         (explore-node (get-in root-result [:data :entry :id]) 0)))))
@@ -332,13 +332,13 @@
     (if (:success result)
       (do
         (log/info "✅ Alfresco connection successful")
-        {:success true 
+        {:success true
          :message "Connected to Alfresco successfully!"
          :company-home (get-in result [:data :entry :name])
          :root-id (get-in result [:data :entry :id])})
       (do
         (log/error "❌ Alfresco connection failed:" (:error result))
-        {:success false 
+        {:success false
          :message (str "Connection failed: " (:error result))}))))
 
 (defn explore-structure
@@ -352,19 +352,155 @@
             children-result (get-node-children ctx root-id)]
         {:success true
          :root-node (get-in root-result [:data :entry])
-         :sites (when (:success sites-result) 
+         :sites (when (:success sites-result)
                   (get-in sites-result [:data :list :entries]))
          :root-children (when (:success children-result)
-                         (get-in children-result [:data :list :entries]))})
-      {:success false 
+                          (get-in children-result [:data :list :entries]))})
+      {:success false
        :error (:error root-result)})))
+
+;; --- WRITE OPERATIONS ---
+
+(defn authenticate
+  "Verify credentials against Alfresco. Returns {:valid? true :user-id ...} or {:valid? false}."
+  [base-url username password]
+  (let [url (str base-url "/alfresco/api/-default-/public/authentication/versions/1/tickets")]
+    (try
+      (let [resp (http/post url {:content-type :json
+                                 :accept :json
+                                 :body (json/write-str {:userId username :password password})
+                                 :throw-exceptions false})]
+        (if (= 201 (:status resp))
+          (let [data (json/read-str (:body resp) :key-fn keyword)]
+            {:valid? true :user-id (get-in data [:entry :userId])})
+          {:valid? false}))
+      (catch Exception e
+        (log/error "Auth error:" (.getMessage e))
+        {:valid? false}))))
+
+(defn create-node
+  "Create a new node as a child of parent-id.
+   node-map keys: :name (required), :nodeType (required), :properties (map), :aspectNames (vec)."
+  [ctx parent-id node-map]
+  (make-request ctx :post
+                (str "/nodes/" parent-id "/children")
+                {:body (json/write-str node-map)}))
+
+(defn update-node
+  "Update a node's properties and/or name.
+   updates-map keys: :properties, :name, :aspectNames (replaces existing aspects — include all)."
+  [ctx node-id updates-map]
+  (make-request ctx :put
+                (str "/nodes/" node-id)
+                {:body (json/write-str updates-map)}))
+
+(defn upload-text-content
+  "Upload text (HTML, markdown, plain text) as the content of an existing node."
+  [ctx node-id text-content mime-type]
+  (make-request ctx :put
+                (str "/nodes/" node-id "/content")
+                {:body text-content
+                 :content-type mime-type}))
+
+(defn delete-node
+  "Delete a node. Moves to trash by default. Pass permanent? true to bypass trash."
+  [ctx node-id & [permanent?]]
+  (let [{:keys [base-url username password]} (get-config ctx)
+        api-base (str base-url "/alfresco/api/-default-/public/alfresco/versions/1")
+        url (str api-base "/nodes/" node-id (when permanent? "?permanent=true"))]
+    (try
+      (let [resp (http/request {:method :delete
+                                :url url
+                                :basic-auth [username password]
+                                :throw-exceptions false})]
+        (if (< (:status resp) 400)
+          {:success true :status (:status resp)}
+          {:success false :status (:status resp) :error (:body resp)}))
+      (catch Exception e
+        {:success false :error (.getMessage e)}))))
+
+(defn get-node-tags
+  "Get all tags on a node."
+  [ctx node-id]
+  (make-request ctx :get (str "/nodes/" node-id "/tags")))
+
+(defn add-tag
+  "Add a tag to a node. Creates the tag if it doesn't exist."
+  [ctx node-id tag-name]
+  (make-request ctx :post
+                (str "/nodes/" node-id "/tags")
+                {:body (json/write-str {:tag tag-name})}))
+
+(defn remove-tag
+  "Remove a tag from a node by tag-id."
+  [ctx node-id tag-id]
+  (let [{:keys [base-url username password]} (get-config ctx)
+        api-base (str base-url "/alfresco/api/-default-/public/alfresco/versions/1")
+        url (str api-base "/nodes/" node-id "/tags/" tag-id)]
+    (try
+      (let [resp (http/request {:method :delete
+                                :url url
+                                :basic-auth [username password]
+                                :throw-exceptions false})]
+        (if (< (:status resp) 400)
+          {:success true}
+          {:success false :error (:body resp)}))
+      (catch Exception e
+        {:success false :error (.getMessage e)}))))
+
+(defn list-tags
+  "List all tags in the repository."
+  [ctx & [max-items]]
+  (make-request ctx :get (str "/tags?maxItems=" (or max-items 100))))
+
+(defn add-aspects
+  "Add one or more aspects to a node, preserving existing aspects."
+  [ctx node-id new-aspects]
+  (let [node-result (get-node ctx node-id)]
+    (if (:success node-result)
+      (let [current (get-in node-result [:data :entry :aspectNames] [])]
+        (update-node ctx node-id
+                     {:aspectNames (vec (into (set current) new-aspects))}))
+      node-result)))
+
+(defn upload-file
+  "Upload a binary file as a new child node of parent-id via multipart upload."
+  [ctx parent-id filename file-bytes mime-type & [extra-properties]]
+  (let [{:keys [base-url username password]} (get-config ctx)
+        api-base (str base-url "/alfresco/api/-default-/public/alfresco/versions/1")
+        url (str api-base "/nodes/" parent-id "/children")]
+    (try
+      (let [parts (cond-> [{:name "filedata"
+                            :content file-bytes
+                            :filename filename
+                            :mime-type mime-type}]
+                    extra-properties
+                    (conj {:name "properties"
+                           :content (json/write-str extra-properties)}))
+            resp (http/post url {:basic-auth [username password]
+                                 :multipart parts
+                                 :throw-exceptions false})]
+        (if (< (:status resp) 400)
+          {:success true :status (:status resp)
+           :data (when (not (str/blank? (:body resp)))
+                   (json/read-str (:body resp) :key-fn keyword))}
+          {:success false :status (:status resp) :error (:body resp)}))
+      (catch Exception e
+        {:success false :error (.getMessage e)}))))
 
 (comment
   ;; Test connection
   (test-connection {})
-  
+
   ;; Get root node
   (get-root-node {})
-  
+
   ;; Get node children
-  (get-node-children {} "some-node-id"))
+  (get-node-children {} "some-node-id")
+
+  ;; Create a test node
+  (create-node {} "some-parent-id" {:name "test.html" :nodeType "cm:content"
+                                    :properties {"cm:title" "Test"}})
+
+  ;; Authenticate
+  (authenticate "http://localhost:8080" "admin" "admin"))

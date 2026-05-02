@@ -4,6 +4,8 @@
    [ring.adapter.jetty :as jetty]
    [ring.middleware.params :as params]
    [ring.middleware.keyword-params :as keyword-params]
+   [ring.middleware.multipart-params :as multipart-params]
+   [ring.middleware.session :as session]
    [ring.middleware.resource :as resource]
    [reitit.ring :as reitit-ring]
    [mtz-cms.routes.main :as routes]
@@ -12,20 +14,22 @@
 
 (defn create-handler []
   (reitit-ring/ring-handler
-    (reitit-ring/router routes/all-routes)
-    (reitit-ring/create-default-handler)))
+   (reitit-ring/router routes/all-routes)
+   (reitit-ring/create-default-handler)))
 
 (defn create-app []
   (-> (create-handler)
       keyword-params/wrap-keyword-params
       params/wrap-params
+      multipart-params/wrap-multipart-params
+      session/wrap-session
       (resource/wrap-resource "public")))
 
 (defn start-server [& [port]]
   (let [port (or port 3000)]
     (log/info "Starting Mount Zion CMS on port" port)
-    (jetty/run-jetty (create-app) 
-                     {:port port 
+    (jetty/run-jetty (create-app)
+                     {:port port
                       :join? false})))
 
 (defn -main [& args]

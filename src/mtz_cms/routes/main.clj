@@ -11,6 +11,7 @@
    [mtz-cms.components.blog :as blog]
    [mtz-cms.components.sunday-worship :as worship]
    [mtz-cms.routes.api :as api]
+   [mtz-cms.routes.admin :as admin]
    [mtz-cms.validation.dashboard :as dashboard]
    [mtz-cms.admin.style-guide :as style-guide]
    [mtz-cms.cache.simple :as cache]
@@ -98,11 +99,11 @@
       (do
         (log/info "📄 Serving STATIC page:" slug)
         (html-response (pages/dynamic-page
-                       {:page/title (:title static-content)
-                        :page/content (:content static-content)
-                        :page/node-id (:node-id static-content)
-                        :page/exists true
-                        :page/static true} ctx)))
+                        {:page/title (:title static-content)
+                         :page/content (:content static-content)
+                         :page/node-id (:node-id static-content)
+                         :page/exists true
+                         :page/static true} ctx)))
 
       ;; Fall back to dynamic (Alfresco)
       (let [result (pathom/query ctx [{[:page/slug slug] [:page/title :page/content :page/exists]}])
@@ -317,11 +318,11 @@
 
               ;; Build hero detail data
               hero-data {:hero/id image-id
-                        :hero/title (or (:cm:title props) (:name node-data) "Untitled")
-                        :hero/description (:cm:description props)
-                        :hero/content (:cm:content props)  ; Optional additional content
-                        :hero/image {:url (str "/proxy/image/" image-id "/imgpreview")
-                                    :alt (or (:cm:title props) (:name node-data))}}]
+                         :hero/title (or (:cm:title props) (:name node-data) "Untitled")
+                         :hero/description (:cm:description props)
+                         :hero/content (:cm:content props)  ; Optional additional content
+                         :hero/image {:url (str "/proxy/image/" image-id "/imgpreview")
+                                      :alt (or (:cm:title props) (:name node-data))}}]
 
           (log/info "✅ Hero image found:" (:hero/title hero-data))
 
@@ -406,7 +407,7 @@
         username (:username config)
         password (:password config)
         alfresco-url (str base-url "/alfresco/api/-default-/public/alfresco/versions/1/nodes/"
-                         node-id "/content")
+                          node-id "/content")
 
         ;; Get Range header from client request
         range-header (get-in request [:headers "range"])]
@@ -417,13 +418,13 @@
       ;; Get node info for MIME type and size
       (let [node-info (alfresco/get-node ctx node-id)
             mime-type (if (:success node-info)
-                       (get-in node-info [:data :entry :content :mimeType])
-                       "video/mp4")
+                        (get-in node-info [:data :entry :content :mimeType])
+                        "video/mp4")
 
             ;; Build headers for Alfresco request (include Range if present)
             alfresco-headers (if range-header
-                              {"Range" range-header}
-                              {})
+                               {"Range" range-header}
+                               {})
 
             ;; Proxy the request to Alfresco with authentication and Range header
             stream-response (clj-http.client/get alfresco-url
@@ -535,7 +536,10 @@
 
    ;; API routes for HTMX dynamic loading
    api/api-routes
-   
+
+   ;; Admin interface routes
+   admin/admin-routes
+
    ;; Validation dashboard routes
    dashboard/dashboard-routes))
 

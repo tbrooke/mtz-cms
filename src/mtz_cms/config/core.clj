@@ -24,19 +24,27 @@
    :news "fd02c48b-3d27-4df7-82c4-8b3d27adf701"        ; News folder
    :outreach "b0774f12-4ea4-4851-b74f-124ea4f851a7"    ; Outreach folder
    :preschool "915ea06b-4d65-4d5c-9ea0-6b4d65bd5cba"   ; Preschool folder
-   
+
    ;; Special content areas
    :calendar "4f6972f5-9d50-4ff3-a972-f59d500ff3f4"    ; Calendar container
    :document-library "8f2105b4-daaf-4874-9e8a-2152569d109b"  ; Document Library
    :content "f9bffdb0-e21a-4853-bffd-b0e21a1853b6"     ; Content folder
    :website "21f2687f-7b6c-403a-b268-7f7b6c803a85"     ; Web Site folder
-   
+
    ;; Home page features
    :home-hero "39985c5c-201a-42f6-985c-5c201a62f6d8"   ; Hero section
    :home-feature1 "264ab06c-984e-4f64-8ab0-6c984eaf6440" ; Feature 1
    :home-feature2 "fe3c64bf-bb1b-456f-bc64-bfbb1b656f89" ; Feature 2
    :home-feature3 "6737d1b1-5465-4625-b7d1-b15465b62530" ; Feature 3
-   })
+
+   ;; Blog container (swsdp site)
+   :blog "f5e1e5ed-ba6f-471d-a1e5-edba6fe71db1"
+
+   ;; History site (separate Alfresco site: History)
+   :history-doc-library "f9c270d3-8fc2-4621-8270-d38fc2d62136"
+   :history-handbook "35ee58a9-2ecf-4d78-ae58-a92ecf7d78df"
+   :history-sections "90c95236-cd02-456c-8952-36cd02556cd9"
+   :history-pdf "36ce220a-fd00-466d-8e22-0afd00266d45"})
 
 ;; --- SITE CONFIGURATION ---
 
@@ -54,7 +62,7 @@
 
 ;; --- HELPER FUNCTIONS ---
 
-(defn get-node-id 
+(defn get-node-id
   "Get the node ID for a page key"
   [page-key]
   (get page-node-mapping page-key))
@@ -69,5 +77,5 @@
   [page-key]
   (merge {:key page-key
           :node-id (get-node-id page-key)}
-         (first (filter #(= (:key %) page-key) 
-                       (:navigation-items site-config)))))
+         (first (filter #(= (:key %) page-key)
+                        (:navigation-items site-config)))))
