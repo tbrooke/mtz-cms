@@ -30,5 +30,4 @@ Thumbs.db
 node_modules/
 package-lock.json
 
-# Compiled CSS
-resources/public/css/styles.css
+# Compiled CSS and JS tracked in git for deployment
